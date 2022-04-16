@@ -1,0 +1,31 @@
+version: "3"
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./data/crg:/data/crg:ro
+    ports:
+      - "5823:80"
+    environment:
+      CRG_REMOTE_HOST: PLACEHOLDER
+      CRG_REOMTE_APIKEY: PLACEHOLDER
+      SCRAPE_HOST: PLACEHOLDER
+  ui:
+    image: node:16.13.1
+    working_dir: /app
+    command: PORT=80 react-scripts start
+    volumes:
+      - ./crgw-ui:/app
+  app:
+    image: python:3.8-slim-bullseye
+    working_dir: /app
+    stop_signal: SIGINT # https://github.com/docker/compose/issues/4199#issuecomment-426109482
+    command: >
+      bash -c "python -m venv dockervenv &&
+             source dockervenv/bin/activate &&
+             pip install -r requirements.txt &&
+             python main.py"
+    volumes:
+      - ./crgw-app:/app
+      - ./data/crg:/data:ro
