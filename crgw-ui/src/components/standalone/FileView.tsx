@@ -8,7 +8,7 @@ import VideoView from "./VideoView";
 import GalleryView from "./GalleryView";
 
 import "./FileView.scss";
-import { useToast } from "../../providers/Toast";
+import { useToast } from "../../hooks/useToast";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);

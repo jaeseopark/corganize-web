@@ -7,9 +7,9 @@ import { useFileRepository } from "../../providers/FileRepository";
 import { useBlanket } from "../../providers/Blanket";
 import { ContextMenuOption } from "../../typedefs/ContextMenuOption";
 import { copyTextToClipboard } from "../../utils/clipboardUtils";
-import { useToast } from "../../providers/Toast";
 import ScrapePanel from "../standalone/scrape/ScrapePanel";
 import FileMetadataView from "../standalone/FileMetadataView";
+import { useToast } from "../../hooks/useToast";
 
 const getDivider = (label: string): ContextMenuOption => ({
   label,

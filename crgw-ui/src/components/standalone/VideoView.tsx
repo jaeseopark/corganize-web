@@ -3,10 +3,10 @@ import cls from "classnames";
 import screenfull from "screenfull";
 import "./VideoView.scss";
 import { toHumanDuration } from "../../utils/numberUtils";
-import { useToast } from "../../providers/Toast";
 import HighlightManager from "../../bizlog/HighlightManager";
 import { CorganizeFile, Multimedia } from "../../typedefs/CorganizeFile";
 import RotatingDiv from "../reusable/RotatingDiv";
+import { useToast } from "../../hooks/useToast";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   z: -15,
