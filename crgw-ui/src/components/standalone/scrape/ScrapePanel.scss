@@ -1,0 +1,79 @@
+.scrape-panel {
+  .control-bar {
+    margin-bottom: 10px;
+
+    input[type="text"] {
+      width: calc(100% - 275px);
+      margin: 4px 0;
+    }
+
+    .btn {
+      float: right;
+      margin-left: 5px;
+
+      &.addall {
+        width: 80px;
+      }
+
+      &.open {
+        background-image: url("../../../../assets/chrome.svg");
+        background-repeat: no-repeat;
+        background-size: 18px 18px;
+        background-position: 6px 9px;
+        padding-left: 28px;
+        width: 80px;
+      }
+    }
+
+    .form-row {
+      margin: 0;
+
+      &.metadata {
+        font-size: 0.9rem;
+        padding-top: 5px;
+        display: block;
+        width: 100%;
+        height: 20px;
+
+        .tag-container {
+          float: right;
+        }
+
+        .tag {
+          margin: 0 0 0 4px;
+          border-radius: 3px;
+          color: white;
+          background-color: gainsboro;
+
+          &.Available {
+            background-color: rgba(0, 123, 255, 0.3);
+          }
+
+          &.Complete {
+            background-color: rgba(50, 205, 50, 0.3);
+          }
+
+          &.Error {
+            background-color: rgba(255, 0, 0, 0.3);
+          }
+        }
+      }
+    }
+  }
+
+  .MuiCircularProgress-root {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: calc(50% - 20px);
+    left: calc(50% - 20px);
+    z-index: 1;
+  }
+
+  .scrape-grid {
+    width: 100%;
+    height: calc(100vh - 175px);
+    display: block;
+    overflow-y: scroll;
+  }
+}

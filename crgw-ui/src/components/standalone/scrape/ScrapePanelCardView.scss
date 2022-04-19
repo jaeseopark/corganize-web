@@ -1,0 +1,41 @@
+.scrape-card {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  margin-right: 5px;
+  margin-bottom: 5px;
+
+  &.error {
+    background-color: rgba(255, 0, 0, 0.3);
+  }
+
+  &.complete {
+    background-color: rgba(50, 205, 50, 0.3);
+  }
+
+  .scrape {
+    padding: 0;
+    width: 60px;
+    height: 30px;
+    position: absolute;
+    left: 10px;
+    top: 160px;
+  }
+
+  .img-wrapper {
+    img.thumbnail {
+      min-width: 80px;
+      width: unset;
+      height: 200px;
+
+      &.clickable {
+        cursor: pointer;
+      }
+
+      &.error,
+      &.complete {
+        opacity: 0.5;
+      }
+    }
+  }
+}

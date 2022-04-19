@@ -1,0 +1,43 @@
+.page-control {
+  .page-size {
+    float: left;
+    display: none;
+
+    select {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+
+  .page-nav {
+    float: right;
+
+    .buttons {
+      float: right;
+      margin-top: -4px;
+
+      Button {
+        margin-right: 5px;
+      }
+    }
+
+    .page-indicator {
+      float: right;
+      margin-left: 15px;
+      margin-right: 15px;
+    }
+
+    .page-jump-field {
+      width: 42px;
+      margin-top: 1px;
+      margin-left: 5px;
+      text-align: right;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
