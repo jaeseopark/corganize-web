@@ -2,9 +2,9 @@ import cls from "classnames";
 import {
   toHumanFileSize,
   toRelativeHumanTime,
-} from "../../../utils/numberUtils";
-import FileSummary from "../../reusable/FileSummary";
-import WithFileContextMenu from "../../reusable/WithFileContextMenu";
+} from "utils/numberUtils";
+import FileSummary from "components/reusable/FileSummary";
+import WithFileContextMenu from "components/reusable/WithFileContextMenu";
 import { ReactTableRenderProps } from "./props";
 
 const TableCellView = ({ value, column, row }: ReactTableRenderProps) => {

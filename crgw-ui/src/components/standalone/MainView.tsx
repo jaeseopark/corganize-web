@@ -1,6 +1,6 @@
 import cls from "classnames";
 
-import { useBlanket } from "../../providers/Blanket";
+import { useBlanket } from "providers/Blanket";
 import TableView from "./table/TableView";
 
 // TODO

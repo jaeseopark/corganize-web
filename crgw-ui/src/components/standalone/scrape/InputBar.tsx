@@ -1,9 +1,9 @@
 import cls from "classnames";
 
 import { Card, CARD_STATUS } from "./ScrapePanelCardView";
-import { sample } from "../../../utils/arrayUtils";
-import { useBlanket } from "../../../providers/Blanket";
-import Butt, { SplitButt } from "../../reusable/Button";
+import { sample } from "utils/arrayUtils";
+import { useBlanket } from "providers/Blanket";
+import Butt, { SplitButt } from "components/reusable/Button";
 
 const BULK_ADD_OPTIONS = [10, 50, 100, 200];
 

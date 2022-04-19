@@ -1,4 +1,4 @@
-import { CorganizeFile } from "../typedefs/CorganizeFile";
+import { CorganizeFile } from "typedefs/CorganizeFile";
 
 const STORE: { map: Map<string, string> | null } = {
   map: null,

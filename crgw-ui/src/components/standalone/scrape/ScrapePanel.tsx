@@ -6,11 +6,11 @@ import ScrapeInputBar from "./InputBar";
 import ScrapeGrid from "./Grid";
 
 import "./ScrapePanel.scss";
-import { useBlanket } from "../../../providers/Blanket";
-import { useFileRepository } from "../../../providers/FileRepository";
-import { getInstance } from "../../../clients/corganize";
-import { CorganizeFile } from "../../../typedefs/CorganizeFile";
-import { isDiscovered } from "../../../shared/globalstore";
+import { useBlanket } from "providers/Blanket";
+import { useFileRepository } from "providers/FileRepository";
+import { getInstance } from "clients/corganize";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import { isDiscovered } from "shared/globalstore";
 
 type ScrapePanelProps = {
   defaultUrls?: string[];

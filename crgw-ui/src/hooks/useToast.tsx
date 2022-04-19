@@ -16,8 +16,8 @@ import {
   AlertDescription,
 } from "@chakra-ui/react";
 
-import { getPosixSeconds } from "../utils/dateUtils";
-import { toRelativeHumanTime } from "../utils/numberUtils";
+import { getPosixSeconds } from "utils/dateUtils";
+import { toRelativeHumanTime } from "utils/numberUtils";
 
 const DEFAULT_DURATION = 4000;
 

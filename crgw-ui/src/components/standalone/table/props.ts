@@ -1,4 +1,4 @@
-import { CorganizeFile } from "../../../typedefs/CorganizeFile";
+import { CorganizeFile } from "typedefs/CorganizeFile";
 
 export type ReactTableRow = {
   original: CorganizeFile;

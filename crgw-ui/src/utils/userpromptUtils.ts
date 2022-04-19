@@ -1,4 +1,4 @@
-import { CorganizeFile } from "../typedefs/CorganizeFile";
+import { CorganizeFile } from "typedefs/CorganizeFile";
 
 export const FILE_MARKED_AS_NEW = "Marked as new again";
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Butt from "../../reusable/Button";
+import Butt from "components/reusable/Button";
 
 import "./PageControl.scss";
 import { ReactTableInstance } from "./props";
