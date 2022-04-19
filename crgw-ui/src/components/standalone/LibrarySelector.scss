@@ -1,0 +1,56 @@
+.path-dropdown,
+.add-first {
+  float: left;
+
+  select {
+    height: 25px;
+    font-size: small;
+  }
+}
+
+.browse-file-button {
+  float: left;
+
+  button {
+    font-size: small;
+    padding: 1px 5px 1px 5px;
+    margin: -3px 0 0 10px;
+    height: 25px;
+  }
+}
+
+.config-table {
+  font-size: small;
+  width: fit-content;
+  position: relative;
+  top: 10px;
+
+  td {
+    padding: 2px 5px 2px 0;
+  }
+
+  input[type="number"] {
+    width: 70px;
+    height: 25px;
+    font-size: small;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+
+  input[type="checkbox"] {
+    margin-top: 6px;
+  }
+
+  tr {
+    height: 30px;
+  }
+}
+
+.ok {
+  width: fit-content;
+  position: relative;
+  top: 30px;
+}

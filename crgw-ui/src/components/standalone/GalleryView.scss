@@ -1,0 +1,86 @@
+.zip-view {
+  background: white;
+  outline: none;
+  height: 100vh;
+
+  .lightbox-with-progress {
+    width: 100%;
+    height: 100%;
+  }
+
+  .MuiLinearProgress-determinate {
+    * {
+      transition: none;
+    }
+  }
+
+  .lightbox {
+    width: 100%;
+    height: 100%;
+    display: grid;
+
+    img {
+      display: block;
+      margin: auto;
+      max-width: 10%;
+      max-height: 10%;
+      transform: scale(10);
+    }
+  }
+
+  .bulk-mode {
+    position: absolute;
+    z-index: 1;
+    color: white;
+    background: black;
+    padding: 5px;
+
+    span {
+      float: left;
+      padding-top: 5px;
+    }
+
+    .btn {
+      margin-left: 5px;
+      padding: 5px;
+    }
+  }
+
+  .zip-grid {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    img {
+      height: 350px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      opacity: 0.6;
+      transform: scale(0.9);
+    }
+
+    .selected {
+      transform: none;
+    }
+
+    .highlighted {
+      opacity: 1;
+    }
+  }
+}
+
+.zipview,
+.windowed {
+  height: calc(100vh - 100px);
+
+  .zip-grid {
+    img {
+      height: 200px;
+    }
+  }
+}
+
+.error {
+  outline: none;
+}

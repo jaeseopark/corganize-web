@@ -1,0 +1,32 @@
+upstream ui {
+    server ui;
+}
+
+upstream app {
+    server app;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://ui;
+    }
+
+    location /api/ {
+        rewrite /api/(.*) /$1 break;
+        proxy_pass http://app;
+    }
+
+    location ~* \.(dec|zdec)$ {
+        root /data/crg;
+    }
+
+    location /remote/ {
+        rewrite /remote/(.*) ${CRG_REMOTE_HOST}/$1?apikey=${CRG_REOMTE_APIKEY} redirect;
+    }
+
+    location /scrape/ {
+        proxy_pass ${SCRAPE_HOST};
+    }
+}

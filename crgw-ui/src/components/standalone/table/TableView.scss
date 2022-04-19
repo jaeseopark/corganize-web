@@ -1,0 +1,203 @@
+.tableview {
+  .table {
+    outline: none;
+    width: 100%;
+
+    td,
+    th {
+      padding: 0.5rem 0;
+    }
+
+    thead {
+      th {
+        cursor: unset !important; // Underlying library uses !important
+        padding-left: 0;
+        padding-right: 0;
+
+        select {
+          width: 80px;
+          font-size: 0.7rem;
+        }
+
+        span[role="button"] {
+          cursor: pointer;
+        }
+
+        &.mimetype {
+          width: 100px;
+        }
+
+        &.lastupdated {
+          width: 85px;
+        }
+
+        &.size {
+          width: 80px;
+        }
+
+        &.dateactivated {
+          width: 42px;
+        }
+
+        &.isnewfile {
+          width: 50px;
+        }
+
+        &.actions {
+          width: 40px;
+        }
+
+        &.storageservice {
+          width: 80px;
+
+          select {
+            width: 55px;
+          }
+        }
+
+        &.highlights {
+          width: 80px;
+        }
+      }
+
+      span {
+        float: left;
+      }
+
+      .sorted {
+        width: 18px;
+        height: 18px;
+        background-size: 18px 18px;
+        background-repeat: no-repeat;
+        margin-top: 4px;
+
+        &.desc {
+          background-image: url("../../../../assets/iconfinder_angle-down_1608507.svg");
+        }
+
+        &.asc {
+          background-image: url("../../../../assets/iconfinder_angle-up_1608510.svg");
+        }
+      }
+
+      .primary-header {
+        width: 100%;
+        float: left;
+      }
+
+      .secondary-header {
+        width: 100%;
+        float: left;
+      }
+    }
+
+    tbody {
+      .icon {
+        width: 18px;
+        height: 18px;
+        background-size: 18px 18px;
+        margin-top: 4px;
+        margin-left: -2px;
+        margin-right: 5px;
+        background-repeat: no-repeat;
+      }
+
+      .mimetype {
+        &.application-zip {
+          background-image: url("../../../../assets/iconfinder_file-zip-alt_285690.svg");
+        }
+
+        &.video-mp4,
+        &.video-x-m4v,
+        &.video-x-matroska {
+          background-image: url("../../../../assets/iconfinder_movie-alt2_285634.svg");
+        }
+      }
+
+      .storageservice {
+        &.gdrive {
+          background-image: url("../../../../assets/gdrive-lightweight.svg");
+        }
+
+        &.local {
+          background-image: url("../../../../assets/disk.svg");
+        }
+      }
+
+      .dateactivated {
+        .icon {
+          background-size: 14px 14px;
+          background-image: url("../../../../assets/heart.svg");
+          margin-top: 8px;
+          margin-left: 2px;
+
+          &.false {
+            opacity: 0.15;
+          }
+        }
+      }
+
+      .isnewfile {
+        .icon {
+          background-image: url("../../../../assets/new.svg");
+          margin-top: 5px;
+          margin-left: 2px;
+
+          &.false {
+            opacity: 0.15;
+          }
+        }
+      }
+
+      .highlights {
+        .icon {
+          background-image: url("../../../../assets/star.svg");
+          margin-top: 5px;
+          margin-left: 2px;
+
+          &.false {
+            opacity: 0.15;
+          }
+        }
+      }
+
+      .lastupdated {
+        padding-left: 5px;
+      }
+
+      .dateactivated {
+        cursor: pointer;
+      }
+
+      .fileactions {
+        float: right;
+
+        .row-index {
+          color: var(--light);
+          font-size: 0.6rem;
+          position: fixed;
+          margin-left: 3px;
+        }
+
+        .btn,
+        .MuiLinearProgress-root {
+          padding: 1px 6px;
+          width: 55px;
+          height: 28px;
+          border-radius: 5px;
+        }
+      }
+
+      .is-most-recent {
+        .btn {
+          color: var(--primary);
+          background-color: var(--white);
+        }
+
+        .row-index {
+          color: var(--primary);
+        }
+      }
+    }
+  }
+}
