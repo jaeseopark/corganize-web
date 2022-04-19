@@ -5,7 +5,7 @@ import {
 } from "utils/numberUtils";
 import FileSummary from "components/reusable/FileSummary";
 import WithFileContextMenu from "components/reusable/WithFileContextMenu";
-import { ReactTableRenderProps } from "./props";
+import { ReactTableRenderProps } from "components/standalone/table/props";
 
 const TableCellView = ({ value, column, row }: ReactTableRenderProps) => {
   switch (column.id || column.accessor) {

@@ -4,8 +4,8 @@ import { useFileRepository } from "providers/FileRepository";
 import { getInnermostChild } from "utils/elementUtils";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import WithFileContextMenu from "components/reusable/WithFileContextMenu";
-import VideoView from "./VideoView";
-import GalleryView from "./GalleryView";
+import VideoView from "components/standalone/VideoView";
+import GalleryView from "components/standalone/GalleryView";
 
 import "./FileView.scss";
 import { useToast } from "hooks/useToast";

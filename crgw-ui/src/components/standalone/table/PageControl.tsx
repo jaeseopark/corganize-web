@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import Butt from "components/reusable/Button";
 
 import "./PageControl.scss";
-import { ReactTableInstance } from "./props";
-import { goToRandomPage } from "./tableUtils";
+import { ReactTableInstance } from "components/standalone/table/props";
+import { goToRandomPage } from "components/standalone/table/tableUtils";
 
 const PageControl = ({
   tableInstance,

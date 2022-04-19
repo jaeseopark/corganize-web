@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import cls from "classnames";
 import styled from "styled-components";
-import { ReactTableRow } from "./props";
+import { ReactTableRow } from "components/standalone/table/props";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { useFileRepository } from "providers/FileRepository";
-import FileActions from "./FileActions";
+import FileActions components/standalone/table./FileActions";
 
 export const ROW_HEIGHT = 45;
 

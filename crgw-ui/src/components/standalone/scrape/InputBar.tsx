@@ -1,6 +1,6 @@
 import cls from "classnames";
 
-import { Card, CARD_STATUS } from "./ScrapePanelCardView";
+import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
 import { sample } from "utils/arrayUtils";
 import { useBlanket } from "providers/Blanket";
 import Butt, { SplitButt } from "components/reusable/Button";

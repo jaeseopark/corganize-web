@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import ContextMenuWrapper from "./ContextMenuWrapper";
-import FileSummary from "./FileSummary";
+import ContextMenuWrapper from "components/reusable/ContextMenuWrapper";
+import FileSummary from "components/reusable/FileSummary";
 import { COPIED_TO_CLIPBOARD } from "utils/userpromptUtils";
 import { useFileRepository } from "providers/FileRepository";
 import { useBlanket } from "providers/Blanket";

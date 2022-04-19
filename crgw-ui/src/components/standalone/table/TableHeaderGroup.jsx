@@ -1,4 +1,4 @@
-import TableHeader from "./TableHeader";
+import TableHeader from "components/standalone/table/TableHeader";
 
 const TableHeaderGroup = ({ headerGroup }) => {
   const props = headerGroup.getHeaderGroupProps();

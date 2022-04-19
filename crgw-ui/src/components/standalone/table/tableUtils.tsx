@@ -1,5 +1,5 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { ReactTableInstance } from "./props";
+import { ReactTableInstance } from "components/standalone/table/props";
 import { randomIntFromInterval } from "utils/numberUtils";
 import { sampleOne } from "utils/arrayUtils";
 
