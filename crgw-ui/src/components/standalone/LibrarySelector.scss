@@ -1,56 +1,37 @@
-.path-dropdown,
-.add-first {
-  float: left;
-
-  select {
-    height: 25px;
-    font-size: small;
-  }
-}
-
-.browse-file-button {
-  float: left;
-
-  button {
-    font-size: small;
-    padding: 1px 5px 1px 5px;
-    margin: -3px 0 0 10px;
-    height: 25px;
-  }
+.session-configurer {
+  min-width: 31em;
+  min-height: 25em;
+  background-color: aliceblue;
+  padding: 3em;
+  border-radius: 0.5em;
 }
 
 .config-table {
-  font-size: small;
-  width: fit-content;
-  position: relative;
-  top: 10px;
+  margin-top: 2em;
 
   td {
-    padding: 2px 5px 2px 0;
+    padding: 0.2em 0.5em 0.2em 0;
   }
 
-  input[type="number"] {
-    width: 70px;
-    height: 25px;
-    font-size: small;
+  tr {
+    height: 2em;
+  }
+
+  input[type="number"],
+  select {
+    width: 5em;
+    min-height: 1em;
+    padding: 0.25em;
   }
 
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     opacity: 1;
   }
-
-  input[type="checkbox"] {
-    margin-top: 6px;
-  }
-
-  tr {
-    height: 30px;
-  }
 }
 
-.ok {
-  width: fit-content;
-  position: relative;
-  top: 30px;
+.ok-container {
+  margin-top: 1.5em;
+  padding: 1em;
+  background-color: rgb(201, 229, 254);
 }
