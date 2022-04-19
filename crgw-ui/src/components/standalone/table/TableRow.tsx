@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { ReactTableRow } from "components/standalone/table/props";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { useFileRepository } from "providers/FileRepository";
-import FileActions components/standalone/table./FileActions";
+import FileActions from "components/standalone/table/FileActions";
 
 export const ROW_HEIGHT = 45;
 
