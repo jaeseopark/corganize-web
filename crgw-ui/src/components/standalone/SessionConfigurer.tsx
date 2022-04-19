@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Center, Heading } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Spacer } from "@chakra-ui/react";
 
 import { addDays, dateToPosixSeconds } from "utils/dateUtils";
 import { SessionInfo } from "typedefs/Session";
@@ -43,9 +43,23 @@ const SessionConfigurer = ({
     />
   );
 
-  const renderDateRangerPicker = () => (
-    <ExpandableDateRange dateRange={dateRange} setDateRange={setDateRange} />
-  );
+  const maybeRenderDateRangerPicker = () => {
+    if (endpoint !== "active") {
+      return null;
+    }
+
+    return (
+      <tr className="date-picker">
+        <td>Date Range</td>
+        <td>
+          <ExpandableDateRange
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+          />
+        </td>
+      </tr>
+    );
+  };
 
   const renderEndpointPicker = () => (
     <select
@@ -73,10 +87,7 @@ const SessionConfigurer = ({
             <td>Endpoint</td>
             <td>{renderEndpointPicker()}</td>
           </tr>
-          <tr className="date-picker">
-            <td>Date Range</td>
-            <td>{renderDateRangerPicker()}</td>
-          </tr>
+          {maybeRenderDateRangerPicker()}
           <tr>
             <td>File Limit</td>
             <td>{renderFilecountLimiter()}</td>
@@ -91,13 +102,20 @@ const SessionConfigurer = ({
   );
 
   const render = () => (
-    <div className="library-selection">
-      <Heading>Configure Session</Heading>
+    <Flex className="session-configurer" direction="column">
+      <Box>
+        <Center>
+          <Heading>Configure Session</Heading>
+        </Center>
+      </Box>
       {renderConfigTable()}
-      <div className="ok">
-        <Butt onClick={onOK}>OK</Butt>
-      </div>
-    </div>
+      <Spacer />
+      <Box>
+        <Center className="ok-container">
+          <Butt onClick={onOK}>OK</Butt>
+        </Center>
+      </Box>
+    </Flex>
   );
 
   return <Center h="100vh">{render()}</Center>;

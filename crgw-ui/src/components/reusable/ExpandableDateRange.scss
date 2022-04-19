@@ -1,11 +1,9 @@
 .expandable-date-range {
   @import "react-date-range/dist/styles";
   @import "react-date-range/dist/theme/default";
-  font-size: small;
 
   .preview {
     .btn {
-      font-size: small;
       padding: 1px 5px 1px 5px;
       margin: -3px 0 0 10px;
       height: 25px;
