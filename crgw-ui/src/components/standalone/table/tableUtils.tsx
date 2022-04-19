@@ -1,7 +1,7 @@
-import { CorganizeFile } from "../../../typedefs/CorganizeFile";
-import { ReactTableInstance } from "./props";
-import { randomIntFromInterval } from "../../../utils/numberUtils";
-import { sampleOne } from "../../../utils/arrayUtils";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import { ReactTableInstance } from "components/standalone/table/props";
+import { randomIntFromInterval } from "utils/numberUtils";
+import { sampleOne } from "utils/arrayUtils";
 
 export const goToRandomPage = (tableInstance: ReactTableInstance) =>
   tableInstance.gotoPage(randomIntFromInterval(1, tableInstance.pageCount) - 1);

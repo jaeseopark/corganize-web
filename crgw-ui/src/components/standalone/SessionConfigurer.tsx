@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Center, Heading } from "@chakra-ui/react";
 
-import { addDays, dateToPosixSeconds } from "../../utils/dateUtils";
-import { SessionInfo } from "../../typedefs/Session";
-import Butt from "../reusable/Button";
-import ExpandableDateRange from "../reusable/ExpandableDateRange";
+import { addDays, dateToPosixSeconds } from "utils/dateUtils";
+import { SessionInfo } from "typedefs/Session";
+import Butt from "components/reusable/Button";
+import ExpandableDateRange from "components/reusable/ExpandableDateRange";
 
 import "./LibrarySelector.scss";
 

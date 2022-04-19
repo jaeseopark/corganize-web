@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
-import { retrieveFiles } from "../clients/adapter";
-import { CreateResponse, getInstance } from "../clients/corganize";
-import SessionConfigurer from "../components/standalone/SessionConfigurer";
-import { addAll } from "../shared/globalstore";
-import { CorganizeFile } from "../typedefs/CorganizeFile";
-import { SessionInfo } from "../typedefs/Session";
-import { getPosixSeconds } from "../utils/dateUtils";
-import { didChange } from "../utils/objectUtils";
+import { retrieveFiles } from "clients/adapter";
+import { CreateResponse, getInstance } from "clients/corganize";
+import SessionConfigurer from "components/standalone/SessionConfigurer";
+import { addAll } from "shared/globalstore";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import { SessionInfo } from "typedefs/Session";
+import { getPosixSeconds } from "utils/dateUtils";
+import { didChange } from "utils/objectUtils";
 
 type State = {
   files: CorganizeFile[];

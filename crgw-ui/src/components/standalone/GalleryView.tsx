@@ -10,16 +10,16 @@ import screenfull from "screenfull";
 import cls from "classnames";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
-import { getPosixMilliseconds } from "../../utils/dateUtils";
+import { getPosixMilliseconds } from "utils/dateUtils";
 
-import { createRange } from "../../utils/arrayUtils";
+import { createRange } from "utils/arrayUtils";
 
 import "./GalleryView.scss";
-import { CorganizeFile, Multimedia } from "../../typedefs/CorganizeFile";
-import HighlightManager from "../../bizlog/HighlightManager";
-import Butt from "../reusable/Button";
-import { useToast } from "../../providers/Toast";
-import { getObjectUrls } from "../../utils/zipUtils";
+import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
+import HighlightManager from "bizlog/HighlightManager";
+import Butt from "components/reusable/Button";
+import { getObjectUrls } from "utils/zipUtils";
+import { useToast } from "hooks/useToast";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,

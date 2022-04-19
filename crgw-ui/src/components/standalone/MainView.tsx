@@ -1,7 +1,7 @@
 import cls from "classnames";
 
-import { useBlanket } from "../../providers/Blanket";
-import TableView from "./table/TableView";
+import { useBlanket } from "providers/Blanket";
+import TableView from "components/standalone/table/TableView";
 
 // TODO
 const BurgerMenuSpacer = () => <div />;

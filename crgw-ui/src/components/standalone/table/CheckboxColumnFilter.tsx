@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Checkbox from "react-three-state-checkbox";
-import { ReactTableRow } from "./props";
+import { ReactTableRow } from "components/standalone/table/props";
 
 type CheckboxState = "true" | "false" | "maybe";
 

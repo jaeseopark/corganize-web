@@ -1,5 +1,5 @@
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import { ContextMenuOption } from "../../typedefs/ContextMenuOption";
+import { ContextMenuOption } from "typedefs/ContextMenuOption";
 
 import "./ContextMenuWrapper.scss";
 

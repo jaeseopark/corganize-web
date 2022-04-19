@@ -9,7 +9,7 @@
 
       &.vertical {
         display: block;
-        background-image: url("../../../assets/phone.svg");
+        background-image: url("/assets/phone.svg");
       }
     }
   }
@@ -38,11 +38,11 @@
 
       .storageservice {
         &.gdrive {
-          background-image: url("../../../assets/gdrive-lightweight.svg");
+          background-image: url("/assets/gdrive-lightweight.svg");
         }
 
         &.local {
-          background-image: url("../../../assets/disk.svg");
+          background-image: url("/assets/disk.svg");
         }
       }
 

@@ -1,15 +1,15 @@
 import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import ContextMenuWrapper from "./ContextMenuWrapper";
-import FileSummary from "./FileSummary";
-import { COPIED_TO_CLIPBOARD } from "../../utils/userpromptUtils";
-import { useFileRepository } from "../../providers/FileRepository";
-import { useBlanket } from "../../providers/Blanket";
-import { ContextMenuOption } from "../../typedefs/ContextMenuOption";
-import { copyTextToClipboard } from "../../utils/clipboardUtils";
-import { useToast } from "../../providers/Toast";
-import ScrapePanel from "../standalone/scrape/ScrapePanel";
-import FileMetadataView from "../standalone/FileMetadataView";
+import ContextMenuWrapper from "components/reusable/ContextMenuWrapper";
+import FileSummary from "components/reusable/FileSummary";
+import { COPIED_TO_CLIPBOARD } from "utils/userpromptUtils";
+import { useFileRepository } from "providers/FileRepository";
+import { useBlanket } from "providers/Blanket";
+import { ContextMenuOption } from "typedefs/ContextMenuOption";
+import { copyTextToClipboard } from "utils/clipboardUtils";
+import ScrapePanel from "components/standalone/scrape/ScrapePanel";
+import FileMetadataView from "components/standalone/FileMetadataView";
+import { useToast } from "hooks/useToast";
 
 const getDivider = (label: string): ContextMenuOption => ({
   label,

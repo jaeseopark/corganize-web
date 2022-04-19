@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useFileRepository } from "../../providers/FileRepository";
-import { useBlanket } from "../../providers/Blanket";
-import { useToast } from "../../providers/Toast";
+import { useFileRepository } from "providers/FileRepository";
+import { useBlanket } from "providers/Blanket";
 
-import Butt from "../reusable/Button";
+import Butt from "components/reusable/Button";
 
 import "./FileMetadataView.scss";
+import { useToast } from "hooks/useToast";
 
 const FileMetadataView = ({ file }) => {
   const [newFile, setNewFile] = useState(JSON.stringify(file, null, 2));

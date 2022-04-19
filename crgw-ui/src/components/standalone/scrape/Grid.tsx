@@ -1,4 +1,4 @@
-import CardView, { Card } from "./ScrapePanelCardView";
+import CardView, { Card } from "components/standalone/scrape/ScrapePanelCardView";
 import { CircularProgress } from "@material-ui/core";
 
 type ScrapeGridProps = {

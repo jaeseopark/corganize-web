@@ -1,5 +1,5 @@
-import { CorganizeFile } from "../typedefs/CorganizeFile";
-import { closeEnough } from "../utils/numberUtils";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import { closeEnough } from "utils/numberUtils";
 
 export const getVideoMetadata = (file: CorganizeFile) => {
   if (!file.multimedia?.duration) return null;

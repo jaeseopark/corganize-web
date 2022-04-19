@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useFileRepository } from "../../providers/FileRepository";
-import { getInnermostChild } from "../../utils/elementUtils";
-import { CorganizeFile } from "../../typedefs/CorganizeFile";
-import WithFileContextMenu from "../reusable/WithFileContextMenu";
-import VideoView from "./VideoView";
-import GalleryView from "./GalleryView";
+import { useFileRepository } from "providers/FileRepository";
+import { getInnermostChild } from "utils/elementUtils";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import WithFileContextMenu from "components/reusable/WithFileContextMenu";
+import VideoView from "components/standalone/VideoView";
+import GalleryView from "components/standalone/GalleryView";
 
 import "./FileView.scss";
-import { useToast } from "../../providers/Toast";
+import { useToast } from "hooks/useToast";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);

@@ -1,11 +1,11 @@
-import { CorganizeFile } from "../typedefs/CorganizeFile";
-import { SessionInfo } from "../typedefs/Session";
-import { getPosixSeconds } from "../utils/dateUtils";
-import { getInstance } from "./corganize";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import { SessionInfo } from "typedefs/Session";
+import { getPosixSeconds } from "utils/dateUtils";
+import { getInstance } from "clients/corganize";
 import {
   initWithLocalFilenames,
   getLocalFilename,
-} from "../shared/globalstore";
+} from "shared/globalstore";
 
 const NEW_FILE_THRESHOLD = getPosixSeconds() - 30 * 86400; // in the last 30 days
 

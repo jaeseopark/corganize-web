@@ -1,6 +1,6 @@
 import cls from "classnames";
-import { CorganizeFile } from "../../../typedefs/CorganizeFile";
-import Butt from "../../reusable/Button";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import Butt from "components/reusable/Button";
 
 import "./ScrapePanelCardView.scss";
 

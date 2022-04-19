@@ -1,5 +1,5 @@
-import { CorganizeFile } from "../../../typedefs/CorganizeFile";
-import Butt from "../../reusable/Button";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import Butt from "components/reusable/Button";
 
 type FileActionsProps = {
   file: CorganizeFile;

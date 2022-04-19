@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useFileRepository } from "../../../providers/FileRepository";
+import { useFileRepository } from "providers/FileRepository";
 import {
   useColumnOrder,
   useFilters,
@@ -9,27 +9,27 @@ import {
   useTable,
 } from "react-table";
 
-import TableCellView from "./TableCellView";
+import TableCellView from "components/standalone/table/TableCellView";
 import {
   ReactTableRenderProps,
   ReactTableColumn,
   ReactTableInstance,
-} from "./props";
+} from "components/standalone/table/props";
 import CheckboxColumnFilter, {
   checkboxColumnFilter,
   checkboxColumnFilterWithCustomSelector,
-} from "./CheckboxColumnFilter";
+} from "components/standalone/table/CheckboxColumnFilter";
 import SelectColumnFilter, {
   nullableSelectColumnFilter,
-} from "./SelectColumnFilter";
-import { CorganizeFile } from "../../../typedefs/CorganizeFile";
-import { useBlanket } from "../../../providers/Blanket";
-import FileSummary from "../../reusable/FileSummary";
-import FileView from "../FileView";
-import PageControl from "./PageControl";
-import TableRow, { ROW_HEIGHT } from "./TableRow";
-import TableHeaderGroup from "./TableHeaderGroup";
-import { getTableKeyHandler } from "./tableUtils";
+} from "components/standalone/table/SelectColumnFilter";
+import { CorganizeFile } from "typedefs/CorganizeFile";
+import { useBlanket } from "providers/Blanket";
+import FileSummary from "components/reusable/FileSummary";
+import FileView from "components/standalone/FileView";
+import PageControl from "components/standalone/table/PageControl";
+import TableRow, { ROW_HEIGHT } from "components/standalone/table/TableRow";
+import TableHeaderGroup from "components/standalone/table/TableHeaderGroup";
+import { getTableKeyHandler } from "components/standalone/table/tableUtils";
 import { useWindowSize } from "react-use";
 
 import "./TableView.scss";
