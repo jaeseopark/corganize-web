@@ -6,12 +6,19 @@ const initialState: State = {
   files: [],
   filteredFiles: [],
   filteredAndPaginatedFiles: [],
-  filters: [],
+  filters: [
+    {
+      name: "Global Search",
+      type: "global",
+      value: "",
+    },
+  ],
   mostRecentFileid: "",
   page: {
     index: 0,
     itemsPerPage: 10,
   },
+  sortOrders: [],
 };
 
 export const GridContext = React.createContext<{

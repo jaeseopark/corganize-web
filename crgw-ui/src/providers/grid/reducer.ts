@@ -23,6 +23,7 @@ export const gridReducer = (
     mostRecentFileid,
     filters,
     page,
+    sortOrders,
   }: State,
   action: Action
 ): State => {
@@ -36,16 +37,18 @@ export const gridReducer = (
         mostRecentFileid,
         filters,
         page,
+        sortOrders,
       };
     }
-    case "UPSERT_FILTER": {
-      const newFilters: Filter[] = filters.reduce((acc, next) => {
-        if (next.name === action.payload.name) {
-          return [...acc, action.payload];
+    case "UPSERT_FILTERS": {
+      const newFilters = [...action.payload, ...filters].reduce((acc, next) => {
+        const match = acc.find((f) => f.name === next.name);
+        if (!match) {
+          acc.push(next);
         }
-        return [...acc, next];
+        return acc;
       }, new Array<Filter>());
-      const newFilteredFiles = filterAll(files, newFilters);
+      const newFilteredFiles = filterAll(files, Object.values(newFilters));
       return {
         files,
         filteredFiles: newFilteredFiles,
@@ -53,6 +56,7 @@ export const gridReducer = (
         mostRecentFileid,
         filters: newFilters,
         page,
+        sortOrders,
       };
     }
     case "SET_PAGE":
@@ -63,6 +67,7 @@ export const gridReducer = (
         mostRecentFileid,
         filters,
         page: action.payload,
+        sortOrders,
       };
     case "SET_MOST_RECENT":
       return {
@@ -72,6 +77,7 @@ export const gridReducer = (
         mostRecentFileid: action.payload,
         filters,
         page,
+        sortOrders,
       };
     default:
       return {
@@ -81,6 +87,7 @@ export const gridReducer = (
         mostRecentFileid,
         filters,
         page,
+        sortOrders,
       };
   }
 };

@@ -1,23 +1,39 @@
 import { useEffect } from "react";
-import { Box, SimpleGrid } from "@chakra-ui/react";
+import { Box, SimpleGrid, useColorModeValue } from "@chakra-ui/react";
 import { useGrid } from "hooks/useGrid";
 import { useFileRepository } from "providers/fileRepository";
-import FilterBar from "./FilterBar";
-
-// TODO
-const GlobalSearch = () => <div />;
+import FilterBar from "./filter/FilterBar";
+import GlobalSearch from "./filter/GlobalSearch";
 
 const MIN_WIDTH = 200;
+
+const Card = ({ children }: { children: JSX.Element }) => (
+  <Box
+    maxW={"420px"}
+    w={"full"}
+    bg={useColorModeValue("white", "gray.900")}
+    boxShadow={"xl"}
+    rounded={"lg"}
+    p={6}
+    textAlign={"center"}
+  >
+    {children}
+  </Box>
+);
 
 const InnerGrid = () => {
   const { files } = useGrid();
 
   return (
-    <SimpleGrid className="inner-grid" minChildWidth={`${MIN_WIDTH}px`}>
+    <SimpleGrid
+      className="inner-grid"
+      minChildWidth={`${MIN_WIDTH}px`}
+      spacing={6}
+    >
       {files.map((f) => (
-        <Box key={f.fileid}>
-          <pre>{JSON.stringify(f, null, 2)}</pre>
-        </Box>
+        <Card key={f.fileid}>
+          <label>{f.filename}</label>
+        </Card>
       ))}
     </SimpleGrid>
   );
@@ -28,8 +44,11 @@ const GridView = () => {
   const { setFiles } = useGrid();
 
   useEffect(() => {
-    setFiles(files);
-  }, [files, setFiles]);
+    if (files && files.length > 0) {
+      setFiles(files);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files]);
 
   return (
     <div className="grid-view">

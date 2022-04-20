@@ -1,26 +1,27 @@
-import { useEffect } from "react";
 import cls from "classnames";
+import styled from "styled-components";
 
 import { useBlanket } from "hooks/useBlanket";
 import GridProvider from "providers/grid/grid";
 import GridView from "./grid/GridView";
 
-// TODO
 const SelfClosingBurgerMenu = () => <div />;
 
 const MainView = () => {
   const { isBlanketEnabled } = useBlanket();
 
-  useEffect(() => {}, []);
-
   return (
-    <div className={cls("main-view", { hidden: isBlanketEnabled })}>
+    <StyledMainView className={cls({ hidden: isBlanketEnabled })}>
       <SelfClosingBurgerMenu />
       <GridProvider>
         <GridView />
       </GridProvider>
-    </div>
+    </StyledMainView>
   );
 };
 
 export default MainView;
+
+const StyledMainView = styled.div`
+  margin: 1rem;
+`;

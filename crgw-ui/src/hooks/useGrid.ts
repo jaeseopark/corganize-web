@@ -9,16 +9,22 @@ export const useGrid = () => {
     dispatch,
   } = useContext(GridContext);
 
-  const upsertFilter = (filter: Filter) =>
-    dispatch!({ type: "UPSERT_FILTER", payload: filter });
+  const upsertFilters = (filters: Filter[]) =>
+    dispatch!({ type: "UPSERT_FILTERS", payload: filters });
+
+  const upsertFilter = (filter: Filter) => upsertFilters([filter]);
 
   const setFiles = (files: CorganizeFile[]) =>
     dispatch!({ type: "SET_FILES", payload: files });
 
+  const [globalSearchFilter] = filters.filter((f) => f.type === "global");
+
   return {
     files: filteredAndPaginatedFiles,
     filters,
+    globalSearchFilter,
     upsertFilter,
+    upsertFilters,
     setFiles,
   };
 };

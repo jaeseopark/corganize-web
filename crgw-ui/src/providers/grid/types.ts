@@ -6,12 +6,17 @@ export type Page = {
 };
 
 export type MaybeBoolean = "checked" | "unchecked" | "maybe";
+export type SortDirection = "asc" | "desc";
+export type SortOrder = {
+  filter: Filter;
+  direction: SortDirection;
+};
 
 export type Filter =
   | {
       name: string;
       type: "global";
-      value?: string;
+      value: string;
     }
   | {
       name: string;
@@ -34,10 +39,11 @@ export type State = {
   filters: Filter[];
   mostRecentFileid: string;
   page: Page;
+  sortOrders: SortOrder[];
 };
 
 export type Action =
   | { type: "SET_FILES"; payload: CorganizeFile[] }
-  | { type: "UPSERT_FILTER"; payload: Filter }
+  | { type: "UPSERT_FILTERS"; payload: Filter[] }
   | { type: "SET_PAGE"; payload: Page }
   | { type: "SET_MOST_RECENT"; payload: string };
