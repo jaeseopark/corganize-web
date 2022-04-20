@@ -24,6 +24,6 @@ export type CorganizeFile = {
 
   // UI-only fields
   isnewfile: boolean;
-  streamingUrl?: string;
+  streamingurl?: string;
   thumbnailurl?: string;
 };

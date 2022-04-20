@@ -7,10 +7,10 @@ type FileActionsProps = {
 };
 
 const FileActions = ({ file, openFile }: FileActionsProps) => {
-  const { streamingUrl } = file;
+  const { streamingurl } = file;
 
   const maybeRenderOpenButton = () => {
-    if (streamingUrl) {
+    if (streamingurl) {
       return <Butt onClick={() => openFile(file)}>Open</Butt>;
     }
     return <Butt disabled>DL</Butt>;

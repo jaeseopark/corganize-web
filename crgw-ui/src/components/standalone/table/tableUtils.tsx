@@ -14,7 +14,7 @@ export function getTableKeyHandler(
   const downloadAllRemoteFiles = () => {
     tableInstance.page
       .map((row) => row.original)
-      .filter((file: CorganizeFile) => !file.streamingUrl && file.storageservice)
+      .filter((file: CorganizeFile) => !file.streamingurl && file.storageservice)
       .forEach((file: CorganizeFile) => {
         downloadOrOpenFile(file);
       });
@@ -29,13 +29,13 @@ export function getTableKeyHandler(
     downloadOrOpenFile(
       tableInstance.page
         .map((row) => row.original)
-        .find((file) => file.streamingUrl && file.isnewfile) as CorganizeFile
+        .find((file) => file.streamingurl && file.isnewfile) as CorganizeFile
     );
 
   const openRandomLocalFile = () => {
     const files = tableInstance.page
       .map((row) => row.original)
-      .filter((f) => f.streamingUrl);
+      .filter((f) => f.streamingurl);
     downloadOrOpenFile(sampleOne(files));
   };
 

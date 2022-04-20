@@ -27,7 +27,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const { filename, multimedia } = file;
 
   const getContent = useCallback(() => {
-    const { mimetype, streamingUrl } = file;
+    const { mimetype, streamingurl } = file;
 
     if (!mimetype) {
       return <span tabIndex={1}>Mimetype is missing</span>;
@@ -52,7 +52,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
     return (
       <InnerComponent
-        path={streamingUrl}
+        path={streamingurl}
         updateFile={updateFileWrapper}
         multimedia={multimedia}
       />

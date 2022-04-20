@@ -28,7 +28,7 @@ export const retrieveFiles = (
 
     const localFilename = getLocalFilename(f.fileid);
     if (localFilename) {
-      decorated.streamingUrl = `/${localFilename}`;
+      decorated.streamingurl = `/${localFilename}`;
     }
 
     return decorated;
@@ -37,7 +37,7 @@ export const retrieveFiles = (
   const decorateAndFilter = (files: CorganizeFile[]) => {
     files = files.map(decorate);
     if (sessionInfo.showLocalOnly) {
-      return files.filter((f: CorganizeFile) => f.streamingUrl);
+      return files.filter((f: CorganizeFile) => f.streamingurl);
     }
     return files;
   };

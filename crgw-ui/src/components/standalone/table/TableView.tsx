@@ -95,12 +95,12 @@ const TableView = () => {
           filter: nullableSelectColumnFilter,
         },
         {
-          id: "streamingUrl",
-          accessor: "streamingUrl",
+          id: "streamingurl",
+          accessor: "streamingurl",
           Header: "local",
           Filter: CheckboxColumnFilter,
           filter: checkboxColumnFilterWithCustomSelector(
-            (row) => !!row.original.streamingUrl
+            (row) => !!row.original.streamingurl
           ),
         },
         { accessor: "filename" },
@@ -198,7 +198,7 @@ const TableView = () => {
 
   const openFile = useCallback(
     (file: CorganizeFile): void => {
-      if (file.streamingUrl) {
+      if (file.streamingurl) {
         const { fileid: fid } = file;
         const title = <FileSummary fileid={fid} withFav withSize withStorage />;
         const body = <FileView fileid={fid} />;
