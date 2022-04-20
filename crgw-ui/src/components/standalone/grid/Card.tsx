@@ -18,14 +18,10 @@ import FileMetadataTags from "components/reusable/FileMetadataTag";
 const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
   const { setBlanket } = useBlanket();
   const { streamingurl, mimetype, filename, fileid } = file;
+  const openable = !!streamingurl;
 
   const openFile = () => {
-    if (streamingurl) {
-      setBlanket(filename, <FileView fileid={fileid} />);
-    } else {
-      // for testing purposes
-      setBlanket(filename, <FileMetadataView file={file} />);
-    }
+    if (openable) setBlanket(filename, <FileView fileid={fileid} />);
   };
 
   const openJsonEditor = () =>
@@ -41,7 +37,7 @@ const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
       rounded="lg"
     >
       <VStack textAlign="center" p={6}>
-        <label className="clickable" onClick={openFile}>
+        <label className={cls({ clickable: openable })} onClick={openFile}>
           <label className="index">{index}</label>
           {filename}
         </label>

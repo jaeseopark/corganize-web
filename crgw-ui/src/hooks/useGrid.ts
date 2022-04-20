@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { GridContext } from "providers/grid/grid";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { Filter } from "providers/grid/types";
+import { Filter, GlobalSearchFilter } from "providers/grid/types";
 
 export const useGrid = () => {
   const {
@@ -22,7 +22,7 @@ export const useGrid = () => {
   return {
     files: filteredAndPaginatedFiles,
     filters,
-    globalSearchFilter,
+    globalSearchFilter: globalSearchFilter as GlobalSearchFilter,
     upsertFilter,
     upsertFilters,
     setFiles,

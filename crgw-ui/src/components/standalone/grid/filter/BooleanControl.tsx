@@ -1,12 +1,12 @@
 import { Checkbox } from "@chakra-ui/react";
 import { useGrid } from "hooks/useGrid";
-import { Filter, MaybeBoolean } from "providers/grid/types";
+import { BooleanFilter, MaybeBoolean } from "providers/grid/types";
 
 const ROTATION: MaybeBoolean[] = ["checked", "unchecked", "maybe"];
 const getNextValue = (value: MaybeBoolean) =>
   ROTATION[(ROTATION.indexOf(value) + 1) % 3];
 
-const BooleanControl = ({ filter }: { filter: Filter }) => {
+const BooleanControl = ({ filter }: { filter: BooleanFilter }) => {
   const { upsertFilter } = useGrid();
   return (
     <Checkbox

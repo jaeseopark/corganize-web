@@ -17,7 +17,14 @@ const FILTERS: Filter[] = [
     fieldName: "streamingurl",
     value: "checked",
   },
-  
+  {
+    displayName: "Size",
+    type: "number",
+    fieldName: "size",
+    value1: 0,
+    value2: 1,
+    isActive: false,
+  },
 ];
 
 const nonGlobal = (f: Filter) => f.type !== "global";
@@ -27,7 +34,7 @@ const renderControl = (f: Filter) => {
     case "boolean":
       return <BooleanControl filter={f} />;
     default:
-      return <label>coming soon</label>;
+      return null;
   }
 };
 

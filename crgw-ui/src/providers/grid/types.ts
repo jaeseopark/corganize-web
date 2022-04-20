@@ -11,29 +11,41 @@ export type SortOrder = {
   filter: Filter;
   direction: SortDirection;
 };
+export type GlobalSearchFilter = {
+  type: "global";
+  value: string;
+  displayName: string;
+};
+
+export type BooleanFilter = {
+  type: "boolean";
+  fieldName: keyof CorganizeFile;
+  value: MaybeBoolean;
+  displayName: string;
+};
+
+export type DropdownFilter = {
+  type: "dropdown";
+  isActive: boolean;
+  fieldName: keyof CorganizeFile;
+  value: string;
+  displayName: string;
+};
+
+export type NumberFilter = {
+  type: "number";
+  isActive: boolean;
+  fieldName: keyof CorganizeFile;
+  value1: number;
+  value2: number;
+  displayName: string;
+};
 
 export type Filter =
-  | {
-      type: "global";
-      value: string;
-      displayName: string;
-      displayOrder?: number;
-    }
-  | {
-      type: "boolean";
-      fieldName: keyof CorganizeFile;
-      value: MaybeBoolean;
-      displayName: string;
-      displayOrder?: number;
-    }
-  | {
-      type: "dropdown";
-      isActive: boolean;
-      fieldName: keyof CorganizeFile;
-      value: string;
-      displayName: string;
-      displayOrder?: number;
-    };
+  | GlobalSearchFilter
+  | BooleanFilter
+  | DropdownFilter
+  | NumberFilter;
 
 export type State = {
   files: CorganizeFile[];
