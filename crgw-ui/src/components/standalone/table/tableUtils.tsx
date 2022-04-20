@@ -29,7 +29,7 @@ export function getTableKeyHandler(
     downloadOrOpenFile(
       tableInstance.page
         .map((row) => row.original)
-        .find((file) => file.streamingUrl && file.isNewFile) as CorganizeFile
+        .find((file) => file.streamingUrl && file.isnewfile) as CorganizeFile
     );
 
   const openRandomLocalFile = () => {

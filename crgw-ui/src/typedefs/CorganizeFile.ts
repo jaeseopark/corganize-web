@@ -23,7 +23,7 @@ export type CorganizeFile = {
   multimedia?: Multimedia;
 
   // UI-only fields
-  isNewFile: boolean;
+  isnewfile: boolean;
   streamingUrl?: string;
   thumbnailurl?: string;
 };

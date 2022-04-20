@@ -34,6 +34,8 @@ import { useWindowSize } from "react-use";
 
 import "./TableView.scss";
 
+const SHOULD_SHOW_HIGHLIGHTS_COLUMN = false;
+
 const hiddenColumns = ["sourceurl", "fileid", "encryptedPath"];
 const columnOrder = ["dateactivated", "isnewfile"];
 
@@ -52,8 +54,10 @@ const TableView = () => {
       };
     });
 
-    const custom = [
-      {
+    const custom = [];
+
+    if (SHOULD_SHOW_HIGHLIGHTS_COLUMN) {
+      custom.push({
         accessor: "highlights",
         Header: "highlights",
         Cell: ({ row }: ReactTableRenderProps) => {
@@ -69,55 +73,60 @@ const TableView = () => {
           } = row;
           return !!multimedia?.highlights;
         }),
-      },
-      {
-        accessor: "lastupdated",
-        Header: "modded",
-      },
-      { accessor: "size" },
-      {
-        accessor: "storageservice",
-        Header: "storage",
-        Filter: SelectColumnFilter,
-        filter: nullableSelectColumnFilter,
-      },
-      {
-        accessor: "mimetype",
-        Filter: SelectColumnFilter,
-        filter: nullableSelectColumnFilter,
-      },
-      { accessor: "filename" },
-      {
-        id: "local",
-        accessor: "local",
-        Header: "local",
-        Filter: CheckboxColumnFilter,
-        filter: checkboxColumnFilterWithCustomSelector(
-          (row) => !!row.original.streamingUrl
-        ),
-      },
-      {
-        accessor: "dateactivated",
-        Header: "fav",
-        Cell: ({ value, row }: ReactTableRenderProps) => {
-          const onClick = () => {
-            const { original: file } = row;
-            toggleFavourite(file.fileid);
-          };
-          return (
-            <div onClick={onClick} className={`${String(!!value)} icon`} />
-          );
+      });
+    }
+
+    custom.push(
+      ...[
+        {
+          accessor: "lastupdated",
+          Header: "modded",
         },
-        Filter: CheckboxColumnFilter,
-        filter: checkboxColumnFilter,
-      },
-      {
-        accessor: "isnewfile",
-        Header: "new",
-        Filter: CheckboxColumnFilter,
-        filter: checkboxColumnFilter,
-      },
-    ];
+        { accessor: "size" },
+        {
+          accessor: "storageservice",
+          Header: "storage",
+          Filter: SelectColumnFilter,
+          filter: nullableSelectColumnFilter,
+        },
+        {
+          accessor: "mimetype",
+          Filter: SelectColumnFilter,
+          filter: nullableSelectColumnFilter,
+        },
+        {
+          id: "streamingUrl",
+          accessor: "streamingUrl",
+          Header: "local",
+          Filter: CheckboxColumnFilter,
+          filter: checkboxColumnFilterWithCustomSelector(
+            (row) => !!row.original.streamingUrl
+          ),
+        },
+        { accessor: "filename" },
+        {
+          accessor: "dateactivated",
+          Header: "fav",
+          Cell: ({ value, row }: ReactTableRenderProps) => {
+            const onClick = () => {
+              const { original: file } = row;
+              toggleFavourite(file.fileid);
+            };
+            return (
+              <div onClick={onClick} className={`${String(!!value)} icon`} />
+            );
+          },
+          Filter: CheckboxColumnFilter,
+          filter: checkboxColumnFilter,
+        },
+        {
+          accessor: "isnewfile",
+          Header: "new",
+          Filter: CheckboxColumnFilter,
+          filter: checkboxColumnFilter,
+        },
+      ]
+    );
 
     // @ts-ignore
     return [...hidden, ...custom].map((column: ReactTableColumn) => {

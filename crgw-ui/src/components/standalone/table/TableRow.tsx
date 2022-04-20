@@ -4,30 +4,12 @@ import styled from "styled-components";
 import { ReactTableRow } from "components/standalone/table/props";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { useFileRepository } from "providers/FileRepository";
-import FileActions from "components/standalone/table/FileActions";
 
 export const ROW_HEIGHT = 45;
 
-const TrComponent = styled.tr`
+const TrComponent = styled.div`
   height: ${ROW_HEIGHT}px;
 `;
-
-const getRenderComponent = (
-  row: ReactTableRow,
-  cell: any,
-  index: number,
-  openFile: (file: CorganizeFile) => void
-) => {
-  if (cell.column.id === "local")
-    return (
-      <FileActions
-        file={row.original}
-        openFile={() => openFile(row.original)}
-      />
-    );
-
-  return cell.render("Cell");
-};
 
 type TableRowProps = {
   index: number;
@@ -54,7 +36,7 @@ const TableRow = ({ index, row, prepareRow, openFile }: TableRowProps) => {
           const columnId = cell?.column?.id;
           return (
             <td key={columnId} {...cell.getCellProps()} className={columnId}>
-              {getRenderComponent(row, cell, index, openFile)}
+              {cell.render("Cell")}
             </td>
           );
         })

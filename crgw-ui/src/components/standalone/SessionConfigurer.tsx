@@ -3,7 +3,6 @@ import { Box, Center, Flex, Heading, Spacer } from "@chakra-ui/react";
 
 import { addDays, dateToPosixSeconds } from "utils/dateUtils";
 import { SessionInfo } from "typedefs/Session";
-import Butt from "components/reusable/Button";
 import ExpandableDateRange from "components/reusable/ExpandableDateRange";
 
 import "./LibrarySelector.scss";
@@ -111,8 +110,8 @@ const SessionConfigurer = ({
       {renderConfigTable()}
       <Spacer />
       <Box>
-        <Center className="ok-container">
-          <Butt onClick={onOK}>OK</Butt>
+        <Center className="ok-container" onClick={onOK}>
+          <label>OK</label>
         </Center>
       </Box>
     </Flex>

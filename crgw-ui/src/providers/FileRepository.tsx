@@ -131,7 +131,7 @@ const FileRepositoryProvider = ({ children }: { children: JSX.Element }) => {
       payload: {
         ...file,
         lastopened: getPosixSeconds(),
-        isNewFile: false,
+        isnewfile: false,
       },
     });
     dispatch({ type: "SET_MOST_RECENT", payload: fid });
