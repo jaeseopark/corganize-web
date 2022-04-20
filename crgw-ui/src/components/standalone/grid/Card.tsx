@@ -1,3 +1,4 @@
+import cls from "classnames";
 import { InfoIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -7,10 +8,12 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useBlanket } from "hooks/useBlanket";
-import styled from "styled-components";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import FileMetadataView from "../FileMetadataView";
 import FileView from "../FileView";
+
+import "./Card.scss";
+import FileMetadataTags from "components/reusable/FileMetadataTag";
 
 const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
   const { setBlanket } = useBlanket();
@@ -19,6 +22,9 @@ const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
   const openFile = () => {
     if (streamingurl) {
       setBlanket(filename, <FileView fileid={fileid} />);
+    } else {
+      // for testing purposes
+      setBlanket(filename, <FileMetadataView file={file} />);
     }
   };
 
@@ -26,28 +32,27 @@ const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
     setBlanket(filename, <FileMetadataView file={file} />);
 
   return (
-    <VStack
-      maxW={"420px"}
-      w={"full"}
+    <Box
+      className={cls("card", mimetype)}
+      maxWidth="420px"
+      w="full"
       bg={useColorModeValue("white", "gray.900")}
-      boxShadow={"xl"}
-      rounded={"lg"}
-      p={6}
-      textAlign={"center"}
+      boxShadow="xl"
+      rounded="lg"
     >
-      <Index>{index}</Index>
-      <label onClick={openFile}>{filename}</label>
-      <Divider />
-      <div className="tags">{mimetype}</div>
-      <HStack>
-        <InfoIcon onClick={openJsonEditor} />
-      </HStack>
-    </VStack>
+      <VStack textAlign="center" p={6}>
+        <label className="clickable" onClick={openFile}>
+          <label className="index">{index}</label>
+          {filename}
+        </label>
+        <Divider />
+        <FileMetadataTags f={file} />
+        <HStack>
+          <InfoIcon className="clickable" onClick={openJsonEditor} />
+        </HStack>
+      </VStack>
+    </Box>
   );
 };
 
 export default Card;
-
-const Index = styled.label`
-  background-color: pink;
-`;

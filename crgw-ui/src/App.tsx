@@ -4,7 +4,7 @@ import MainView from "components/standalone/MainView";
 import FileRepositoryProvider from "providers/fileRepository";
 import BlanketProvider from "providers/blanket";
 
-import "./App.css";
+import "./App.scss";
 
 const App = () => (
   <BlanketProvider>

@@ -2,7 +2,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Filter, MaybeBoolean } from "./types";
 
 const filterGlobalText = (value: string) => {
-  const lowered = value.toLowerCase();
+  const lowered = value.toLowerCase().trim();
   return (f: CorganizeFile) => {
     return (
       f.filename.toLowerCase().includes(lowered) ||

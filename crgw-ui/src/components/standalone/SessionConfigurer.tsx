@@ -110,7 +110,7 @@ const SessionConfigurer = ({
       {renderConfigTable()}
       <Spacer />
       <Box>
-        <Center className="ok-container" onClick={onOK}>
+        <Center className="ok-container clickable" onClick={onOK}>
           <label>OK</label>
         </Center>
       </Box>
