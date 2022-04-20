@@ -1,25 +1,12 @@
 import { useEffect } from "react";
-import { Box, SimpleGrid, useColorModeValue } from "@chakra-ui/react";
+import { SimpleGrid } from "@chakra-ui/react";
 import { useGrid } from "hooks/useGrid";
 import { useFileRepository } from "providers/fileRepository";
 import FilterBar from "./filter/FilterBar";
 import GlobalSearch from "./filter/GlobalSearch";
+import Card from "./Card";
 
 const MIN_WIDTH = 200;
-
-const Card = ({ children }: { children: JSX.Element }) => (
-  <Box
-    maxW={"420px"}
-    w={"full"}
-    bg={useColorModeValue("white", "gray.900")}
-    boxShadow={"xl"}
-    rounded={"lg"}
-    p={6}
-    textAlign={"center"}
-  >
-    {children}
-  </Box>
-);
 
 const InnerGrid = () => {
   const { files } = useGrid();
@@ -30,10 +17,8 @@ const InnerGrid = () => {
       minChildWidth={`${MIN_WIDTH}px`}
       spacing={6}
     >
-      {files.map((f) => (
-        <Card key={f.fileid}>
-          <label>{f.filename}</label>
-        </Card>
+      {files.map((f, i) => (
+        <Card key={f.fileid} file={f} index={i} />
       ))}
     </SimpleGrid>
   );
