@@ -6,11 +6,18 @@ import BooleanControl from "./BooleanControl";
 
 const FILTERS: Filter[] = [
   {
-    name: "New",
+    displayName: "New",
     type: "boolean",
     fieldName: "isnewfile",
     value: "checked",
   },
+  {
+    displayName: "Local",
+    type: "boolean",
+    fieldName: "streamingurl",
+    value: "checked",
+  },
+  
 ];
 
 const nonGlobal = (f: Filter) => f.type !== "global";
@@ -34,8 +41,8 @@ const FilterBar = () => {
   return (
     <div className="filter-bar">
       {filters.filter(nonGlobal).map((f) => (
-        <Tag key={f.name} size="lg">
-          {f.name}
+        <Tag key={f.displayName} size="lg">
+          {f.displayName}
           {renderControl(f)}
         </Tag>
       ))}

@@ -11,7 +11,7 @@ const filterGlobalText = (value: string) => {
   };
 };
 
-export const merge = (filters: Filter[]) =>
+export const createMegaFilter = (filters: Filter[]) =>
   filters.reduce(
     (acc, next) => {
       if (next.type === "global" && next.value) {

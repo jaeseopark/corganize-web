@@ -8,7 +8,7 @@ const initialState: State = {
   filteredAndPaginatedFiles: [],
   filters: [
     {
-      name: "Global Search",
+      displayName: "Global Search",
       type: "global",
       value: "",
     },

@@ -14,22 +14,25 @@ export type SortOrder = {
 
 export type Filter =
   | {
-      name: string;
       type: "global";
       value: string;
+      displayName: string;
+      displayOrder?: number;
     }
   | {
-      name: string;
       type: "boolean";
       fieldName: keyof CorganizeFile;
       value: MaybeBoolean;
+      displayName: string;
+      displayOrder?: number;
     }
   | {
-      name: string;
       type: "dropdown";
       isActive: boolean;
       fieldName: keyof CorganizeFile;
       value: string;
+      displayName: string;
+      displayOrder?: number;
     };
 
 export type State = {

@@ -4,8 +4,9 @@ import { useBlanket } from "hooks/useBlanket";
 
 import Butt from "components/reusable/Button";
 
-import "./FileMetadataView.scss";
 import { useToast } from "hooks/useToast";
+
+import "./FileMetadataView.scss";
 
 const FileMetadataView = ({ file }) => {
   const [newFile, setNewFile] = useState(JSON.stringify(file, null, 2));

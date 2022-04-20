@@ -1,12 +1,12 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { merge } from "./filter";
+import { createMegaFilter } from "./filter";
 import { Action, Filter, Page, State } from "./types";
 
 const filterAll = (
   files: CorganizeFile[],
   filters: Filter[]
 ): CorganizeFile[] => {
-  const mergedFilter = merge(filters);
+  const mergedFilter = createMegaFilter(filters);
   return files.filter(mergedFilter);
 };
 
@@ -14,6 +14,21 @@ const paginate = (files: CorganizeFile[], page: Page) => {
   const offset = page.index * page.itemsPerPage;
   return files.slice(offset, offset + page.itemsPerPage);
 };
+
+const merge = (old: Filter[], neww: Filter[]): Filter[] =>
+  neww.reduce(
+    (acc, next) => {
+      const i = acc.findIndex((f) => f.displayName === next.displayName);
+      if (i === -1) {
+        acc.push(next);
+        return acc;
+      }
+
+      acc.splice(i, 1, next);
+      return acc;
+    },
+    [...old]
+  );
 
 export const gridReducer = (
   {
@@ -41,13 +56,7 @@ export const gridReducer = (
       };
     }
     case "UPSERT_FILTERS": {
-      const newFilters = [...action.payload, ...filters].reduce((acc, next) => {
-        const match = acc.find((f) => f.name === next.name);
-        if (!match) {
-          acc.push(next);
-        }
-        return acc;
-      }, new Array<Filter>());
+      const newFilters = merge(filters, action.payload);
       const newFilteredFiles = filterAll(files, Object.values(newFilters));
       return {
         files,
