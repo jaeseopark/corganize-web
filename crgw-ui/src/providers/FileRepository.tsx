@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import { retrieveFiles } from "clients/adapter";
 import { CreateResponse, getInstance } from "clients/corganize";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
@@ -178,8 +184,25 @@ export const useFileRepository = () => {
     ...rest
   } = useContext(FileRepository);
 
+  const globallyFilteredFiles = useMemo(() => {
+    if (!searchKeyword) {
+      return files;
+    }
+
+    const searchKeywordLowered = searchKeyword.toLowerCase();
+    const isMatch = (f: CorganizeFile) => {
+      return (
+        f.filename.toLowerCase().includes(searchKeywordLowered) ||
+        f.fileid.toLocaleLowerCase().includes(searchKeywordLowered)
+      );
+    };
+
+    return files.filter(isMatch);
+  }, [searchKeyword, files]);
+
   return {
     files,
+    globallyFilteredFiles,
     mostRecentFileid,
     searchKeyword,
     ...rest,

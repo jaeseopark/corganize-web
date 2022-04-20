@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useFileRepository } from "providers/FileRepository";
-import { useBlanket } from "providers/Blanket";
+import { useFileRepository } from "providers/fileRepository";
+import { useBlanket } from "hooks/useBlanket";
 
 import Butt from "components/reusable/Button";
 

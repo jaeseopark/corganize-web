@@ -1,8 +1,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
 
 import MainView from "components/standalone/MainView";
-import FileRepositoryProvider from "providers/FileRepository";
-import BlanketProvider from "providers/Blanket";
+import FileRepositoryProvider from "providers/fileRepository";
+import BlanketProvider from "providers/blanket";
 
 import "./App.css";
 

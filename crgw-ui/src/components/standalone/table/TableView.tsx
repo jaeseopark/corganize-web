@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useFileRepository } from "providers/FileRepository";
+import { useFileRepository } from "providers/fileRepository";
 import {
   useColumnOrder,
   useFilters,
@@ -23,7 +23,7 @@ import SelectColumnFilter, {
   nullableSelectColumnFilter,
 } from "components/standalone/table/SelectColumnFilter";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { useBlanket } from "providers/Blanket";
+import { useBlanket } from "hooks/useBlanket";
 import FileSummary from "components/reusable/FileSummary";
 import FileView from "components/standalone/FileView";
 import PageControl from "components/standalone/table/PageControl";

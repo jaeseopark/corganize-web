@@ -3,7 +3,7 @@ import cls from "classnames";
 import styled from "styled-components";
 import { ReactTableRow } from "components/standalone/table/props";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { useFileRepository } from "providers/FileRepository";
+import { useFileRepository } from "providers/fileRepository";
 
 export const ROW_HEIGHT = 45;
 

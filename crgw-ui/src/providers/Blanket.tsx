@@ -1,7 +1,7 @@
-import React, { useContext, useReducer } from "react";
+import React, { Dispatch, useReducer } from "react";
 import cls from "classnames";
 
-import "./Blanket.scss";
+import "./blanket.scss";
 
 type Payload = {
   title: JSX.Element;
@@ -21,25 +21,14 @@ type Action =
   | { type: "UNSET" }
   | { type: "SET_HOTKEY"; payload: boolean };
 
-type Setter = (title: JSX.Element | string, body: JSX.Element) => void;
-
 const initialState: State = {
   isHotkeyEnabled: true,
 };
 
-const BlanketContext = React.createContext<{
+export const BlanketContext = React.createContext<{
   state: State;
-  setBlanket: Setter;
-  exitBlanket: () => void;
-  enableHotkey: () => void;
-  disableHotkey: () => void;
-}>({
-  state: initialState,
-  setBlanket: (t, s) => null,
-  exitBlanket: () => null,
-  enableHotkey: () => null,
-  disableHotkey: () => null,
-});
+  dispatch?: Dispatch<Action>;
+}>({ state: initialState });
 
 const blanketReducer = (
   { current, isHotkeyEnabled }: State,
@@ -66,20 +55,6 @@ const blanketReducer = (
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
 
-  const exitBlanket = () => dispatch({ type: "UNSET" });
-
-  const setBlanket: Setter = (title, body) => {
-    const payload = {
-      title: typeof title === "string" ? <span>{title}</span> : title,
-      body,
-    };
-
-    dispatch({ type: "SET", payload });
-  };
-
-  const enableHotkey = () => dispatch({ type: "SET_HOTKEY", payload: true });
-  const disableHotkey = () => dispatch({ type: "SET_HOTKEY", payload: false });
-
   const maybeRenderBlanket = () => {
     if (!state.current) {
       return null;
@@ -93,7 +68,7 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
             type="button"
             className="close"
             aria-label="Close"
-            onClick={() => exitBlanket()}
+            onClick={() => dispatch({ type: "UNSET" })}
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -104,34 +79,15 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const childrenClassName = cls("children", { hidden: !!state.current });
-  const value = {
-    state,
-    setBlanket,
-    exitBlanket,
-    enableHotkey,
-    disableHotkey,
-  };
 
   return (
-    <BlanketContext.Provider value={value}>
+    <BlanketContext.Provider value={{ state, dispatch }}>
       <div className="blanket-provider">
         {maybeRenderBlanket()}
         <div className={childrenClassName}>{children}</div>
       </div>
     </BlanketContext.Provider>
   );
-};
-
-export const useBlanket = () => {
-  const {
-    state: { current },
-    ...rest
-  } = useContext(BlanketContext);
-
-  return {
-    isBlanketEnabled: !!current,
-    ...rest,
-  };
 };
 
 export default BlanketProvider;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useFileRepository } from "providers/FileRepository";
+import { useFileRepository } from "providers/fileRepository";
 import { getInnermostChild } from "utils/elementUtils";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import WithFileContextMenu from "components/reusable/WithFileContextMenu";

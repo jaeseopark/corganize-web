@@ -1,34 +1,25 @@
+import { useEffect } from "react";
 import cls from "classnames";
 
-import { useBlanket } from "providers/Blanket";
-import TableView from "components/standalone/table/TableView";
+import { useBlanket } from "hooks/useBlanket";
+import GridProvider from "providers/grid/grid";
+import GridView from "./grid/GridView";
 
 // TODO
-const BurgerMenuSpacer = () => <div />;
-const BurgerMenu = () => <div />;
-const GlobalSearch = () => <div />;
+const SelfClosingBurgerMenu = () => <div />;
 
 const MainView = () => {
-  const { isBlanketEnabled: isBlanketEnalbed } = useBlanket();
+  const { isBlanketEnabled } = useBlanket();
 
-  const maybeRenderBurgerMenu = () => {
-    if (isBlanketEnalbed) return null;
-    return <BurgerMenu />;
-  };
-
-  const renderMainView = () => (
-    <div className={cls("mainview", { hidden: isBlanketEnalbed })}>
-      <BurgerMenuSpacer />
-      <GlobalSearch />
-      <TableView />
-    </div>
-  );
+  useEffect(() => {}, []);
 
   return (
-    <>
-      {maybeRenderBurgerMenu()}
-      {renderMainView()}
-    </>
+    <div className={cls("main-view", { hidden: isBlanketEnabled })}>
+      <SelfClosingBurgerMenu />
+      <GridProvider>
+        <GridView />
+      </GridProvider>
+    </div>
   );
 };
 
