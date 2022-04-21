@@ -9,6 +9,16 @@ const GlobalSearch = () => {
     fileProps: { fileCount },
   } = useGrid();
 
+  const onKeyDown = (e: any) => {
+    if (e.key === "Escape") {
+      upsertFilter({
+        ...filter,
+        type: "global",
+        value: "",
+      });
+    }
+  };
+
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     upsertFilter({
       ...filter,
@@ -27,6 +37,7 @@ const GlobalSearch = () => {
         placeholder="Filter by keyword"
         value={filter.value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
       />
       <label>{fileCount}</label>
     </InputGroup>
