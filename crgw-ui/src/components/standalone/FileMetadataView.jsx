@@ -27,17 +27,13 @@ const FileMetadataView = ({ file }) => {
   }, []);
 
   return (
-    <div>
-      <div>
-        <textarea
-          className="file-metadata"
-          onChange={(e) => setNewFile(e.target.value)}
-          value={newFile}
-          onFocus={() => disableHotkey()}
-          onBlur={() => enableHotkey()}
-        />
-      </div>
-    </div>
+    <textarea
+      className="file-metadata"
+      onChange={(e) => setNewFile(e.target.value)}
+      value={newFile}
+      onFocus={disableHotkey}
+      onBlur={enableHotkey}
+    />
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { Dispatch, useReducer } from "react";
 import cls from "classnames";
 
-import { Button, Center } from "@chakra-ui/react";
+import { Box, Button, Center, Flex } from "@chakra-ui/react";
 
 import "./blanket.scss";
 
@@ -12,13 +12,13 @@ export type UserAction = {
 };
 
 type BlanketPayload = {
-  title: JSX.Element;
+  title: string;
   body: JSX.Element;
   userActions: UserAction[];
 };
 
 type State = {
-  title?: JSX.Element;
+  title?: string;
   body?: JSX.Element;
   isHotkeyEnabled: boolean;
   userActions: UserAction[];
@@ -98,11 +98,17 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
     };
 
     return (
-      <div className="blanket-provider" onKeyDown={onKeyDown}>
-        <div className="blanket-header">
+      <Flex
+        direction="column"
+        className="blanket-provider"
+        onKeyDown={onKeyDown}
+      >
+        <Box className="blanket-header">
           <label className="blanket-title">{title}</label>
-        </div>
-        <div className="blanket-body">{body}</div>
+        </Box>
+        <Box flex="1" className="blanket-body">
+          {body}
+        </Box>
         <Center className="blanket-footer">
           <>
             {userActions.map(({ name, icon, onClick }) => (
@@ -118,7 +124,7 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
             ))}
           </>
         </Center>
-      </div>
+      </Flex>
     );
   };
 

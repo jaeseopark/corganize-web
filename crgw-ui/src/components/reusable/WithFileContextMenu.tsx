@@ -74,11 +74,7 @@ const WithFileContextMenu = ({
       },
       {
         label: "Show Metadata (I)",
-        onClick: () =>
-          setBlanket(
-            <FileSummary fileid={fileid} withFav withSize withStorage />,
-            <FileMetadataView file={file} />
-          ),
+        onClick: () => setBlanket("title", <FileMetadataView file={file} />),
         hotkey: "i",
       },
     ];

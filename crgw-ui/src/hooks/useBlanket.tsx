@@ -1,11 +1,12 @@
 import { CloseIcon } from "@chakra-ui/icons";
+import { Text } from "@chakra-ui/react";
 import FileView from "components/standalone/FileView";
 import { BlanketContext, UserAction } from "providers/blanket";
 import { useContext } from "react";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
 type Setter = (
-  title: JSX.Element | string,
+  title: string,
   body: JSX.Element,
   userActions?: UserAction[]
 ) => void;
@@ -25,7 +26,7 @@ export const useBlanket = () => {
     };
 
     const payload = {
-      title: typeof title === "string" ? <span>{title}</span> : title,
+      title,
       body,
       userActions: [defaultUserAction, ...userActions],
     };
