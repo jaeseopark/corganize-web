@@ -63,7 +63,7 @@ const getFilterProps = (state: State, dispatch: Dispatch<Action>) => {
 
   const clearSortOrder = () => dispatch({ type: "SET_SORT_ORDERS", payload: [] })
 
-  const getSortOrderByFilter = (filter: Filter) => sortOrders.find(so => so.filter.displayName === filter.displayName);
+  const getSortOrderByName = (name: string) => sortOrders.find(so => so.displayName === name);
 
   return {
     filters,
@@ -71,7 +71,7 @@ const getFilterProps = (state: State, dispatch: Dispatch<Action>) => {
     upsertFilters,
     setSortOrder,
     clearSortOrder,
-    getSortOrderByFilter,
+    getSortOrderByName,
     globalSearchFilter: globalSearchFilter as GlobalSearchFilter,
   };
 };

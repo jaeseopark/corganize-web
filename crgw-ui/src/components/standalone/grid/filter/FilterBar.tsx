@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
 import { useGrid } from "hooks/useGrid";
-import { Filter } from "providers/grid/types";
+import { Filter, SortOrder } from "providers/grid/types";
 import FilterTag from "./FilterTag";
 
-const FILTERS: Filter[] = [
+const DEFAULT_FILTERS: Filter[] = [
   {
     displayName: "New",
     type: "boolean",
@@ -33,16 +33,24 @@ const FILTERS: Filter[] = [
   },
 ];
 
+const DEFAULT_SORT_ORDER: SortOrder = {
+  displayName: "Size",
+  type: "number",
+  fieldName: "size",
+  direction: "desc"
+};
+
 const nonGlobal = (f: Filter) => f.type !== "global";
 
 
 const FilterBar = () => {
   const {
-    filterProps: { filters, upsertFilters },
+    filterProps: { filters, upsertFilters, setSortOrder },
   } = useGrid();
 
   useEffect(() => {
-    upsertFilters(FILTERS);
+    upsertFilters(DEFAULT_FILTERS);
+    setSortOrder(DEFAULT_SORT_ORDER)
   }, []);
 
 

@@ -1,26 +1,20 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
-export type Page = {
-  index: number;
-  // applying filters can cause situations where index > maxIndex.
-  // This property allows the index to gracefully decrement while allowing the user to go back to the original index upon removing the filters.
-  normalizedIndex: number;
-  maxIndex: number;
-  itemsPerPage: number;
-};
+/**
+ * Shared items
+ */
+export type FilterAndSortDataType = "global" | "number" | "boolean" | "dropdown";
 
-export type MaybeBoolean = "checked" | "unchecked" | "maybe";
-export type SortDirection = "asc" | "desc";
-export type SortOrder = {
-  filter: Filter;
-  direction: SortDirection;
-};
+/**
+ * Filter-related items
+ */
 export type GlobalSearchFilter = {
   type: "global";
   value: string;
   displayName: string;
 };
 
+export type MaybeBoolean = "checked" | "unchecked" | "maybe";
 export type BooleanFilter = {
   type: "boolean";
   fieldName: keyof CorganizeFile;
@@ -51,6 +45,32 @@ export type Filter =
   | DropdownFilter
   | NumberFilter;
 
+/**
+ * Sort-related items
+ */
+export type SortDirection = "asc" | "desc";
+export type SortOrder = {
+  displayName: string,
+  type: FilterAndSortDataType,
+  fieldName: keyof CorganizeFile,
+  direction: SortDirection;
+};
+
+/**
+ * Page-related items
+ */
+export type Page = {
+  index: number;
+  // applying filters can cause situations where index > maxIndex.
+  // This property allows the index to gracefully decrement while allowing the user to go back to the original index upon removing the filters.
+  normalizedIndex: number;
+  maxIndex: number;
+  itemsPerPage: number;
+};
+
+/**
+ *  Reducer boilerplate
+ */
 export type State = {
   files: CorganizeFile[];
   filteredAndSorted: CorganizeFile[];

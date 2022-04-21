@@ -83,6 +83,17 @@ export const gridReducer = (
         sortOrders,
       };
     }
+    case "SET_SORT_ORDERS":
+      const newSortOrders = action.payload;
+      const newFilteredAndSorted = filteredAndSorted.sort(createMegaComparer(newSortOrders));
+      return {
+        files,
+        filteredAndSorted: newFilteredAndSorted,
+        filteredSortedAndPaginated: paginate(newFilteredAndSorted, page),
+        filters,
+        page,
+        sortOrders: newSortOrders
+      }
     case "SET_PAGE":
       const newPage = getNewPage(action.payload, filteredAndSorted.length);
       return {
@@ -93,17 +104,6 @@ export const gridReducer = (
         page: newPage,
         sortOrders,
       };
-    case "SET_SORT_ORDERS":
-      const newSortOrders = action.payload;
-      const newFilteredAndSorted = filteredAndSorted.sort(createMegaComparer(newSortOrders))
-      return {
-        files,
-        filteredAndSorted: newFilteredAndSorted,
-        filteredSortedAndPaginated: paginate(newFilteredAndSorted, page),
-        filters,
-        page,
-        sortOrders: newSortOrders
-      }
     default:
       return {
         files,

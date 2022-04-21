@@ -19,7 +19,7 @@ COMPONENT_BY_MIMETYPE.set("application/zip", GalleryView);
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { enqueue } = useToast();
-  const { findById, updateFile } = useFileRepository();
+  const { findById, updateFile, markAsOpened } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
   const contentRef: any = useRef();
 
@@ -39,9 +39,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
     const updateFileWrapper = (partialProps: CorganizeFile) => {
       updateFile({ ...partialProps, fileid, filename })
-        .then((file) => {
-          enqueue({ title: filename, body: "File updated" });
-        })
+        .then(() => enqueue({ title: filename, body: "File updated" }))
         .catch((error: Error) => {
           if (error.message !== "foobar") {
             enqueue({ title: filename, body: error.message });
@@ -60,6 +58,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
   useEffect(() => {
     if (file) {
+      markAsOpened(fileid);
       setContent(getContent());
     }
   }, [getContent, file]);

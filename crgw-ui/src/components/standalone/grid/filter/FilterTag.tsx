@@ -13,8 +13,9 @@ const rotate = (direction: SortDirection): SortDirection | undefined => {
 
 const FilterTag = ({ filter }: { filter: Filter }) => {
     const {
-        filterProps: { getSortOrderByFilter, setSortOrder, clearSortOrder },
+        filterProps: { getSortOrderByName, setSortOrder, clearSortOrder },
     } = useGrid();
+    const sortOrder = getSortOrderByName(filter.displayName);
 
     const renderControl = () => {
         switch (filter.type) {
@@ -25,13 +26,18 @@ const FilterTag = ({ filter }: { filter: Filter }) => {
         }
     };
 
-    const createSortOrder = () => setSortOrder({
-        filter,
-        direction: "desc"
-    })
+    const createSortOrder = () => {
+        if (filter.type !== "global") {
+            setSortOrder({
+                displayName: filter.displayName,
+                type: filter.type,
+                fieldName: filter.fieldName,
+                direction: "desc"
+            })
+        }
+    }
 
     const updateSortOrder = () => {
-        const sortOrder = getSortOrderByFilter(filter);
         if (!sortOrder) {
             return createSortOrder();
         }
@@ -48,9 +54,8 @@ const FilterTag = ({ filter }: { filter: Filter }) => {
     };
 
     const renderSortIcon = () => {
-        const sortOrder = getSortOrderByFilter(filter);
         if (!sortOrder) {
-            return <MinusIcon />
+            return <MinusIcon className="semi-hidden" />
         }
 
         const Icon = {
