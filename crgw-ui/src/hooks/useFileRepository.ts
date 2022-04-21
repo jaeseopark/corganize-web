@@ -12,9 +12,7 @@ export const useFileRepository = () => {
     addFiles,
   } = useContext(FileRepository);
 
-  const findById = (fid: string): CorganizeFile => {
-    return files.find((f) => f.fileid === fid)!;
-  }
+  const findById = (fid: string) => files.find((f) => f.fileid === fid)!
 
   const createThenAddFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
     return getInstance()
