@@ -39,7 +39,9 @@ const renderControl = (f: Filter) => {
 };
 
 const FilterBar = () => {
-  const { filters, upsertFilters, sortOrders } = useGrid();
+  const {
+    filterProps: { filters, upsertFilters, sortOrders },
+  } = useGrid();
 
   useEffect(() => {
     upsertFilters(FILTERS);

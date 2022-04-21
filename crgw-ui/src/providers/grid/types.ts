@@ -2,6 +2,10 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 export type Page = {
   index: number;
+  // applying filters can cause situations where index > maxIndex.
+  // This property allows the index to gracefully decrement while allowing the user to go back to the original index upon removing the filters.
+  normalizedIndex: number;
+  maxIndex: number;
   itemsPerPage: number;
 };
 

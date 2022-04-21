@@ -7,7 +7,9 @@ const getNextValue = (value: MaybeBoolean) =>
   ROTATION[(ROTATION.indexOf(value) + 1) % 3];
 
 const BooleanControl = ({ filter }: { filter: BooleanFilter }) => {
-  const { upsertFilter } = useGrid();
+  const {
+    filterProps: { upsertFilter },
+  } = useGrid();
   return (
     <Checkbox
       tabIndex={-1}

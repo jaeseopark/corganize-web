@@ -15,6 +15,7 @@ type BlanketPayload = {
   title: string;
   body: JSX.Element;
   userActions: UserAction[];
+  onClose?: () => void;
 };
 
 type State = {
@@ -22,6 +23,7 @@ type State = {
   body?: JSX.Element;
   isHotkeyEnabled: boolean;
   userActions: UserAction[];
+  onClose?: () => void;
 };
 
 type ReducerAction =
@@ -44,7 +46,7 @@ export const BlanketContext = React.createContext<{
 }>({ state: initialState });
 
 const blanketReducer = (
-  { title, body, isHotkeyEnabled, userActions }: State,
+  { title, body, isHotkeyEnabled, userActions, onClose }: State,
   action: ReducerAction
 ): State => {
   switch (action.type) {
@@ -54,8 +56,12 @@ const blanketReducer = (
         body: action.payload.body,
         userActions: action.payload.userActions,
         isHotkeyEnabled: true,
+        onClose: action.payload.onClose,
       };
     case "UNSET":
+      if (onClose) {
+        onClose();
+      }
       return { isHotkeyEnabled: false, userActions: [] };
     case "ADD_USER_ACTION":
       return {
@@ -63,6 +69,7 @@ const blanketReducer = (
         body,
         isHotkeyEnabled,
         userActions: [...userActions, action.payload],
+        onClose,
       };
     case "SET_HOTKEY":
       return {
@@ -70,9 +77,10 @@ const blanketReducer = (
         body,
         isHotkeyEnabled: action.payload,
         userActions,
+        onClose,
       };
     default:
-      return { title, body, isHotkeyEnabled, userActions };
+      return { title, body, isHotkeyEnabled, userActions, onClose };
   }
 };
 

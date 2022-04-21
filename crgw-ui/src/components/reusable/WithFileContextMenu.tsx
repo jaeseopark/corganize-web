@@ -52,10 +52,10 @@ const WithFileContextMenu = ({
         {
           label: "Scrape (S)",
           onClick: () =>
-            setBlanket(
-              "Scrape",
-              <ScrapePanel defaultUrls={[sanitizedSourceurl]} />
-            ),
+            setBlanket({
+              title: "Scrape",
+              body: <ScrapePanel defaultUrls={[sanitizedSourceurl]} />,
+            }),
           hotkey: "s",
         }
       );
@@ -74,7 +74,11 @@ const WithFileContextMenu = ({
       },
       {
         label: "Show Metadata (I)",
-        onClick: () => setBlanket("title", <FileMetadataView file={file} />),
+        onClick: () =>
+          setBlanket({
+            title: "title",
+            body: <FileMetadataView file={file} />,
+          }),
         hotkey: "i",
       },
     ];

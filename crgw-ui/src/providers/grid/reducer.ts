@@ -10,11 +10,6 @@ const filterAll = (
   return files.filter(mergedFilter);
 };
 
-const paginate = (files: CorganizeFile[], page: Page) => {
-  const offset = page.index * page.itemsPerPage;
-  return files.slice(offset, offset + page.itemsPerPage);
-};
-
 const merge = (old: Filter[], neww: Filter[]): Filter[] =>
   neww.reduce(
     (acc, next) => {
@@ -29,6 +24,30 @@ const merge = (old: Filter[], neww: Filter[]): Filter[] =>
     },
     [...old]
   );
+
+const getNewPage = (oldPage: Page, fileCount: number): Page => {
+  const { itemsPerPage, index } = oldPage;
+
+  const getMaxIndex = () => {
+    if (fileCount === 0) {
+      return 0;
+    }
+    return Math.ceil(fileCount / itemsPerPage) - 1;
+  };
+
+  const maxIndex = getMaxIndex();
+
+  return {
+    ...oldPage,
+    maxIndex,
+    normalizedIndex: Math.min(maxIndex, index),
+  };
+};
+
+const paginate = (files: CorganizeFile[], page: Page) => {
+  const offset = page.normalizedIndex * page.itemsPerPage;
+  return files.slice(offset, offset + page.itemsPerPage);
+};
 
 export const gridReducer = (
   {
@@ -45,37 +64,40 @@ export const gridReducer = (
   switch (action.type) {
     case "SET_FILES": {
       const newFilteredFiles = filterAll(action.payload, filters);
+      const newPage = getNewPage(page, newFilteredFiles.length);
       return {
         files: action.payload,
         filteredFiles: newFilteredFiles,
-        filteredAndPaginatedFiles: paginate(newFilteredFiles, page),
+        filteredAndPaginatedFiles: paginate(newFilteredFiles, newPage),
         mostRecentFileid,
         filters,
-        page,
+        page: newPage,
         sortOrders,
       };
     }
     case "UPSERT_FILTERS": {
       const newFilters = merge(filters, action.payload);
       const newFilteredFiles = filterAll(files, Object.values(newFilters));
+      const newPage = getNewPage(page, newFilteredFiles.length);
       return {
         files,
         filteredFiles: newFilteredFiles,
-        filteredAndPaginatedFiles: paginate(newFilteredFiles, page),
+        filteredAndPaginatedFiles: paginate(newFilteredFiles, newPage),
         mostRecentFileid,
         filters: newFilters,
-        page,
+        page: newPage,
         sortOrders,
       };
     }
     case "SET_PAGE":
+      const newPage = getNewPage(action.payload, filteredFiles.length);
       return {
         files,
         filteredFiles,
-        filteredAndPaginatedFiles: paginate(filteredFiles, action.payload),
+        filteredAndPaginatedFiles: paginate(filteredFiles, newPage),
         mostRecentFileid,
         filters,
-        page: action.payload,
+        page: newPage,
         sortOrders,
       };
     case "SET_MOST_RECENT":

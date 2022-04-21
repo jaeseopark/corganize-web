@@ -21,11 +21,12 @@ const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
   const openable = !!streamingurl;
 
   const openFile = () => {
-    if (openable) setBlanket(filename, <FileView fileid={fileid} />);
+    if (openable)
+      setBlanket({ title: filename, body: <FileView fileid={fileid} /> });
   };
 
   const openJsonEditor = () =>
-    setBlanket(filename, <FileMetadataView file={file} />);
+    setBlanket({ title: filename, body: <FileMetadataView file={file} /> });
 
   return (
     <Box

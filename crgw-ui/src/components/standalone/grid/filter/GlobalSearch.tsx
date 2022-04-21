@@ -4,7 +4,10 @@ import { useGrid } from "hooks/useGrid";
 import { ChangeEvent } from "react";
 
 const GlobalSearch = () => {
-  const { globalSearchFilter: filter, upsertFilter } = useGrid();
+  const {
+    filterProps: { globalSearchFilter: filter, upsertFilter },
+    fileProps: { fileCount },
+  } = useGrid();
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     upsertFilter({
@@ -25,6 +28,7 @@ const GlobalSearch = () => {
         value={filter.value}
         onChange={onChange}
       />
+      <label>{fileCount}</label>
     </InputGroup>
   );
 };

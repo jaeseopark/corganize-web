@@ -30,7 +30,7 @@ const VideoView = ({
   const { enqueue } = useToast();
   const divRef = useRef();
   const [rotationDegrees, setRotationDegrees] = useState(0);
-  const [isFullscreen, setBlanket] = useState(false);
+  const [isFullscreen, setFullscreen] = useState(false);
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimediaSeed?.highlights),
     [multimediaSeed]
@@ -108,7 +108,7 @@ const VideoView = ({
     if (key === "f") {
       if (screenfull.isEnabled) {
         screenfull.toggle(divRef.current);
-        setBlanket(!isFullscreen);
+        setFullscreen(!isFullscreen);
       }
     } else if (key === "g") {
       // jump by 10%

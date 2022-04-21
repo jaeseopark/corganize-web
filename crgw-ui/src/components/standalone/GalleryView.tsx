@@ -62,7 +62,7 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showLightbox, setShowLightbox] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullscreen, setBlanket] = useState(false);
+  const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
   const highlightManager = useMemo(
@@ -148,7 +148,7 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
 
   const toggleFullscreen = () => {
     if (screenfull.isEnabled && mainref?.current) {
-      setBlanket(!isFullscreen);
+      setFullscreen(!isFullscreen);
       screenfull.toggle(mainref.current);
     }
   };

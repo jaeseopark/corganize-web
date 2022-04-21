@@ -1,15 +1,12 @@
 import { CloseIcon } from "@chakra-ui/icons";
-import { Text } from "@chakra-ui/react";
-import FileView from "components/standalone/FileView";
 import { BlanketContext, UserAction } from "providers/blanket";
 import { useContext } from "react";
-import { CorganizeFile } from "typedefs/CorganizeFile";
 
-type Setter = (
-  title: string,
-  body: JSX.Element,
-  userActions?: UserAction[]
-) => void;
+type SetBlanketProps = {
+  title: string;
+  body: JSX.Element;
+  onClose?: () => void;
+};
 
 export const useBlanket = () => {
   const {
@@ -18,7 +15,7 @@ export const useBlanket = () => {
   } = useContext(BlanketContext);
   const isBlanketEnabled = !!title && !!body;
 
-  const setBlanket: Setter = (title, body, userActions = []) => {
+  const setBlanket = ({ title, body, onClose }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
@@ -28,7 +25,8 @@ export const useBlanket = () => {
     const payload = {
       title,
       body,
-      userActions: [defaultUserAction, ...userActions],
+      userActions: [defaultUserAction],
+      onClose,
     };
 
     dispatch!({ type: "SET", payload });
@@ -38,9 +36,6 @@ export const useBlanket = () => {
     dispatch!({ type: "ADD_USER_ACTION", payload: ua });
 
   const exitBlanket = () => dispatch!({ type: "UNSET" });
-
-  const openFile = (f: CorganizeFile) =>
-    setBlanket(f.filename, <FileView fileid={f.fileid} />);
 
   const enableHotkey = () => dispatch!({ type: "SET_HOTKEY", payload: true });
   const disableHotkey = () => dispatch!({ type: "SET_HOTKEY", payload: false });
@@ -52,6 +47,5 @@ export const useBlanket = () => {
     addUserAction,
     enableHotkey,
     disableHotkey,
-    openFile,
   };
 };
