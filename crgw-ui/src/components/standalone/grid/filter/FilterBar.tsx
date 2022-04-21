@@ -49,21 +49,21 @@ const FilterBar = () => {
     // TODO
   };
 
-  const renderSortIcon = (f: Filter) => {
-    
-  };
+  const renderSortIcon = (f: Filter) => {};
 
   return (
     <div className="filter-bar">
       {filters.filter(nonGlobal).map((f) => (
         <Tag key={f.displayName} size="lg">
-          <div className="clickable" onClick={updateSortOrder}>
-            <>
-              <label>{f.displayName}</label>
-              {renderSortIcon(f)}
-            </>
-          </div>
-          {renderControl(f)}
+          <>
+            <div className="clickable" onClick={updateSortOrder}>
+              <>
+                {renderSortIcon(f)}
+                <label>{f.displayName}</label>
+              </>
+            </div>
+            {renderControl(f)}
+          </>
         </Tag>
       ))}
     </div>

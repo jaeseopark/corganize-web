@@ -1,7 +1,7 @@
 import React, { Dispatch, useReducer } from "react";
 import cls from "classnames";
 
-import { Box, Button, Center } from "@chakra-ui/react";
+import { Button, Center } from "@chakra-ui/react";
 
 import "./blanket.scss";
 
@@ -78,7 +78,7 @@ const blanketReducer = (
 
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
-  const { title, body, userActions } = state;
+  const { title, body, userActions, isHotkeyEnabled } = state;
   const isBlanketEnabled = !!title && !!body;
 
   const maybeRenderBlanket = () => {
@@ -86,8 +86,19 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
       return null;
     }
 
+    const onKeyDown = (e: any) => {
+      if (!isHotkeyEnabled) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === "q") {
+        dispatch({ type: "UNSET" });
+      }
+    };
+
     return (
-      <div className="blanket-provider">
+      <div className="blanket-provider" onKeyDown={onKeyDown}>
         <div className="blanket-header">
           <label className="blanket-title">{title}</label>
         </div>
