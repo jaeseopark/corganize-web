@@ -142,10 +142,9 @@ class CorganizeClient {
 
   getLocalFilenames(): Promise<string[]> {
     // @ts-ignore
-    // return fetch("/api/files")
-    //   .then((res) => res.json())
-    //   .then(({ files }) => files);
-    return Promise.resolve([]);
+    return fetch("/api/files")
+      .then((res) => res.json())
+      .then(({ files }) => files);
   }
 
   scrapeAsync(...urls: string[]): Promise<CorganizeFile[]> {

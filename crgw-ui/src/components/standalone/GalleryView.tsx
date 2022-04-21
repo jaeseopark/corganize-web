@@ -6,19 +6,19 @@ import {
   useRef,
   useState,
 } from "react";
+import { getObjectUrls } from "utils/zipUtils";
 import screenfull from "screenfull";
 import cls from "classnames";
 
-import { getPosixMilliseconds } from "utils/dateUtils";
-
-import { createRange } from "utils/arrayUtils";
-
-import "./GalleryView.scss";
 import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
+import { useToast } from "hooks/useToast";
+import { getPosixMilliseconds } from "utils/dateUtils";
+import { createRange } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
-import { getObjectUrls } from "utils/zipUtils";
-import { useToast } from "hooks/useToast";
+
+import "./GalleryView.scss";
+
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -50,12 +50,12 @@ const Img = forwardRef(
 );
 
 type GalleryViewProps = {
-  zipPath: string;
+  path: string;
   multimedia?: Multimedia;
   updateFile: (f: CorganizeFile) => Promise<CorganizeFile>;
 };
 
-const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
+const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   const { enqueue } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -87,22 +87,20 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
   );
 
   useEffect(() => {
-    if (srcs.length === 0) {
-      getObjectUrls(zipPath)
-        .then((sourcePaths: string[]) => {
-          if (sourcePaths.length === 0) {
-            setErrorMessage("No images");
-            return [];
-          }
-          updateMultimedia({ filecount: sourcePaths.length });
-          return sourcePaths;
-        })
-        .then(setSrcs)
-        .catch((err: Error) => setErrorMessage(err.message));
+    getObjectUrls(path)
+      .then((sourcePaths: string[]) => {
+        if (sourcePaths.length === 0) {
+          setErrorMessage("No images");
+          return [];
+        }
+        updateMultimedia({ filecount: sourcePaths.length });
+        return sourcePaths;
+      })
+      .then(setSrcs)
+      .catch((err: Error) => setErrorMessage(err.message));
 
-      return () => srcs.forEach(URL.revokeObjectURL);
-    }
-  }, [srcs, updateMultimedia, zipPath]);
+    return () => srcs.forEach(URL.revokeObjectURL);
+  }, []);
 
   useEffect(() => {
     const focusElement = () => {

@@ -7,11 +7,11 @@ import BlanketProvider from "providers/blanket";
 import "./App.scss";
 
 const App = () => (
-  <BlanketProvider>
-    <FileRepositoryProvider>
+  <FileRepositoryProvider>
+    <BlanketProvider>
       <MainView />
-    </FileRepositoryProvider>
-  </BlanketProvider>
+    </BlanketProvider>
+  </FileRepositoryProvider>
 );
 
 const ChakraApp = () => (
