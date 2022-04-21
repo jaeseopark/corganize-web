@@ -15,7 +15,13 @@ const FILTERS: Filter[] = [
     displayName: "Local",
     type: "boolean",
     fieldName: "streamingurl",
-    value: "maybe",
+    value: "checked",
+  },
+  {
+    displayName: "Mimetype",
+    type: "boolean",
+    fieldName: "mimetype",
+    value: "checked",
   },
   {
     displayName: "Size",
@@ -51,7 +57,7 @@ const FilterBar = () => {
     // TODO
   };
 
-  const renderSortIcon = (f: Filter) => {};
+  const renderSortIcon = (f: Filter) => { };
 
   return (
     <div className="filter-bar">
