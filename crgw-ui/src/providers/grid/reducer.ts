@@ -52,9 +52,8 @@ const paginate = (files: CorganizeFile[], page: Page) => {
 export const gridReducer = (
   {
     files,
-    filteredFiles,
-    filteredAndPaginatedFiles,
-    mostRecentFileid,
+    filteredAndSorted,
+    filteredSortedAndPaginated,
     filters,
     page,
     sortOrders,
@@ -67,9 +66,8 @@ export const gridReducer = (
       const newPage = getNewPage(page, newFilteredFiles.length);
       return {
         files: action.payload,
-        filteredFiles: newFilteredFiles,
-        filteredAndPaginatedFiles: paginate(newFilteredFiles, newPage),
-        mostRecentFileid,
+        filteredAndSorted: newFilteredFiles,
+        filteredSortedAndPaginated: paginate(newFilteredFiles, newPage),
         filters,
         page: newPage,
         sortOrders,
@@ -81,41 +79,37 @@ export const gridReducer = (
       const newPage = getNewPage(page, newFilteredFiles.length);
       return {
         files,
-        filteredFiles: newFilteredFiles,
-        filteredAndPaginatedFiles: paginate(newFilteredFiles, newPage),
-        mostRecentFileid,
+        filteredAndSorted: newFilteredFiles,
+        filteredSortedAndPaginated: paginate(newFilteredFiles, newPage),
         filters: newFilters,
         page: newPage,
         sortOrders,
       };
     }
     case "SET_PAGE":
-      const newPage = getNewPage(action.payload, filteredFiles.length);
+      const newPage = getNewPage(action.payload, filteredAndSorted.length);
       return {
         files,
-        filteredFiles,
-        filteredAndPaginatedFiles: paginate(filteredFiles, newPage),
-        mostRecentFileid,
+        filteredAndSorted,
+        filteredSortedAndPaginated: paginate(filteredAndSorted, newPage),
         filters,
         page: newPage,
         sortOrders,
       };
-    case "SET_MOST_RECENT":
+    case "SET_SORT_ORDERS":
       return {
         files,
-        filteredFiles,
-        filteredAndPaginatedFiles,
-        mostRecentFileid: action.payload,
+        filteredAndSorted,
+        filteredSortedAndPaginated,
         filters,
         page,
-        sortOrders,
-      };
+        sortOrders: action.payload
+      }
     default:
       return {
         files,
-        filteredFiles,
-        filteredAndPaginatedFiles,
-        mostRecentFileid,
+        filteredAndSorted,
+        filteredSortedAndPaginated,
         filters,
         page,
         sortOrders,

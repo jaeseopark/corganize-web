@@ -1,5 +1,5 @@
 import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
-import { Box, Button, HStack } from "@chakra-ui/react";
+import { HStack, IconButton } from "@chakra-ui/react";
 import { useGrid } from "hooks/useGrid";
 
 const PageControl = () => {
@@ -16,22 +16,22 @@ const PageControl = () => {
 
   return (
     <HStack>
-      <Button
-        rightIcon={<ArrowBackIcon />}
-        colorScheme="blue"
-        variant="outline"
+      <IconButton
+        colorScheme='blue'
+        aria-label='Decrement'
         onClick={decrementPage}
         disabled={!canDecrement}
+        icon={<ArrowBackIcon />}
       />
       <label>
         Page {index + 1} / {maxIndex + 1}
       </label>
-      <Button
-        rightIcon={<ArrowForwardIcon />}
-        colorScheme="blue"
-        variant="outline"
+      <IconButton
+        colorScheme='blue'
+        aria-label='Increment'
         onClick={incrementPage}
         disabled={!canIncrement}
+        icon={<ArrowForwardIcon />}
       />
     </HStack>
   );

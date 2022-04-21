@@ -5,6 +5,7 @@ import {
   Action,
   Filter,
   GlobalSearchFilter,
+  SortOrder,
   State,
 } from "providers/grid/types";
 
@@ -37,7 +38,7 @@ const getPageProps = (state: State, dispatch: Dispatch<Action>) => {
 };
 
 const getFileProps = (state: State, dispatch: Dispatch<Action>) => {
-  const { filteredFiles, filteredAndPaginatedFiles } = state;
+  const { filteredAndSorted: filteredFiles, filteredSortedAndPaginated: filteredAndPaginatedFiles } = state;
 
   const setFiles = (files: CorganizeFile[]) =>
     dispatch({ type: "SET_FILES", payload: files });
@@ -58,11 +59,19 @@ const getFilterProps = (state: State, dispatch: Dispatch<Action>) => {
 
   const upsertFilter = (filter: Filter) => upsertFilters([filter]);
 
+  const setSortOrder = (sortOrder: SortOrder) => dispatch({ type: "SET_SORT_ORDERS", payload: [sortOrder] })
+
+  const clearSortOrder = () => dispatch({ type: "SET_SORT_ORDERS", payload: [] })
+
+  const getSortOrderByFilter = (filter: Filter) => sortOrders.find(so => so.filter.displayName === filter.displayName);
+
   return {
     filters,
     upsertFilter,
     upsertFilters,
-    sortOrders,
+    setSortOrder,
+    clearSortOrder,
+    getSortOrderByFilter,
     globalSearchFilter: globalSearchFilter as GlobalSearchFilter,
   };
 };

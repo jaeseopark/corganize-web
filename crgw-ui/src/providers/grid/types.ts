@@ -53,10 +53,9 @@ export type Filter =
 
 export type State = {
   files: CorganizeFile[];
-  filteredFiles: CorganizeFile[];
-  filteredAndPaginatedFiles: CorganizeFile[];
+  filteredAndSorted: CorganizeFile[];
+  filteredSortedAndPaginated: CorganizeFile[];
   filters: Filter[];
-  mostRecentFileid: string;
   page: Page;
   sortOrders: SortOrder[];
 };
@@ -64,5 +63,6 @@ export type State = {
 export type Action =
   | { type: "SET_FILES"; payload: CorganizeFile[] }
   | { type: "UPSERT_FILTERS"; payload: Filter[] }
+  | { type: "SET_SORT_ORDERS"; payload: SortOrder[] }
   | { type: "SET_PAGE"; payload: Page }
   | { type: "SET_MOST_RECENT"; payload: string };

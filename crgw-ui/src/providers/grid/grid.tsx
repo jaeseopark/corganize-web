@@ -4,8 +4,8 @@ import { Action, State } from "./types";
 
 const initialState: State = {
   files: [],
-  filteredFiles: [],
-  filteredAndPaginatedFiles: [],
+  filteredAndSorted: [],
+  filteredSortedAndPaginated: [],
   filters: [
     {
       displayName: "Global Search",
@@ -13,7 +13,6 @@ const initialState: State = {
       value: "",
     },
   ],
-  mostRecentFileid: "",
   page: {
     index: 0,
     normalizedIndex: 0,
