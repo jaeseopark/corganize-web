@@ -1,48 +1,39 @@
-import { useState } from "react";
-import { useFileRepository } from "providers/FileRepository";
-import { useBlanket } from "providers/Blanket";
+import { useEffect, useState } from "react";
+import { useFileRepository } from "hooks/useFileRepository";
+import { useBlanket } from "hooks/useBlanket";
+import { useToast } from "hooks/useToast";
 
-import Butt from "components/reusable/Button";
+import { CheckIcon } from "@chakra-ui/icons";
 
 import "./FileMetadataView.scss";
-import { useToast } from "hooks/useToast";
 
 const FileMetadataView = ({ file }) => {
   const [newFile, setNewFile] = useState(JSON.stringify(file, null, 2));
-  const [isSaving, setSaving] = useState(false);
-  const { enableHotkey, disableHotkey } = useBlanket();
+  const { enableHotkey, disableHotkey, addUserAction } = useBlanket();
   const { updateFile } = useFileRepository();
   const { enqueue } = useToast();
 
-  const onChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setNewFile(value);
-  };
+  useEffect(() => {
+    const save = () =>
+      updateFile(JSON.parse(newFile)).then(() =>
+        enqueue({ title: "File", body: "Saved" })
+      );
 
-  const save = () => {
-    setSaving(true);
-    updateFile(JSON.parse(newFile))
-      .then(() => enqueue("File", "Saved"))
-      .finally(() => setSaving(false));
-  };
+    addUserAction({
+      name: "Save",
+      icon: <CheckIcon />,
+      onClick: save,
+    });
+  }, []);
 
   return (
-    <div>
-      <div>
-        <textarea
-          className="file-metadata"
-          onChange={onChange}
-          value={newFile}
-          onFocus={() => disableHotkey()}
-          onBlur={() => enableHotkey()}
-        />
-      </div>
-      <Butt disabled={isSaving} onClick={save}>
-        Save
-      </Butt>
-    </div>
+    <textarea
+      className="file-metadata"
+      onChange={(e) => setNewFile(e.target.value)}
+      value={newFile}
+      onFocus={disableHotkey}
+      onBlur={enableHotkey}
+    />
   );
 };
 

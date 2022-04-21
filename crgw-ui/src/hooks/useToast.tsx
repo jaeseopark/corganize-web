@@ -58,13 +58,19 @@ const ToastComponent = ({ title, type, body, onClick, createdAt }: Toast) => (
 export const useToast = () => {
   const showChakraToast = useChakraToast();
 
-  const enqueue = (
-    title: string,
-    body: string,
-    type?: AlertStatus,
-    duration?: number,
-    onClick?: () => void
-  ) => {
+  const enqueue = ({
+    title,
+    body,
+    type,
+    duration,
+    onClick,
+  }: {
+    title: string;
+    body: string;
+    type?: AlertStatus;
+    duration?: number;
+    onClick?: () => void;
+  }) => {
     const createdAt = getPosixSeconds();
     type = type || "info";
     duration = duration || DEFAULT_DURATION;

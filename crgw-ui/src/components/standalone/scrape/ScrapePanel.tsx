@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { useUpdate } from "react-use";
 
-import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
+import {
+  Card,
+  CARD_STATUS,
+} from "components/standalone/scrape/ScrapePanelCardView";
 import ScrapeInputBar from "components/standalone/scrape/InputBar";
 import ScrapeGrid from "components/standalone/scrape/Grid";
 
-import "./ScrapePanel.scss";
-import { useBlanket } from "providers/Blanket";
-import { useFileRepository } from "providers/FileRepository";
+import { useBlanket } from "hooks/useBlanket";
+import { useFileRepository } from "hooks/useFileRepository";
 import { getInstance } from "clients/corganize";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { isDiscovered } from "shared/globalstore";
+
+import "./ScrapePanel.scss";
 
 type ScrapePanelProps = {
   defaultUrls?: string[];

@@ -8,7 +8,6 @@ import {
 } from "react";
 import screenfull from "screenfull";
 import cls from "classnames";
-import LinearProgress from "@material-ui/core/LinearProgress";
 
 import { getPosixMilliseconds } from "utils/dateUtils";
 
@@ -62,7 +61,7 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showLightbox, setShowLightbox] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullscreen, setBlanket] = useState(false);
+  const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
   const highlightManager = useMemo(
@@ -144,11 +143,11 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
   const saveHighlights = () =>
     updateMultimedia({
       highlights: highlightManager.toString(),
-    }).then(() => enqueue("Gallery", "Highlights saved"));
+    }).then(() => enqueue({ title: "Gallery", body: "Highlights saved" }));
 
   const toggleFullscreen = () => {
     if (screenfull.isEnabled && mainref?.current) {
-      setBlanket(!isFullscreen);
+      setFullscreen(!isFullscreen);
       screenfull.toggle(mainref.current);
     }
   };
@@ -184,7 +183,10 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
       toggleFullscreen();
     } else if (key === "g") {
       if (isBulkHighlightMode) {
-        return enqueue("Error", "You must exit Bulk mode first");
+        return enqueue({
+          title: "Error",
+          body: "You must exit Bulk mode first",
+        });
       }
       toggleLightbox();
     } else if (key === "b") {
@@ -216,10 +218,10 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
     if (showLightbox) {
       return (
         <div className="lightbox-with-progress">
-          <LinearProgress
+          {/* <LinearProgress
             variant="determinate"
             value={((currentIndex + 1) * 100) / srcs.length}
-          />
+          /> */}
           <div className="lightbox">
             {
               // @ts-ignore

@@ -1,137 +1,151 @@
-import React, { useContext, useReducer } from "react";
+import React, { Dispatch, useReducer } from "react";
 import cls from "classnames";
 
-import "./Blanket.scss";
+import { Box, Button, Center, Flex } from "@chakra-ui/react";
 
-type Payload = {
-  title: JSX.Element;
+import "./blanket.scss";
+
+export type UserAction = {
+  name: string;
+  icon: JSX.Element;
+  onClick: () => void;
+};
+
+type BlanketPayload = {
+  title: string;
   body: JSX.Element;
+  userActions: UserAction[];
+  onClose?: () => void;
 };
 
 type State = {
-  current?: Payload;
+  title?: string;
+  body?: JSX.Element;
   isHotkeyEnabled: boolean;
+  userActions: UserAction[];
+  onClose?: () => void;
 };
 
-type Action =
+type ReducerAction =
   | {
       type: "SET";
-      payload: Payload;
+      payload: BlanketPayload;
     }
+  | { type: "ADD_USER_ACTION"; payload: UserAction }
   | { type: "UNSET" }
   | { type: "SET_HOTKEY"; payload: boolean };
 
-type Setter = (title: JSX.Element | string, body: JSX.Element) => void;
-
 const initialState: State = {
   isHotkeyEnabled: true,
+  userActions: [],
 };
 
-const BlanketContext = React.createContext<{
+export const BlanketContext = React.createContext<{
   state: State;
-  setBlanket: Setter;
-  exitBlanket: () => void;
-  enableHotkey: () => void;
-  disableHotkey: () => void;
-}>({
-  state: initialState,
-  setBlanket: (t, s) => null,
-  exitBlanket: () => null,
-  enableHotkey: () => null,
-  disableHotkey: () => null,
-});
+  dispatch?: Dispatch<ReducerAction>;
+}>({ state: initialState });
 
 const blanketReducer = (
-  { current, isHotkeyEnabled }: State,
-  action: Action
+  { title, body, isHotkeyEnabled, userActions, onClose }: State,
+  action: ReducerAction
 ): State => {
   switch (action.type) {
     case "SET":
       return {
-        current: action.payload,
-        isHotkeyEnabled,
+        title: action.payload.title,
+        body: action.payload.body,
+        userActions: action.payload.userActions,
+        isHotkeyEnabled: true,
+        onClose: action.payload.onClose,
       };
     case "UNSET":
-      return { isHotkeyEnabled };
+      if (onClose) {
+        onClose();
+      }
+      return { isHotkeyEnabled: false, userActions: [] };
+    case "ADD_USER_ACTION":
+      return {
+        title,
+        body,
+        isHotkeyEnabled,
+        userActions: [...userActions, action.payload],
+        onClose,
+      };
     case "SET_HOTKEY":
       return {
-        current,
+        title,
+        body,
         isHotkeyEnabled: action.payload,
+        userActions,
+        onClose,
       };
     default:
-      return { current, isHotkeyEnabled };
+      return { title, body, isHotkeyEnabled, userActions, onClose };
   }
 };
 
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
-
-  const exitBlanket = () => dispatch({ type: "UNSET" });
-
-  const setBlanket: Setter = (title, body) => {
-    const payload = {
-      title: typeof title === "string" ? <span>{title}</span> : title,
-      body,
-    };
-
-    dispatch({ type: "SET", payload });
-  };
-
-  const enableHotkey = () => dispatch({ type: "SET_HOTKEY", payload: true });
-  const disableHotkey = () => dispatch({ type: "SET_HOTKEY", payload: false });
+  const { title, body, userActions, isHotkeyEnabled } = state;
+  const isBlanketEnabled = !!title && !!body;
 
   const maybeRenderBlanket = () => {
-    if (!state.current) {
+    if (!isBlanketEnabled) {
       return null;
     }
 
+    const onKeyDown = (e: any) => {
+      if (!isHotkeyEnabled) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === "q") {
+        dispatch({ type: "UNSET" });
+      }
+    };
+
     return (
-      <div className="blanket-view">
-        <div className="blanket-header">
-          <label className="blanket-title">{state.current.title}</label>
-          <button
-            type="button"
-            className="close"
-            aria-label="Close"
-            onClick={() => exitBlanket()}
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div className="blanket-body">{state.current.body}</div>
-      </div>
+      <Flex
+        direction="column"
+        className="blanket-provider"
+        onKeyDown={onKeyDown}
+      >
+        <Box className="blanket-header">
+          <label className="blanket-title">{title}</label>
+        </Box>
+        <Box flex="1" className="blanket-body">
+          {body}
+        </Box>
+        <Center className="blanket-footer">
+          <>
+            {userActions.map(({ name, icon, onClick }) => (
+              <Button
+                key={name}
+                rightIcon={icon}
+                colorScheme="blue"
+                variant="outline"
+                onClick={onClick}
+              >
+                {name}
+              </Button>
+            ))}
+          </>
+        </Center>
+      </Flex>
     );
   };
 
-  const childrenClassName = cls("children", { hidden: !!state.current });
-  const value = {
-    state,
-    setBlanket,
-    exitBlanket,
-    enableHotkey,
-    disableHotkey,
-  };
+  const childrenClassName = cls("children", { hidden: isBlanketEnabled });
 
   return (
-    <BlanketContext.Provider value={value}>
-      <div className="blanket-provider">
+    <BlanketContext.Provider value={{ state, dispatch }}>
+      <>
         {maybeRenderBlanket()}
         <div className={childrenClassName}>{children}</div>
-      </div>
+      </>
     </BlanketContext.Provider>
   );
-};
-
-export const useBlanket = () => {
-  const {
-    state: { current },
-    ...rest
-  } = useContext(BlanketContext);
-
-  return {
-    isBlanketEnabled: !!current,
-    ...rest,
-  };
 };
 
 export default BlanketProvider;

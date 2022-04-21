@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import ContextMenuWrapper from "components/reusable/ContextMenuWrapper";
 import FileSummary from "components/reusable/FileSummary";
 import { COPIED_TO_CLIPBOARD } from "utils/userpromptUtils";
-import { useFileRepository } from "providers/FileRepository";
-import { useBlanket } from "providers/Blanket";
+import { useFileRepository } from "hooks/useFileRepository";
+import { useBlanket } from "hooks/useBlanket";
 import { ContextMenuOption } from "typedefs/ContextMenuOption";
 import { copyTextToClipboard } from "utils/clipboardUtils";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
@@ -45,17 +45,17 @@ const WithFileContextMenu = ({
           label: "Copy Source URL",
           onClick: () => {
             copyTextToClipboard(sanitizedSourceurl).then(() =>
-              enqueue(COPIED_TO_CLIPBOARD, filename)
+              enqueue({ title: COPIED_TO_CLIPBOARD, body: filename })
             );
           },
         },
         {
           label: "Scrape (S)",
           onClick: () =>
-            setBlanket(
-              "Scrape",
-              <ScrapePanel defaultUrls={[sanitizedSourceurl]} />
-            ),
+            setBlanket({
+              title: "Scrape",
+              body: <ScrapePanel defaultUrls={[sanitizedSourceurl]} />,
+            }),
           hotkey: "s",
         }
       );
@@ -75,10 +75,10 @@ const WithFileContextMenu = ({
       {
         label: "Show Metadata (I)",
         onClick: () =>
-          setBlanket(
-            <FileSummary fileid={fileid} withFav withSize withStorage />,
-            <FileMetadataView file={file} />
-          ),
+          setBlanket({
+            title: "title",
+            body: <FileMetadataView file={file} />,
+          }),
         hotkey: "i",
       },
     ];

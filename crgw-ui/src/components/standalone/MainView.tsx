@@ -1,35 +1,27 @@
 import cls from "classnames";
+import styled from "styled-components";
 
-import { useBlanket } from "providers/Blanket";
-import TableView from "components/standalone/table/TableView";
+import { useBlanket } from "hooks/useBlanket";
+import GridProvider from "providers/grid/grid";
+import GridView from "./grid/GridView";
 
-// TODO
-const BurgerMenuSpacer = () => <div />;
-const BurgerMenu = () => <div />;
-const GlobalSearch = () => <div />;
+const SelfClosingBurgerMenu = () => <div />;
 
 const MainView = () => {
-  const { isBlanketEnabled: isBlanketEnalbed } = useBlanket();
-
-  const maybeRenderBurgerMenu = () => {
-    if (isBlanketEnalbed) return null;
-    return <BurgerMenu />;
-  };
-
-  const renderMainView = () => (
-    <div className={cls("mainview", { hidden: isBlanketEnalbed })}>
-      <BurgerMenuSpacer />
-      <GlobalSearch />
-      <TableView />
-    </div>
-  );
+  const { isBlanketEnabled } = useBlanket();
 
   return (
-    <>
-      {maybeRenderBurgerMenu()}
-      {renderMainView()}
-    </>
+    <StyledMainView className={cls({ hidden: isBlanketEnabled })}>
+      <SelfClosingBurgerMenu />
+      <GridProvider>
+        <GridView />
+      </GridProvider>
+    </StyledMainView>
   );
 };
 
 export default MainView;
+
+const StyledMainView = styled.div`
+  margin: 1rem;
+`;

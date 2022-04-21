@@ -1,7 +1,7 @@
 import cls from "classnames";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { useFileRepository } from "providers/FileRepository";
+import { useFileRepository } from "hooks/useFileRepository";
 import { favAsEmoji } from "utils/userpromptUtils";
 import { toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 import { getVideoMetadata } from "utils/multimediaUtils";

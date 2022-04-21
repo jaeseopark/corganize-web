@@ -9,7 +9,7 @@ import {
 
 const NEW_FILE_THRESHOLD = getPosixSeconds() - 30 * 86400; // in the last 30 days
 
-const isNewFile = (lastopened?: number) => {
+const isnewfile = (lastopened?: number) => {
   if (lastopened) {
     return lastopened < NEW_FILE_THRESHOLD;
   }
@@ -23,12 +23,12 @@ export const retrieveFiles = (
   const decorate = (f: CorganizeFile): CorganizeFile => {
     const decorated: CorganizeFile = {
       ...f,
-      isNewFile: isNewFile(f.lastopened),
+      isnewfile: isnewfile(f.lastopened),
     };
 
     const localFilename = getLocalFilename(f.fileid);
     if (localFilename) {
-      decorated.streamingUrl = `/${localFilename}`;
+      decorated.streamingurl = `/${localFilename}`;
     }
 
     return decorated;
@@ -37,7 +37,7 @@ export const retrieveFiles = (
   const decorateAndFilter = (files: CorganizeFile[]) => {
     files = files.map(decorate);
     if (sessionInfo.showLocalOnly) {
-      return files.filter((f: CorganizeFile) => f.streamingUrl);
+      return files.filter((f: CorganizeFile) => f.streamingurl);
     }
     return files;
   };
