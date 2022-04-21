@@ -6,9 +6,9 @@ import FilterBar from "./filter/FilterBar";
 import GlobalSearch from "./filter/GlobalSearch";
 import Card from "./Card";
 import { useBlanket } from "hooks/useBlanket";
-import { useToast } from "hooks/useToast";
-import FileMetadataView from "../FileMetadataView";
 import PageControl from "./PageControl";
+import FileView from "../FileView";
+import { CorganizeFile } from "typedefs/CorganizeFile";
 
 const MIN_WIDTH = 200;
 
@@ -17,7 +17,6 @@ const InnerGrid = () => {
     fileProps: { files },
   } = useGrid();
   const { setBlanket } = useBlanket();
-  const { enqueue } = useToast();
   const gridRef: any = useRef();
 
   const [firstLocalFile] = files.filter((f) => true); // TODO test
@@ -28,14 +27,24 @@ const InnerGrid = () => {
     }, 100);
   };
 
+  const openFile = (f: CorganizeFile) => {
+    const { fileid, filename } = f;
+    setBlanket({
+      title: filename,
+      body: <FileView fileid={fileid} />,
+      onClose: refocus,
+    });
+  }
+
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
     if (key === "e") {
-      setBlanket({
-        title: firstLocalFile.filename,
-        body: <FileMetadataView file={firstLocalFile} />,
-        onClose: refocus,
-      });
+      openFile(firstLocalFile);
+    } else if ("0" <= key && key <= "9") {
+      const fileAtIndex = files.at(parseInt(key));
+      if (fileAtIndex) {
+        openFile(fileAtIndex);
+      }
     }
   };
 

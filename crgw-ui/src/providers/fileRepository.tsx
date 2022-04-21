@@ -81,8 +81,8 @@ const FileRepositoryProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(fileReducer, initialState);
 
   const addFiles = (fs: CorganizeFile[]) => {
-    const undiscovered = addAll(fs);
-    dispatch({ type: "ADD", payload: undiscovered });
+    addAll(fs);
+    dispatch({ type: "ADD", payload: fs });
   };
 
   useEffect(() => {

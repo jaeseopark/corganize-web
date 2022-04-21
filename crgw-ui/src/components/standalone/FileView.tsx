@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useToast } from "hooks/useToast";
 import { useFileRepository } from "hooks/useFileRepository";
 import { getInnermostChild } from "utils/elementUtils";
 import { CorganizeFile } from "typedefs/CorganizeFile";
@@ -8,7 +9,6 @@ import VideoView from "components/standalone/VideoView";
 import GalleryView from "components/standalone/GalleryView";
 
 import "./FileView.scss";
-import { useToast } from "hooks/useToast";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
@@ -21,13 +21,12 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const { enqueue } = useToast();
   const { findById, updateFile } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
-  const contentRef = useRef<JSX.Element>();
+  const contentRef: any = useRef();
 
   const file = findById(fileid);
-  const { filename, multimedia } = file;
 
   const getContent = useCallback(() => {
-    const { mimetype, streamingurl } = file;
+    const { filename, multimedia, mimetype, streamingurl } = file;
 
     if (!mimetype) {
       return <span tabIndex={1}>Mimetype is missing</span>;
@@ -57,11 +56,13 @@ const FileView = ({ fileid }: { fileid: string }) => {
         multimedia={multimedia}
       />
     );
-  }, [enqueue, file, fileid, filename, multimedia, updateFile]);
+  }, [enqueue, file, fileid, updateFile]);
 
   useEffect(() => {
-    setContent(getContent());
-  }, [getContent]);
+    if (file) {
+      setContent(getContent());
+    }
+  }, [getContent, file]);
 
   useEffect(() => {
     if (contentRef?.current) {
@@ -70,12 +71,13 @@ const FileView = ({ fileid }: { fileid: string }) => {
     }
   }, [content]);
 
+  if (!file) {
+    return <label>file not found. fileid: {fileid}</label>
+  }
+
   return (
     <WithFileContextMenu fileid={fileid}>
-      {
-        // @ts-ignore
-        <div ref={contentRef}>{content}</div>
-      }
+      <div ref={contentRef}>{content}</div>
     </WithFileContextMenu>
   );
 };
