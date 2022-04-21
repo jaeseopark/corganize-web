@@ -30,9 +30,8 @@ const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
   return (
     <Box
       className={cls("card", mimetype)}
-      maxWidth="420px"
-      w="full"
       bg={useColorModeValue("white", "gray.900")}
+      maxW="400px"
       boxShadow="xl"
       rounded="lg"
     >

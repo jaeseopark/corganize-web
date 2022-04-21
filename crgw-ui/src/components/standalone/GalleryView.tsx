@@ -144,7 +144,7 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
   const saveHighlights = () =>
     updateMultimedia({
       highlights: highlightManager.toString(),
-    }).then(() => enqueue("Gallery", "Highlights saved"));
+    }).then(() => enqueue({ title: "Gallery", body: "Highlights saved" }));
 
   const toggleFullscreen = () => {
     if (screenfull.isEnabled && mainref?.current) {
@@ -184,7 +184,10 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
       toggleFullscreen();
     } else if (key === "g") {
       if (isBulkHighlightMode) {
-        return enqueue("Error", "You must exit Bulk mode first");
+        return enqueue({
+          title: "Error",
+          body: "You must exit Bulk mode first",
+        });
       }
       toggleLightbox();
     } else if (key === "b") {

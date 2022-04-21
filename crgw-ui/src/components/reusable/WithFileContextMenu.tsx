@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import ContextMenuWrapper from "components/reusable/ContextMenuWrapper";
 import FileSummary from "components/reusable/FileSummary";
 import { COPIED_TO_CLIPBOARD } from "utils/userpromptUtils";
-import { useFileRepository } from "providers/fileRepository";
+import { useFileRepository } from "hooks/useFileRepository";
 import { useBlanket } from "hooks/useBlanket";
 import { ContextMenuOption } from "typedefs/ContextMenuOption";
 import { copyTextToClipboard } from "utils/clipboardUtils";
@@ -45,7 +45,7 @@ const WithFileContextMenu = ({
           label: "Copy Source URL",
           onClick: () => {
             copyTextToClipboard(sanitizedSourceurl).then(() =>
-              enqueue(COPIED_TO_CLIPBOARD, filename)
+              enqueue({ title: COPIED_TO_CLIPBOARD, body: filename })
             );
           },
         },

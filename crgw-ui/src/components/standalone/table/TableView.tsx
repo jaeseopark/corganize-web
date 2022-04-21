@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useFileRepository } from "providers/fileRepository";
+import { useFileRepository } from "hooks/useFileRepository";
 import {
   useColumnOrder,
   useFilters,
@@ -40,7 +40,7 @@ const hiddenColumns = ["sourceurl", "fileid", "encryptedPath"];
 const columnOrder = ["dateactivated", "isnewfile"];
 
 const TableView = () => {
-  const { files, markAsOpened, searchKeyword } = useFileRepository();
+  const { files, markAsOpened } = useFileRepository();
   const { setBlanket, isBlanketEnabled: isBlanketEnalbed } = useBlanket();
   const { toggleFavourite } = useFileRepository();
   const { height } = useWindowSize();
@@ -165,11 +165,6 @@ const TableView = () => {
     useSortBy,
     useColumnOrder,
     usePagination
-  );
-
-  useEffect(
-    () => tableInstance.setGlobalFilter(searchKeyword),
-    [searchKeyword, tableInstance]
   );
 
   const focusTable = () => {

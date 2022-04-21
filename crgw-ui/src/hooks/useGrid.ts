@@ -5,7 +5,7 @@ import { Filter, GlobalSearchFilter } from "providers/grid/types";
 
 export const useGrid = () => {
   const {
-    state: { filteredAndPaginatedFiles, filters },
+    state: { filteredAndPaginatedFiles, filters, sortOrders },
     dispatch,
   } = useContext(GridContext);
 
@@ -25,6 +25,7 @@ export const useGrid = () => {
     globalSearchFilter: globalSearchFilter as GlobalSearchFilter,
     upsertFilter,
     upsertFilters,
+    sortOrders,
     setFiles,
   };
 };

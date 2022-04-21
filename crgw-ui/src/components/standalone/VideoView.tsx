@@ -78,7 +78,10 @@ const VideoView = ({
           highlights: highlightManager.toString(),
         }),
       }).then(() =>
-        enqueue(toHumanDuration(vid.currentTime), "Highlight added")
+        enqueue({
+          title: toHumanDuration(vid.currentTime),
+          body: "Highlight added",
+        })
       );
     };
 

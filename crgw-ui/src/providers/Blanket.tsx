@@ -1,91 +1,124 @@
 import React, { Dispatch, useReducer } from "react";
 import cls from "classnames";
 
+import { Box, Button, Center } from "@chakra-ui/react";
+
 import "./blanket.scss";
 
-type Payload = {
+export type UserAction = {
+  name: string;
+  icon: JSX.Element;
+  onClick: () => void;
+};
+
+type BlanketPayload = {
   title: JSX.Element;
   body: JSX.Element;
+  userActions: UserAction[];
 };
 
 type State = {
-  current?: Payload;
+  title?: JSX.Element;
+  body?: JSX.Element;
   isHotkeyEnabled: boolean;
+  userActions: UserAction[];
 };
 
-type Action =
+type ReducerAction =
   | {
       type: "SET";
-      payload: Payload;
+      payload: BlanketPayload;
     }
+  | { type: "ADD_USER_ACTION"; payload: UserAction }
   | { type: "UNSET" }
   | { type: "SET_HOTKEY"; payload: boolean };
 
 const initialState: State = {
   isHotkeyEnabled: true,
+  userActions: [],
 };
 
 export const BlanketContext = React.createContext<{
   state: State;
-  dispatch?: Dispatch<Action>;
+  dispatch?: Dispatch<ReducerAction>;
 }>({ state: initialState });
 
 const blanketReducer = (
-  { current, isHotkeyEnabled }: State,
-  action: Action
+  { title, body, isHotkeyEnabled, userActions }: State,
+  action: ReducerAction
 ): State => {
   switch (action.type) {
     case "SET":
       return {
-        current: action.payload,
-        isHotkeyEnabled,
+        title: action.payload.title,
+        body: action.payload.body,
+        userActions: action.payload.userActions,
+        isHotkeyEnabled: true,
       };
     case "UNSET":
-      return { isHotkeyEnabled };
+      return { isHotkeyEnabled: false, userActions: [] };
+    case "ADD_USER_ACTION":
+      return {
+        title,
+        body,
+        isHotkeyEnabled,
+        userActions: [...userActions, action.payload],
+      };
     case "SET_HOTKEY":
       return {
-        current,
+        title,
+        body,
         isHotkeyEnabled: action.payload,
+        userActions,
       };
     default:
-      return { current, isHotkeyEnabled };
+      return { title, body, isHotkeyEnabled, userActions };
   }
 };
 
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
+  const { title, body, userActions } = state;
+  const isBlanketEnabled = !!title && !!body;
 
   const maybeRenderBlanket = () => {
-    if (!state.current) {
+    if (!isBlanketEnabled) {
       return null;
     }
 
     return (
-      <div className="blanket-view">
+      <div className="blanket-provider">
         <div className="blanket-header">
-          <label className="blanket-title">{state.current.title}</label>
-          <button
-            type="button"
-            className="close"
-            aria-label="Close"
-            onClick={() => dispatch({ type: "UNSET" })}
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <label className="blanket-title">{title}</label>
         </div>
-        <div className="blanket-body">{state.current.body}</div>
+        <div className="blanket-body">{body}</div>
+        <Center className="blanket-footer">
+          <>
+            {userActions.map(({ name, icon, onClick }) => (
+              <Button
+                key={name}
+                rightIcon={icon}
+                colorScheme="blue"
+                variant="outline"
+                onClick={onClick}
+              >
+                {name}
+              </Button>
+            ))}
+          </>
+        </Center>
       </div>
     );
   };
 
-  const childrenClassName = cls("children", { hidden: !!state.current });
+  const childrenClassName = cls("children", { hidden: isBlanketEnabled });
 
   return (
     <BlanketContext.Provider value={{ state, dispatch }}>
-      <div className="blanket-provider">
+      <>
         {maybeRenderBlanket()}
         <div className={childrenClassName}>{children}</div>
-      </div>
+      </>
     </BlanketContext.Provider>
   );
 };

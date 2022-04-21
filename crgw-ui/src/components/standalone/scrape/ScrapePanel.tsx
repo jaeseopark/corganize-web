@@ -9,7 +9,7 @@ import ScrapeInputBar from "components/standalone/scrape/InputBar";
 import ScrapeGrid from "components/standalone/scrape/Grid";
 
 import { useBlanket } from "hooks/useBlanket";
-import { useFileRepository } from "providers/fileRepository";
+import { useFileRepository } from "hooks/useFileRepository";
 import { getInstance } from "clients/corganize";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { isDiscovered } from "shared/globalstore";

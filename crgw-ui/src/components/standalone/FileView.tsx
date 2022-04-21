@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useFileRepository } from "providers/fileRepository";
+import { useFileRepository } from "hooks/useFileRepository";
 import { getInnermostChild } from "utils/elementUtils";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import WithFileContextMenu from "components/reusable/WithFileContextMenu";
@@ -41,11 +41,11 @@ const FileView = ({ fileid }: { fileid: string }) => {
     const updateFileWrapper = (partialProps: CorganizeFile) => {
       updateFile({ ...partialProps, fileid, filename })
         .then((file) => {
-          enqueue(filename, "File updated");
+          enqueue({ title: filename, body: "File updated" });
         })
         .catch((error: Error) => {
           if (error.message !== "foobar") {
-            enqueue(filename, error.message);
+            enqueue({ title: filename, body: error.message });
           }
         });
     };

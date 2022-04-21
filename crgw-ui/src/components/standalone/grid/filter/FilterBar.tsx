@@ -15,7 +15,7 @@ const FILTERS: Filter[] = [
     displayName: "Local",
     type: "boolean",
     fieldName: "streamingurl",
-    value: "checked",
+    value: "maybe",
   },
   {
     displayName: "Size",
@@ -39,17 +39,30 @@ const renderControl = (f: Filter) => {
 };
 
 const FilterBar = () => {
-  const { filters, upsertFilters } = useGrid();
+  const { filters, upsertFilters, sortOrders } = useGrid();
 
   useEffect(() => {
     upsertFilters(FILTERS);
   }, []);
 
+  const updateSortOrder = () => {
+    // TODO
+  };
+
+  const renderSortIcon = (f: Filter) => {
+    
+  };
+
   return (
     <div className="filter-bar">
       {filters.filter(nonGlobal).map((f) => (
         <Tag key={f.displayName} size="lg">
-          {f.displayName}
+          <div className="clickable" onClick={updateSortOrder}>
+            <>
+              <label>{f.displayName}</label>
+              {renderSortIcon(f)}
+            </>
+          </div>
           {renderControl(f)}
         </Tag>
       ))}
