@@ -38,14 +38,14 @@ const getPageProps = (state: State, dispatch: Dispatch<Action>) => {
 };
 
 const getFileProps = (state: State, dispatch: Dispatch<Action>) => {
-  const { filteredAndSorted: filteredFiles, filteredSortedAndPaginated: filteredAndPaginatedFiles } = state;
+  const { filteredAndSorted, filteredSortedAndPaginated } = state;
 
   const setFiles = (files: CorganizeFile[]) =>
     dispatch({ type: "SET_FILES", payload: files });
 
   return {
-    files: filteredAndPaginatedFiles,
-    fileCount: filteredFiles.length,
+    files: filteredSortedAndPaginated,
+    fileCount: filteredAndSorted.length,
     setFiles,
   };
 };

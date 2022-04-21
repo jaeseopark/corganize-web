@@ -1,16 +1,9 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { createMegaFilter } from "./filter";
+import { createMegaComparer } from "./sort";
 import { Action, Filter, Page, State } from "./types";
 
-const filterAll = (
-  files: CorganizeFile[],
-  filters: Filter[]
-): CorganizeFile[] => {
-  const mergedFilter = createMegaFilter(filters);
-  return files.filter(mergedFilter);
-};
-
-const merge = (old: Filter[], neww: Filter[]): Filter[] =>
+const mergeFilters = (old: Filter[], neww: Filter[]): Filter[] =>
   neww.reduce(
     (acc, next) => {
       const i = acc.findIndex((f) => f.displayName === next.displayName);
@@ -62,25 +55,29 @@ export const gridReducer = (
 ): State => {
   switch (action.type) {
     case "SET_FILES": {
-      const newFilteredFiles = filterAll(action.payload, filters);
-      const newPage = getNewPage(page, newFilteredFiles.length);
+      const newFilteredAndSorted = action.payload
+        .filter(createMegaFilter(filters))
+        .sort(createMegaComparer(sortOrders));
+      const newPage = getNewPage(page, newFilteredAndSorted.length);
       return {
         files: action.payload,
-        filteredAndSorted: newFilteredFiles,
-        filteredSortedAndPaginated: paginate(newFilteredFiles, newPage),
+        filteredAndSorted: newFilteredAndSorted,
+        filteredSortedAndPaginated: paginate(newFilteredAndSorted, newPage),
         filters,
         page: newPage,
         sortOrders,
       };
     }
     case "UPSERT_FILTERS": {
-      const newFilters = merge(filters, action.payload);
-      const newFilteredFiles = filterAll(files, Object.values(newFilters));
-      const newPage = getNewPage(page, newFilteredFiles.length);
+      const newFilters = mergeFilters(filters, action.payload);
+      const newFilteredAndSorted = files
+        .filter(createMegaFilter(Object.values(newFilters)))
+        .sort(createMegaComparer(sortOrders));
+      const newPage = getNewPage(page, newFilteredAndSorted.length);
       return {
         files,
-        filteredAndSorted: newFilteredFiles,
-        filteredSortedAndPaginated: paginate(newFilteredFiles, newPage),
+        filteredAndSorted: newFilteredAndSorted,
+        filteredSortedAndPaginated: paginate(newFilteredAndSorted, newPage),
         filters: newFilters,
         page: newPage,
         sortOrders,
@@ -97,13 +94,15 @@ export const gridReducer = (
         sortOrders,
       };
     case "SET_SORT_ORDERS":
+      const newSortOrders = action.payload;
+      const newFilteredAndSorted = filteredAndSorted.sort(createMegaComparer(newSortOrders))
       return {
         files,
-        filteredAndSorted,
-        filteredSortedAndPaginated,
+        filteredAndSorted: newFilteredAndSorted,
+        filteredSortedAndPaginated: paginate(newFilteredAndSorted, page),
         filters,
         page,
-        sortOrders: action.payload
+        sortOrders: newSortOrders
       }
     default:
       return {
