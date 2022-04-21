@@ -1,5 +1,6 @@
-import CardView, { Card } from "components/standalone/scrape/ScrapePanelCardView";
-import { CircularProgress } from "@material-ui/core";
+import CardView, {
+  Card,
+} from "components/standalone/scrape/ScrapePanelCardView";
 
 type ScrapeGridProps = {
   disabled: boolean;
@@ -30,7 +31,7 @@ const ScrapeGrid = ({
     />
   ));
 
-  const spinner = disabled ? <CircularProgress /> : null;
+  const spinner = disabled ? <label>Working...</label> : null;
 
   return (
     <div className="scrape-grid-with-spinner">

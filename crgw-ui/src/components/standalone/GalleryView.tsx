@@ -8,7 +8,6 @@ import {
 } from "react";
 import screenfull from "screenfull";
 import cls from "classnames";
-import LinearProgress from "@material-ui/core/LinearProgress";
 
 import { getPosixMilliseconds } from "utils/dateUtils";
 
@@ -219,10 +218,10 @@ const GalleryView = ({ zipPath, updateFile, multimedia }: GalleryViewProps) => {
     if (showLightbox) {
       return (
         <div className="lightbox-with-progress">
-          <LinearProgress
+          {/* <LinearProgress
             variant="determinate"
             value={((currentIndex + 1) * 100) / srcs.length}
-          />
+          /> */}
           <div className="lightbox">
             {
               // @ts-ignore
