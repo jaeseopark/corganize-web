@@ -1,33 +1,33 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { SortOrder } from "./types";
+import { Field, Sort } from "./types";
 
 const DEFAULT_COMPARER = (a: CorganizeFile, b: CorganizeFile): number => a.fileid > b.fileid ? 1 : -1;
 
-const getFieldValue = (f: CorganizeFile, s: SortOrder) => {
-    if (s.type === "number") {
-        return Number(f[s.fieldName]) || 0;
+const getFieldValue = (file: CorganizeFile, fld: Field) => {
+    if (fld.sortType === "number") {
+        return Number(file[fld.key]) || 0;
     }
 
     throw new Error("Unsupported");
 }
 
-const getComparer = (sortOrder: SortOrder) => (a: CorganizeFile, b: CorganizeFile): number => {
-    const valueA = getFieldValue(a, sortOrder);
-    const valueB = getFieldValue(b, sortOrder);
+const getComparer = (sort: Sort) => (a: CorganizeFile, b: CorganizeFile): number => {
+    const valueA = getFieldValue(a, sort.field);
+    const valueB = getFieldValue(b, sort.field);
     if (valueA === valueB) return 0;
     if (valueA > valueB) return 1;
     return -1;
 }
 
-const getNumericDirection = (s: SortOrder) => s.direction === "asc" ? 1 : -1;
+const getNumericDirection = (s: Sort) => s.direction === "asc" ? 1 : -1;
 
-export const createMegaComparer = (sortOrders: SortOrder[]) => {
-    if (sortOrders.length === 0) {
+export const createMegaComparer = (sorts: Sort[]) => {
+    if (sorts.length === 0) {
         return DEFAULT_COMPARER
     }
 
     return (a: CorganizeFile, b: CorganizeFile): number =>
-        sortOrders.reduce((acc, next) => {
+        sorts.reduce((acc, next) => {
             if (acc !== 0) {
                 // comparison is already done in a previous step
                 return acc;

@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import { SimpleGrid } from "@chakra-ui/react";
 import { useGrid } from "hooks/useGrid";
 import { useFileRepository } from "hooks/useFileRepository";
-import FilterBar from "./filter/FilterBar";
-import GlobalSearch from "./filter/GlobalSearch";
+import FieldBar from "./field/FieldBar";
+import GlobalSearch from "./field/GlobalSearch";
 import Card from "./Card";
 import { useBlanket } from "hooks/useBlanket";
 import PageControl from "./PageControl";
@@ -86,7 +86,7 @@ const GridView = () => {
 
   return (
     <div className="grid-view">
-      <FilterBar />
+      <FieldBar />
       <GlobalSearch />
       <PageControl />
       <InnerGrid />

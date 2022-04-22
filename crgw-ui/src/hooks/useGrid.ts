@@ -3,9 +3,9 @@ import { GridContext } from "providers/grid/grid";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import {
   Action,
+  Field,
   Filter,
-  GlobalSearchFilter,
-  SortOrder,
+  Sort,
   State,
 } from "providers/grid/types";
 
@@ -50,29 +50,29 @@ const getFileProps = (state: State, dispatch: Dispatch<Action>) => {
   };
 };
 
-const getFilterProps = (state: State, dispatch: Dispatch<Action>) => {
-  const { filters, sortOrders } = state;
-  const [globalSearchFilter] = filters.filter((f) => f.type === "global");
+const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
+  const { prefilter, fields, filters, sorts } = state;
 
-  const upsertFilters = (filters: Filter[]) =>
-    dispatch({ type: "UPSERT_FILTERS", payload: filters });
+  const getFilter = (field: Field) => filters.find(flt => flt.field.displayName === field.displayName);
+  const getSort = (field: Field) => sorts.find(flt => flt.field.displayName === field.displayName);
 
-  const upsertFilter = (filter: Filter) => upsertFilters([filter]);
+  const setPrefilter = (value: string) => dispatch({ type: "SET_PREFILTER", payload: value });
 
-  const setSortOrder = (sortOrder: SortOrder) => dispatch({ type: "SET_SORT_ORDERS", payload: [sortOrder] })
-
-  const clearSortOrder = () => dispatch({ type: "SET_SORT_ORDERS", payload: [] })
-
-  const getSortOrderByName = (name: string) => sortOrders.find(so => so.displayName === name);
+  const upsertFilter = (filter: Filter) => dispatch({ type: "UPSERT_FILTERS", payload: [filter] });
+  const removeFilter = (filter: Filter) => dispatch({ type: "REMOVE_FILTERS", payload: [filter] });
+  const upsertSort = (sort: Sort) => dispatch({ type: "UPSERT_SORTS", payload: [sort] });
+  const removeSort = (sort: Sort) => dispatch({ type: "REMOVE_SORTS", payload: [sort] });
 
   return {
-    filters,
+    fields,
+    getFilter,
+    getSort,
+    prefilter,
+    setPrefilter,
     upsertFilter,
-    upsertFilters,
-    setSortOrder,
-    clearSortOrder,
-    getSortOrderByName,
-    globalSearchFilter: globalSearchFilter as GlobalSearchFilter,
+    removeFilter,
+    upsertSort,
+    removeSort
   };
 };
 
@@ -80,7 +80,7 @@ export const useGrid = () => {
   const { state, dispatch } = useContext(GridContext);
   return {
     fileProps: getFileProps(state, dispatch!),
-    filterProps: getFilterProps(state, dispatch!),
+    fieldProps: getFieldProps(state, dispatch!),
     pageProps: getPageProps(state, dispatch!),
   };
 };

@@ -1,58 +1,50 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
 /**
- * Shared items
+ * Field-related items
  */
-export type FilterAndSortDataType = "global" | "number" | "boolean" | "dropdown";
+export type SortType = "number" | "boolean" | "string";
+export type FilterType = "number" | "boolean" | "dropdown";
+export type Field = {
+  key: keyof CorganizeFile;
+  displayName: string;
+  filterType: FilterType;
+  sortType: SortType;
+}
+
+export interface FieldReferer {
+  field: Field;
+};
 
 /**
  * Filter-related items
  */
-export type GlobalSearchFilter = {
-  type: "global";
-  value: string;
-  displayName: string;
-};
 
 export type MaybeBoolean = "checked" | "unchecked" | "maybe";
 export type BooleanFilter = {
-  type: "boolean";
-  fieldName: keyof CorganizeFile;
   value: MaybeBoolean;
-  displayName: string;
 };
 
 export type DropdownFilter = {
-  type: "dropdown";
-  isActive: boolean;
-  fieldName: keyof CorganizeFile;
   value: string;
-  displayName: string;
 };
 
 export type NumberFilter = {
-  type: "number";
-  isActive: boolean;
-  fieldName: keyof CorganizeFile;
   value1: number;
   value2: number;
-  displayName: string;
 };
 
-export type Filter =
-  | GlobalSearchFilter
-  | BooleanFilter
-  | DropdownFilter
-  | NumberFilter;
+export interface Filter extends FieldReferer {
+  number?: NumberFilter,
+  boolean?: BooleanFilter
+  dropdown?: DropdownFilter
+}
 
 /**
  * Sort-related items
  */
 export type SortDirection = "asc" | "desc";
-export type SortOrder = {
-  displayName: string,
-  type: FilterAndSortDataType,
-  fieldName: keyof CorganizeFile,
+export interface Sort extends FieldReferer {
   direction: SortDirection;
 };
 
@@ -75,14 +67,18 @@ export type State = {
   files: CorganizeFile[];
   filteredAndSorted: CorganizeFile[];
   filteredSortedAndPaginated: CorganizeFile[];
-  filters: Filter[];
+  fields: Field[],
+  filters: Filter[],
+  sorts: Sort[],
+  prefilter: string,
   page: Page;
-  sortOrders: SortOrder[];
 };
 
 export type Action =
   | { type: "SET_FILES"; payload: CorganizeFile[] }
   | { type: "UPSERT_FILTERS"; payload: Filter[] }
-  | { type: "SET_SORT_ORDERS"; payload: SortOrder[] }
-  | { type: "SET_PAGE"; payload: Page }
-  | { type: "SET_MOST_RECENT"; payload: string };
+  | { type: "REMOVE_FILTERS"; payload: Filter[] }
+  | { type: "UPSERT_SORTS"; payload: Sort[] }
+  | { type: "REMOVE_SORTS"; payload: Sort[] }
+  | { type: "SET_PREFILTER"; payload: string }
+  | { type: "SET_PAGE"; payload: Page };
