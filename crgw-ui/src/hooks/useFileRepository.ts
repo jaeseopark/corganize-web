@@ -34,8 +34,8 @@ export const useFileRepository = () => {
     return getInstance()
       .updateFile(partialProps)
       .then(() => {
-        dispatch!({ type: "UPDATE", payload: partialProps })
-      })
+        dispatch!({ type: "UPDATE", payload: partialProps });
+      });
   };
 
   const markAsOpened = (fileid: string) => {
@@ -45,23 +45,30 @@ export const useFileRepository = () => {
       isnewfile: false,
     };
 
-    updateFile(partialProps)
-      .then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
+    updateFile(partialProps).then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
   };
 
   /**
    * De/activates a file by its fileid.
-   * 
+   *
    * @param fileid ID of the file to de/activate.
-   * @returns A boolean value indicating the new activation state
+   * @returns A boolean value indicating the new activation state along with the emoji representation.
    */
   const toggleFavourite = (fileid: string) => {
-    const { dateactivated } = findById(fileid);
-    const partialProps: Partial<CorganizeFile> = {
-      fileid,
-      dateactivated: !dateactivated ? getPosixSeconds() : 0,
-    };
-    return updateFile(partialProps).then(() => ({ activated: !!partialProps.dateactivated, emoji: !!partialProps.dateactivated ? "👍" : "👎" }));
+    const file = findById(fileid);
+    const isActivating = !file.dateactivated;
+    const newDateActivated = isActivating ? getPosixSeconds() : 0;
+
+    // Note: Toggling is one use case where the entire file has to be sent to the server.
+    const updatePayload = {
+      ...file,
+      dateactivated: newDateActivated,
+    }
+
+    return updateFile(updatePayload).then(() => ({
+      activated: isActivating,
+      emoji: isActivating ? "👍" : "👎",
+    }));
   };
 
   return {

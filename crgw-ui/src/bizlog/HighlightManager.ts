@@ -27,6 +27,7 @@ class HighlightManager {
   }
 
   isHighlighted = (value: number): boolean => this.highlights.includes(value);
+  isEmpty = () => this.highlights.length === 0;
 
   toRanges = (): number[][] => {
     if (this.highlights.length === 0) return [];

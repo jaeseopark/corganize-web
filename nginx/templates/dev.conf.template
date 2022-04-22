@@ -23,7 +23,7 @@ server {
     }
 
     location /remote/ {
-        rewrite /remote/(.*) $1?apikey=${CRG_REOMTE_APIKEY} break;
+        rewrite /remote/(.*) ${CRG_REMOTE_HOST}/$1?apikey=${CRG_REOMTE_APIKEY} break;
         proxy_pass ${CRG_REMOTE_HOST};
         proxy_set_header Host ${CRG_REMOTE_HOST};
     }

@@ -40,17 +40,22 @@ const Img = forwardRef(({ src, isHighlighted, isSelected, onClick }: ImgProps, r
   );
 });
 
-
-const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileViewComponentProps) => {
+const GalleryView = ({
+  file: { multimedia, streamingurl },
+  updateFile,
+}: FileViewComponentProps) => {
   const { enqueue } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [showLightbox, setShowLightbox] = useState(false);
+  const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
-  const highlightManager = useMemo(() => new HighlightManager(multimedia?.highlights), [multimedia]);
+  const highlightManager = useMemo(
+    () => new HighlightManager(multimedia?.highlights),
+    [multimedia]
+  );
   const mainref = useRef();
   const selectedImgRef = useRef();
 
@@ -97,10 +102,10 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
 
   useEffect(() => {
     const element = selectedImgRef?.current;
-    if (!showLightbox && element && (element as any) instanceof HTMLElement) {
+    if (!isLightboxEnabled && element && (element as any) instanceof HTMLElement) {
       (element as HTMLElement).scrollIntoView();
     }
-  }, [currentIndex, showLightbox]);
+  }, [currentIndex, isLightboxEnabled]);
 
   const rerender = () => setLastBulkHighlightActivity(getPosixMilliseconds());
 
@@ -132,14 +137,23 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
     }
   };
 
-  const toggleLightbox = () => setShowLightbox(!showLightbox);
+  const enterFullscreen = () => {
+    if (isFullscreen) {
+      return;
+    }
+    toggleFullscreen();
+  };
+
+  const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
+  const enterLightbox = () => setLightboxEnabled(true);
+  const leaveLightbox = () => setLightboxEnabled(false);
 
   const toggleBulkHighlightMode = () => {
     if (isBulkHighlightMode) {
       setBulkHighlightMode(false);
       saveHighlights();
     } else {
-      setShowLightbox(false);
+      setLightboxEnabled(false);
       setBulkHighlightMode(true);
     }
   };
@@ -168,6 +182,12 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
         });
       }
       toggleLightbox();
+    } else if (key === "e") {
+      // jump by 10% in fullscreen.
+      enterFullscreen();
+      enterLightbox();
+      const i = currentIndex + Math.floor(srcs.length / 10);
+      safeJump(i % srcs.length);
     } else if (key === "b") {
       toggleHighlight(currentIndex);
       if (!isBulkHighlightMode) {
@@ -181,7 +201,7 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
     } else if (key === "`") {
       const nextIndex = highlightManager.next(currentIndex);
       if (nextIndex !== null) setCurrentIndex(nextIndex);
-    } else if (!isBulkHighlightMode && !showLightbox && key === " ") {
+    } else if (!isBulkHighlightMode && !isLightboxEnabled && key === " ") {
       toggleLightbox();
     } else if (key === "enter") {
       toggleBulkHighlightMode();
@@ -194,23 +214,24 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
   };
 
   const maybeRenderLightbox = () => {
-    if (showLightbox) {
-      return (
-        <div className="lightbox-with-progress">
-          {/* <LinearProgress
-            variant="determinate"
-            value={((currentIndex + 1) * 100) / srcs.length}
-          /> */}
-          <div className="lightbox">
-            {
-              // @ts-ignore
-              <Img src={srcs[currentIndex]} />
-            }
-          </div>
-        </div>
-      );
+    if (!isLightboxEnabled) {
+      return null;
     }
-    return null;
+
+    return (
+      <div className="lightbox-with-progress">
+        {/* <LinearProgress
+          variant="determinate"
+          value={((currentIndex + 1) * 100) / srcs.length}
+        /> */}
+        <div className="lightbox">
+          {
+            // @ts-ignore
+            <Img src={srcs[currentIndex]} />
+          }
+        </div>
+      </div>
+    );
   };
 
   const maybeRenderBulkModeControls = () => {
@@ -226,7 +247,7 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
   };
 
   const maybeRenderGrid = () => {
-    if (showLightbox) return null;
+    if (isLightboxEnabled) return null;
     return (
       <div className="zip-grid">
         {srcs.map((imgSrc, i) => {
@@ -249,6 +270,11 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
     );
   };
 
+  const maybeRenderAlertProvider = () => {
+    if (!isFullscreen) return null; // TODO
+    //return <AlertProvider />;
+  };
+
   if (errorMessage) {
     return (
       // @ts-ignore
@@ -263,13 +289,13 @@ const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileVie
   }
 
   const divCls = cls("zip-view", { windowed: !isFullscreen });
-
   return (
     // @ts-ignore
     <div className={divCls} tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
       {maybeRenderLightbox()}
       {maybeRenderBulkModeControls()}
       {maybeRenderGrid()}
+      {maybeRenderAlertProvider()}
     </div>
   );
 };

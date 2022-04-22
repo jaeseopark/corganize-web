@@ -17,14 +17,19 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   b: 300,
 };
 
-const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateFile }: FileViewComponentProps) => {
-
+const VideoView = ({
+  file: { multimedia: multimediaSeed, streamingurl },
+  updateFile,
+}: FileViewComponentProps) => {
+  const mainref = useRef();
   const { enqueue } = useToast();
-  const divRef = useRef();
-  const [rotationDegrees, setRotationDegrees] = useState(0);
   const [isFullscreen, setFullscreen] = useState(false);
-  const highlightManager: HighlightManager = useMemo(() => new HighlightManager(multimediaSeed?.highlights), [multimediaSeed]);
+  const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
+  const highlightManager: HighlightManager = useMemo(
+    () => new HighlightManager(multimediaSeed?.highlights),
+    [multimediaSeed]
+  );
 
   const quarterRotation = () => setRotationDegrees(rotationDegrees + 90);
   const resetRotation = () => setRotationDegrees(0);
@@ -71,7 +76,7 @@ const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateF
     const jumpTimeByDelta = (deltaInSeconds: number) => {
       try {
         vid.currentTime += deltaInSeconds;
-      } catch (e) { }
+      } catch (e) {}
     };
 
     /**
@@ -80,7 +85,7 @@ const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateF
     const jumpTimeByPercentage = (percentage: number) => {
       try {
         vid.currentTime = vid.duration * percentage;
-      } catch (e) { }
+      } catch (e) {}
     };
 
     const jumptToNextHighlight = () => {
@@ -90,12 +95,15 @@ const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateF
 
     if (key === "f") {
       if (screenfull.isEnabled) {
-        screenfull.toggle(divRef.current);
+        screenfull.toggle(mainref.current);
         setFullscreen(!isFullscreen);
       }
-    } else if (key === "g") {
-      // jump by 10%
-      jumpTimeByDelta(vid.duration / 10);
+    } else if (key === "e") {
+      if (highlightManager.isEmpty()) {
+        jumpTimeByDelta(vid.duration / 10); // jump by 10%
+      } else {
+        jumptToNextHighlight();
+      }
     } else if (key === "m") {
       vid.muted = !vid.muted;
     } else if (key === "r") {
@@ -106,8 +114,6 @@ const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateF
       }
     } else if (key === "b") {
       addHighlight();
-    } else if (key === "`") {
-      jumptToNextHighlight();
     } else if (key >= "0" && key <= "9") {
       jumpTimeByPercentage(parseInt(key, 10) / 10);
     } else if (SEEK_HOTKEY_MAP[key]) {
@@ -119,14 +125,22 @@ const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateF
 
   const renderVideo = () => (
     <RotatingDiv fillViewport={isFullscreen} degrees={rotationDegrees}>
-      <video onKeyDown={onKeyDown} onLoadedMetadata={onMetadata} src={streamingurl} muted autoPlay loop controls />
+      <video
+        onKeyDown={onKeyDown}
+        onLoadedMetadata={onMetadata}
+        src={streamingurl}
+        muted
+        autoPlay
+        loop
+        controls
+      />
     </RotatingDiv>
   );
 
-  const divCls = cls("video-view", { fullscreen: isFullscreen })
+  const divCls = cls("video-view", { fullscreen: isFullscreen });
   return (
     // @ts-ignore
-    <div className={divCls} ref={divRef}>
+    <div className={divCls} ref={mainref}>
       {renderVideo()}
     </div>
   );
