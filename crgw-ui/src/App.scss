@@ -2,8 +2,13 @@
   display: none;
 }
 
+.semi-hidden {
+  opacity: 0;
+}
+
 .clickable {
   cursor: pointer;
+
   * {
     cursor: pointer;
   }

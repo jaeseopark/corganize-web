@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { Box, Center, Flex, Heading, Spacer } from "@chakra-ui/react";
 
-import { addDays, dateToPosixSeconds } from "utils/dateUtils";
 import { SessionInfo } from "typedefs/Session";
+import { addDays, dateToPosixSeconds } from "utils/dateUtils";
 import ExpandableDateRange from "components/reusable/ExpandableDateRange";
 
 import "./LibrarySelector.scss";
 
 const DEFAULT_LOOKBACK_DAYS = 14;
-const INCREMENT = 1000;
+const INCREMENT = 250;
 
 const SessionConfigurer = ({
   setInfo,
 }: {
   setInfo: (s: SessionInfo) => void;
 }) => {
-  const [fileLimit, setFileLimit] = useState(1000);
+  const [fileLimit, setFileLimit] = useState(500);
   const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
   const [showLocalOnly, setLocalOnly] = useState(true);
   const [dateRange, setDateRange] = useState({
@@ -38,7 +38,7 @@ const SessionConfigurer = ({
       onChange={(e) => setFileLimit(Number.parseInt(e.target.value))}
       value={fileLimit}
       step={INCREMENT}
-      min={0}
+      min={INCREMENT}
     />
   );
 

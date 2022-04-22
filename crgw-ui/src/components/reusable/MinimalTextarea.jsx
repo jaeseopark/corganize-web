@@ -2,7 +2,7 @@ import cls from "classnames";
 
 import "./MinimalTextarea.scss";
 
-// TODO: forwardRef?
+// TODO: Delete this cls
 const MinimalTextarea = (props) => {
   const { className, ...rest } = props;
   return (

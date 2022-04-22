@@ -5,26 +5,18 @@ import { ChangeEvent } from "react";
 
 const GlobalSearch = () => {
   const {
-    filterProps: { globalSearchFilter: filter, upsertFilter },
+    fieldProps: { prefilter, setPrefilter },
     fileProps: { fileCount },
   } = useGrid();
 
   const onKeyDown = (e: any) => {
     if (e.key === "Escape") {
-      upsertFilter({
-        ...filter,
-        type: "global",
-        value: "",
-      });
+      setPrefilter("");
     }
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    upsertFilter({
-      ...filter,
-      type: "global",
-      value: e.target.value as string,
-    });
+    setPrefilter(e.target.value as string);
   };
 
   return (
@@ -35,7 +27,7 @@ const GlobalSearch = () => {
       />
       <Input
         placeholder="Filter by keyword"
-        value={filter.value}
+        value={prefilter}
         onChange={onChange}
         onKeyDown={onKeyDown}
       />

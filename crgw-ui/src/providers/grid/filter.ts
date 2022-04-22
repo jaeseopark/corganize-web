@@ -1,40 +1,24 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Filter, MaybeBoolean } from "./types";
 
-const filterGlobalText = (value: string) => {
+const filterGlobalText = (value: string) => (f: CorganizeFile) => {
   const lowered = value.toLowerCase().trim();
-  return (f: CorganizeFile) => {
-    return (
-      f.filename.toLowerCase().includes(lowered) ||
-      f.fileid.toLocaleLowerCase().includes(lowered)
-    );
-  };
+  return f.filename.toLowerCase().includes(lowered) || f.fileid.toLowerCase().includes(lowered);
 };
 
-export const createMegaFilter = (filters: Filter[]) =>
+export const createMegaFilter = (filters: Filter[], prefilter: string) =>
   filters.reduce(
     (acc, next) => {
-      if (next.type === "global" && next.value) {
-        return (f: CorganizeFile) => acc(f) && filterGlobalText(next.value!)(f);
-      }
-
-      if (next.type === "boolean" && next.value !== "maybe") {
+      if (next.field!.filterType === "boolean" && next.boolean!.value !== "maybe") {
         return (f: CorganizeFile) => {
-          const fieldValue: MaybeBoolean = Boolean(f[next.fieldName])
+          const fieldValue: MaybeBoolean = Boolean(f[next.field.key])
             ? "checked"
             : "unchecked";
-          return acc(f) && fieldValue === next.value;
-        };
-      }
-
-      if (next.type === "dropdown" && next.isActive) {
-        return (f: CorganizeFile) => {
-          const fieldValue = String(f[next.fieldName]);
-          return acc(f) && fieldValue === next.value;
+          return acc(f) && fieldValue === next.boolean!.value;
         };
       }
 
       return acc;
     },
-    (f: CorganizeFile) => true
+    (f: CorganizeFile) => filterGlobalText(prefilter)(f)
   );

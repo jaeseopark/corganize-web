@@ -1,19 +1,12 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { createMegaFilter } from "./filter";
-import { Action, Filter, Page, State } from "./types";
+import { createMegaComparer } from "./sort";
+import { Action, FieldReferer, Page, Sort, State } from "./types";
 
-const filterAll = (
-  files: CorganizeFile[],
-  filters: Filter[]
-): CorganizeFile[] => {
-  const mergedFilter = createMegaFilter(filters);
-  return files.filter(mergedFilter);
-};
-
-const merge = (old: Filter[], neww: Filter[]): Filter[] =>
+const merge = (old: FieldReferer[], neww: FieldReferer[]) =>
   neww.reduce(
     (acc, next) => {
-      const i = acc.findIndex((f) => f.displayName === next.displayName);
+      const i = acc.findIndex((f) => f.field.displayName === next.field.displayName);
       if (i === -1) {
         acc.push(next);
         return acc;
@@ -49,76 +42,82 @@ const paginate = (files: CorganizeFile[], page: Page) => {
   return files.slice(offset, offset + page.itemsPerPage);
 };
 
+const recompute = (state: State): State => {
+  const { files, filters, prefilter, sorts, page } = state;
+  const newFilteredAndSorted = files
+    .filter(createMegaFilter(filters, prefilter))
+    .sort(createMegaComparer(sorts));
+  const newPage = getNewPage(page, newFilteredAndSorted.length);
+  const newFilteredSortedAndPaginated = paginate(newFilteredAndSorted, newPage);
+  return {
+    ...state,
+    filteredAndSorted: newFilteredAndSorted,
+    filteredSortedAndPaginated: newFilteredSortedAndPaginated,
+    page: newPage
+  }
+}
+
 export const gridReducer = (
-  {
-    files,
-    filteredFiles,
-    filteredAndPaginatedFiles,
-    mostRecentFileid,
-    filters,
-    page,
-    sortOrders,
-  }: State,
+  state: State,
   action: Action
 ): State => {
+  const {
+    filteredAndSorted,
+    filters,
+    sorts
+  } = state;
+
   switch (action.type) {
     case "SET_FILES": {
-      const newFilteredFiles = filterAll(action.payload, filters);
-      const newPage = getNewPage(page, newFilteredFiles.length);
-      return {
-        files: action.payload,
-        filteredFiles: newFilteredFiles,
-        filteredAndPaginatedFiles: paginate(newFilteredFiles, newPage),
-        mostRecentFileid,
-        filters,
-        page: newPage,
-        sortOrders,
-      };
+      return recompute({
+        ...state,
+        files: action.payload
+      });
     }
     case "UPSERT_FILTERS": {
       const newFilters = merge(filters, action.payload);
-      const newFilteredFiles = filterAll(files, Object.values(newFilters));
-      const newPage = getNewPage(page, newFilteredFiles.length);
-      return {
-        files,
-        filteredFiles: newFilteredFiles,
-        filteredAndPaginatedFiles: paginate(newFilteredFiles, newPage),
-        mostRecentFileid,
-        filters: newFilters,
-        page: newPage,
-        sortOrders,
-      };
+      return recompute({
+        ...state,
+        filters: newFilters
+      });
+    }
+    case "REMOVE_FILTERS": {
+      const fieldNamesToRemove = new Set(action.payload.map(flt => flt.field.displayName));
+      const newFilters = filters.filter(f => !fieldNamesToRemove.has(f.field.displayName));
+      return recompute({
+        ...state,
+        filters: newFilters
+      });
+    }
+    case "UPSERT_SORTS": {
+      const newSorts = merge(sorts, action.payload) as Sort[];
+      return recompute({
+        ...state,
+        sorts: newSorts
+      });
+    }
+    case "REMOVE_SORTS": {
+      const fieldNamesToRemove = new Set(action.payload.map(flt => flt.field.displayName));
+      const newSorts = sorts.filter(f => !fieldNamesToRemove.has(f.field.displayName));
+      return recompute({
+        ...state,
+        sorts: newSorts
+      });
+    }
+    case "SET_PREFILTER": {
+      return recompute({
+        ...state,
+        prefilter: action.payload
+      });
     }
     case "SET_PAGE":
-      const newPage = getNewPage(action.payload, filteredFiles.length);
+      const newPage = getNewPage(action.payload, filteredAndSorted.length);
       return {
-        files,
-        filteredFiles,
-        filteredAndPaginatedFiles: paginate(filteredFiles, newPage),
-        mostRecentFileid,
-        filters,
+        ...state,
+        filteredSortedAndPaginated: paginate(filteredAndSorted, newPage),
         page: newPage,
-        sortOrders,
-      };
-    case "SET_MOST_RECENT":
-      return {
-        files,
-        filteredFiles,
-        filteredAndPaginatedFiles,
-        mostRecentFileid: action.payload,
-        filters,
-        page,
-        sortOrders,
       };
     default:
-      return {
-        files,
-        filteredFiles,
-        filteredAndPaginatedFiles,
-        mostRecentFileid,
-        filters,
-        page,
-        sortOrders,
-      };
+      return state;
   }
 };
