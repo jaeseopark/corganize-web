@@ -1,13 +1,7 @@
 import { Dispatch, useContext } from "react";
 import { GridContext } from "providers/grid/grid";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import {
-  Action,
-  Field,
-  Filter,
-  Sort,
-  State,
-} from "providers/grid/types";
+import { Action, Field, Filter, Sort, State } from "providers/grid/types";
 
 const getPageProps = (state: State, dispatch: Dispatch<Action>) => {
   const { page } = state;
@@ -40,8 +34,7 @@ const getPageProps = (state: State, dispatch: Dispatch<Action>) => {
 const getFileProps = (state: State, dispatch: Dispatch<Action>) => {
   const { filteredAndSorted, filteredSortedAndPaginated } = state;
 
-  const setFiles = (files: CorganizeFile[]) =>
-    dispatch({ type: "SET_FILES", payload: files });
+  const setFiles = (files: CorganizeFile[]) => dispatch({ type: "SET_FILES", payload: files });
 
   return {
     files: filteredSortedAndPaginated,
@@ -53,8 +46,8 @@ const getFileProps = (state: State, dispatch: Dispatch<Action>) => {
 const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
   const { prefilter, fields, filters, sorts } = state;
 
-  const getFilter = (field: Field) => filters.find(flt => flt.field.displayName === field.displayName);
-  const getSort = (field: Field) => sorts.find(flt => flt.field.displayName === field.displayName);
+  const getFilter = (field: Field) => filters.find((flt) => flt.field.displayName === field.displayName);
+  const getSort = (field: Field) => sorts.find((flt) => flt.field.displayName === field.displayName);
 
   const setPrefilter = (value: string) => dispatch({ type: "SET_PREFILTER", payload: value });
 
@@ -72,7 +65,7 @@ const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
     upsertFilter,
     removeFilter,
     upsertSort,
-    removeSort
+    removeSort,
   };
 };
 

@@ -23,10 +23,13 @@ server {
     }
 
     location /remote/ {
-        rewrite /remote/(.*) ${CRG_REMOTE_HOST}/$1?apikey=${CRG_REOMTE_APIKEY} redirect;
+        rewrite /remote/(.*) ${CRG_REMOTE_HOST}/$1?apikey=${CRG_REOMTE_APIKEY} break;
+        proxy_pass ${CRG_REMOTE_HOST};
+        proxy_set_header Host ${CRG_REMOTE_HOST};
     }
 
-    location /scrape/ {
+    location /scrape {
         proxy_pass ${SCRAPE_HOST};
+        proxy_set_header Host ${SCRAPE_HOST};
     }
 }

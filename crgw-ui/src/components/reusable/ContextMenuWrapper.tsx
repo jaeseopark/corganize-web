@@ -9,11 +9,7 @@ type ContextMenuWrapperProps = {
   options: ContextMenuOption[];
 };
 
-const ContextMenuWrapper = ({
-  id,
-  children,
-  options,
-}: ContextMenuWrapperProps) => {
+const ContextMenuWrapper = ({ id, children, options }: ContextMenuWrapperProps) => {
   const optionsWithHotkeys = options
     .filter((option) => option && option.hotkey)
     .reduce((map, obj) => {

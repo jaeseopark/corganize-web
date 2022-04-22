@@ -1,6 +1,4 @@
-import CardView, {
-  Card,
-} from "components/standalone/scrape/ScrapePanelCardView";
+import CardView, { Card } from "components/standalone/scrape/ScrapePanelCardView";
 
 type ScrapeGridProps = {
   disabled: boolean;
@@ -11,13 +9,7 @@ type ScrapeGridProps = {
   scrape: () => void;
 };
 
-const ScrapeGrid = ({
-  disabled,
-  cards,
-  createFilesFromCards,
-  setUrl,
-  scrape,
-}: ScrapeGridProps) => {
+const ScrapeGrid = ({ disabled, cards, createFilesFromCards, setUrl, scrape }: ScrapeGridProps) => {
   const cardViews = cards.map((card) => (
     <CardView
       key={card.file.fileid}

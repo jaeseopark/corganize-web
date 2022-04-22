@@ -44,70 +44,61 @@ const paginate = (files: CorganizeFile[], page: Page) => {
 
 const recompute = (state: State): State => {
   const { files, filters, prefilter, sorts, page } = state;
-  const newFilteredAndSorted = files
-    .filter(createMegaFilter(filters, prefilter))
-    .sort(createMegaComparer(sorts));
+  const newFilteredAndSorted = files.filter(createMegaFilter(filters, prefilter)).sort(createMegaComparer(sorts));
   const newPage = getNewPage(page, newFilteredAndSorted.length);
   const newFilteredSortedAndPaginated = paginate(newFilteredAndSorted, newPage);
   return {
     ...state,
     filteredAndSorted: newFilteredAndSorted,
     filteredSortedAndPaginated: newFilteredSortedAndPaginated,
-    page: newPage
-  }
-}
+    page: newPage,
+  };
+};
 
-export const gridReducer = (
-  state: State,
-  action: Action
-): State => {
-  const {
-    filteredAndSorted,
-    filters,
-    sorts
-  } = state;
+export const gridReducer = (state: State, action: Action): State => {
+  const { filteredAndSorted, filters, sorts } = state;
 
   switch (action.type) {
     case "SET_FILES": {
       return recompute({
         ...state,
-        files: action.payload
+        files: action.payload,
       });
     }
     case "UPSERT_FILTERS": {
       const newFilters = merge(filters, action.payload);
       return recompute({
         ...state,
-        filters: newFilters
+        filters: newFilters,
       });
     }
     case "REMOVE_FILTERS": {
-      const fieldNamesToRemove = new Set(action.payload.map(flt => flt.field.displayName));
-      const newFilters = filters.filter(f => !fieldNamesToRemove.has(f.field.displayName));
+      const fieldNamesToRemove = new Set(action.payload.map((flt) => flt.field.displayName));
+      const newFilters = filters.filter((f) => !fieldNamesToRemove.has(f.field.displayName));
       return recompute({
         ...state,
-        filters: newFilters
+        filters: newFilters,
       });
     }
     case "UPSERT_SORTS": {
       const newSorts = merge(sorts, action.payload) as Sort[];
       return recompute({
         ...state,
-        sorts: newSorts
+        sorts: newSorts,
       });
     }
     case "REMOVE_SORTS": {
-      const fieldNamesToRemove = new Set(action.payload.map(flt => flt.field.displayName));
-      const newSorts = sorts.filter(f => !fieldNamesToRemove.has(f.field.displayName));
+      const fieldNamesToRemove = new Set(action.payload.map((flt) => flt.field.displayName));
+      const newSorts = sorts.filter((f) => !fieldNamesToRemove.has(f.field.displayName));
       return recompute({
         ...state,
-        sorts: newSorts
+        sorts: newSorts,
       });
     }
     case "SET_PREFILTER": {
       return recompute({
         ...state,
-        prefilter: action.payload
+        prefilter: action.payload,
       });
     }
     case "SET_PAGE":

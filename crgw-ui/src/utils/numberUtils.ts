@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-properties */
-const FILESIZE_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-const METRIC = ['', 'k', 'M', 'G', 'T', 'P'];
+const FILESIZE_UNITS = ["B", "kB", "MB", "GB", "TB", "PB"];
+const METRIC = ["", "k", "M", "G", "T", "P"];
 
 export const shorten = (n: number, log = 1000, units = METRIC) => {
   const i = Math.floor(Math.log(n) / Math.log(log));
@@ -8,22 +8,19 @@ export const shorten = (n: number, log = 1000, units = METRIC) => {
   return `${value} ${units[i]}`.trimEnd();
 };
 
-export const toHumanFileSize = (sizeInBytes: number): string =>
-  shorten(sizeInBytes, 1024, FILESIZE_UNITS);
+export const toHumanFileSize = (sizeInBytes: number): string => shorten(sizeInBytes, 1024, FILESIZE_UNITS);
 
 // min and max included
-export const randomIntFromInterval = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1) + min);
+export const randomIntFromInterval = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
 
-export const closeEnough = (val1: number, val2: number, margin: number) =>
-  Math.abs(val1 - val2) < margin;
+export const closeEnough = (val1: number, val2: number, margin: number) => Math.abs(val1 - val2) < margin;
 
 export const toHumanDuration = (seconds: number): string =>
   new Date(seconds * 1000)
     .toISOString()
     .substr(seconds < 3600 ? 14 : 11, seconds < 3600 ? 5 : 8)
     .substr(seconds < 600 ? 1 : 0)
-    .replaceAll('-', ':');
+    .replaceAll("-", ":");
 
 export const toRelativeHumanTime = (timestamp: number) => {
   // Assume 'timestamp' is always > Year 2001 (min. 13 digits)

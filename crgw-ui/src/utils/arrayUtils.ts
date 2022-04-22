@@ -21,19 +21,12 @@ export const sampleOne = (array: any[]) => {
 
 export const removeAll = (array: any[], elements: any[]) => {
   const indicesToRemove = elements.map((e) => array.findIndex(e));
-  if (indicesToRemove.includes(-1))
-    throw new Error("One or more elements missing from the array");
+  if (indicesToRemove.includes(-1)) throw new Error("One or more elements missing from the array");
 
-  for (let i = indicesToRemove.length - 1; i >= 0; i--)
-    array.splice(indicesToRemove[i], 1);
+  for (let i = indicesToRemove.length - 1; i >= 0; i--) array.splice(indicesToRemove[i], 1);
 };
 
-export const createRange = (
-  start: number,
-  stop: number,
-  step = 1,
-  inclusive = true
-) =>
+export const createRange = (start: number, stop: number, step = 1, inclusive = true) =>
   Array(Math.ceil((stop + (inclusive ? 1 : 0) - start) / step))
     .fill(start)
     .map((x, y) => x + y * step);

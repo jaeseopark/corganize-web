@@ -10,11 +10,7 @@ import "./LibrarySelector.scss";
 const DEFAULT_LOOKBACK_DAYS = 14;
 const INCREMENT = 250;
 
-const SessionConfigurer = ({
-  setInfo,
-}: {
-  setInfo: (s: SessionInfo) => void;
-}) => {
+const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
   const [fileLimit, setFileLimit] = useState(500);
   const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
   const [showLocalOnly, setLocalOnly] = useState(true);
@@ -51,31 +47,21 @@ const SessionConfigurer = ({
       <tr className="date-picker">
         <td>Date Range</td>
         <td>
-          <ExpandableDateRange
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-          />
+          <ExpandableDateRange dateRange={dateRange} setDateRange={setDateRange} />
         </td>
       </tr>
     );
   };
 
   const renderEndpointPicker = () => (
-    <select
-      value={endpoint}
-      onChange={(e) => setEndpoint(e.target.value as "stale" | "active")}
-    >
+    <select value={endpoint} onChange={(e) => setEndpoint(e.target.value as "stale" | "active")}>
       <option>stale</option>
       <option>active</option>
     </select>
   );
 
   const renderLocalCheckbox = () => (
-    <input
-      type="checkbox"
-      checked={showLocalOnly}
-      onChange={(e) => setLocalOnly(e.target.checked)}
-    />
+    <input type="checkbox" checked={showLocalOnly} onChange={(e) => setLocalOnly(e.target.checked)} />
   );
 
   const renderConfigTable = () => (

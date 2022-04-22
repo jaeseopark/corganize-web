@@ -1,16 +1,9 @@
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getObjectUrls } from "utils/zipUtils";
 import screenfull from "screenfull";
 import cls from "classnames";
 
-import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
+import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "hooks/useToast";
 import { getPosixMilliseconds } from "utils/dateUtils";
 import { createRange } from "utils/arrayUtils";
@@ -18,7 +11,7 @@ import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
-
+import { FileViewComponentProps } from "./types";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -39,27 +32,22 @@ type ImgProps = {
   onClick: () => void;
 };
 
-const Img = forwardRef(
-  ({ src, isHighlighted, isSelected, onClick }: ImgProps, ref) => {
-    const c = cls({ selected: isSelected, highlighted: isHighlighted });
-    return (
-      // @ts-ignore
-      <img className={c} src={src} alt={src} onClick={onClick} ref={ref} />
-    );
-  }
-);
+const Img = forwardRef(({ src, isHighlighted, isSelected, onClick }: ImgProps, ref) => {
+  const c = cls({ selected: isSelected, highlighted: isHighlighted });
+  return (
+    // @ts-ignore
+    <img className={c} src={src} alt={src} onClick={onClick} ref={ref} />
+  );
+});
 
-type GalleryViewProps = {
-  path: string;
-  multimedia?: Multimedia;
-  updateFile: (f: CorganizeFile) => Promise<CorganizeFile>;
-};
-
-const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
+const GalleryView = ({
+  file: { multimedia, streamingurl },
+  updateFile,
+}: FileViewComponentProps) => {
   const { enqueue } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [showLightbox, setShowLightbox] = useState(false);
+  const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
@@ -78,7 +66,6 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
         return { ...multimedia, ...newProps };
       };
 
-      // @ts-ignore
       return updateFile({
         multimedia: getNewMultimedia(),
       });
@@ -87,7 +74,7 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   );
 
   useEffect(() => {
-    getObjectUrls(path)
+    getObjectUrls(streamingurl)
       .then((sourcePaths: string[]) => {
         if (sourcePaths.length === 0) {
           setErrorMessage("No images");
@@ -115,10 +102,10 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
 
   useEffect(() => {
     const element = selectedImgRef?.current;
-    if (!showLightbox && element && (element as any) instanceof HTMLElement) {
+    if (!isLightboxEnabled && element && (element as any) instanceof HTMLElement) {
       (element as HTMLElement).scrollIntoView();
     }
-  }, [currentIndex, showLightbox]);
+  }, [currentIndex, isLightboxEnabled]);
 
   const rerender = () => setLastBulkHighlightActivity(getPosixMilliseconds());
 
@@ -150,14 +137,23 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
     }
   };
 
-  const toggleLightbox = () => setShowLightbox(!showLightbox);
+  const enterFullscreen = () => {
+    if (isFullscreen) {
+      return;
+    }
+    toggleFullscreen();
+  };
+
+  const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
+  const enterLightbox = () => setLightboxEnabled(true);
+  const leaveLightbox = () => setLightboxEnabled(false);
 
   const toggleBulkHighlightMode = () => {
     if (isBulkHighlightMode) {
       setBulkHighlightMode(false);
       saveHighlights();
     } else {
-      setShowLightbox(false);
+      setLightboxEnabled(false);
       setBulkHighlightMode(true);
     }
   };
@@ -174,9 +170,8 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
 
   const deltaJump = (delta: number) => safeJump(currentIndex + delta);
 
-  // @ts-ignore
-  const onKeyDown = (event) => {
-    const key = event.key.toLowerCase();
+  const onKeyDown = (e: any) => {
+    const key = e.key.toLowerCase();
     if (key === "f") {
       toggleFullscreen();
     } else if (key === "g") {
@@ -187,6 +182,12 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
         });
       }
       toggleLightbox();
+    } else if (key === "e") {
+      // jump by 10% in fullscreen.
+      enterFullscreen();
+      enterLightbox();
+      const i = currentIndex + Math.floor(srcs.length / 10);
+      safeJump(i % srcs.length);
     } else if (key === "b") {
       toggleHighlight(currentIndex);
       if (!isBulkHighlightMode) {
@@ -200,7 +201,7 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
     } else if (key === "`") {
       const nextIndex = highlightManager.next(currentIndex);
       if (nextIndex !== null) setCurrentIndex(nextIndex);
-    } else if (!isBulkHighlightMode && !showLightbox && key === " ") {
+    } else if (!isBulkHighlightMode && !isLightboxEnabled && key === " ") {
       toggleLightbox();
     } else if (key === "enter") {
       toggleBulkHighlightMode();
@@ -213,23 +214,24 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   };
 
   const maybeRenderLightbox = () => {
-    if (showLightbox) {
-      return (
-        <div className="lightbox-with-progress">
-          {/* <LinearProgress
-            variant="determinate"
-            value={((currentIndex + 1) * 100) / srcs.length}
-          /> */}
-          <div className="lightbox">
-            {
-              // @ts-ignore
-              <Img src={srcs[currentIndex]} />
-            }
-          </div>
-        </div>
-      );
+    if (!isLightboxEnabled) {
+      return null;
     }
-    return null;
+
+    return (
+      <div className="lightbox-with-progress">
+        {/* <LinearProgress
+          variant="determinate"
+          value={((currentIndex + 1) * 100) / srcs.length}
+        /> */}
+        <div className="lightbox">
+          {
+            // @ts-ignore
+            <Img src={srcs[currentIndex]} />
+          }
+        </div>
+      </div>
+    );
   };
 
   const maybeRenderBulkModeControls = () => {
@@ -245,7 +247,7 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   };
 
   const maybeRenderGrid = () => {
-    if (showLightbox) return null;
+    if (isLightboxEnabled) return null;
     return (
       <div className="zip-grid">
         {srcs.map((imgSrc, i) => {
@@ -268,6 +270,11 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
     );
   };
 
+  const maybeRenderAlertProvider = () => {
+    if (!isFullscreen) return null; // TODO
+    //return <AlertProvider />;
+  };
+
   if (errorMessage) {
     return (
       // @ts-ignore
@@ -282,13 +289,13 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   }
 
   const divCls = cls("zip-view", { windowed: !isFullscreen });
-
   return (
     // @ts-ignore
     <div className={divCls} tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
       {maybeRenderLightbox()}
       {maybeRenderBulkModeControls()}
       {maybeRenderGrid()}
+      {maybeRenderAlertProvider()}
     </div>
   );
 };

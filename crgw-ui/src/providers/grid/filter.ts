@@ -11,9 +11,7 @@ export const createMegaFilter = (filters: Filter[], prefilter: string) =>
     (acc, next) => {
       if (next.field!.filterType === "boolean" && next.boolean!.value !== "maybe") {
         return (f: CorganizeFile) => {
-          const fieldValue: MaybeBoolean = Boolean(f[next.field.key])
-            ? "checked"
-            : "unchecked";
+          const fieldValue: MaybeBoolean = Boolean(f[next.field.key]) ? "checked" : "unchecked";
           return acc(f) && fieldValue === next.boolean!.value;
         };
       }

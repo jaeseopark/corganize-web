@@ -3,11 +3,12 @@ import { useGrid } from "hooks/useGrid";
 import { Filter, MaybeBoolean } from "providers/grid/types";
 
 const ROTATION: MaybeBoolean[] = ["checked", "unchecked", "maybe"];
-const getNextValue = (value: MaybeBoolean) =>
-  ROTATION[(ROTATION.indexOf(value) + 1) % 3];
+const getNextValue = (value: MaybeBoolean) => ROTATION[(ROTATION.indexOf(value) + 1) % 3];
 
 const BooleanControl = ({ filter }: { filter: Filter }) => {
-  const { fieldProps: { upsertFilter } } = useGrid();
+  const {
+    fieldProps: { upsertFilter },
+  } = useGrid();
   const { boolean } = filter;
 
   return (

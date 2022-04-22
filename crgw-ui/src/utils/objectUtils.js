@@ -3,10 +3,7 @@ const deepEquals = (o1, o2) => {
   if (typeof o1 !== typeof o2) return false;
   if (typeof o1 === "object" && o1 && o2) {
     const allUniqueKeys = [...new Set(Object.keys(o1).concat(Object.keys(o2)))];
-    const allEqual = allUniqueKeys.reduce(
-      (acc, key) => acc && deepEquals(o1[key], o2[key]),
-      true
-    );
+    const allEqual = allUniqueKeys.reduce((acc, key) => acc && deepEquals(o1[key], o2[key]), true);
     return allEqual;
   }
   return false;

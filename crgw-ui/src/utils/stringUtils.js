@@ -1,2 +1,1 @@
-export const htmlDecode = (input) =>
-  new DOMParser().parseFromString(input, "text/html").body.textContent;
+export const htmlDecode = (input) => new DOMParser().parseFromString(input, "text/html").body.textContent;

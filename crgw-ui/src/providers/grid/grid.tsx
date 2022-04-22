@@ -13,14 +13,14 @@ const fieldLocal: Field = {
   displayName: "Local",
   key: "streamingurl",
   filterType: "boolean",
-  sortType: "boolean"
+  sortType: "boolean",
 };
 
 const fieldMimetype: Field = {
   displayName: "Mimetype",
   key: "mimetype",
   filterType: "boolean", // TODO: change to dropdown later
-  sortType: "string"
+  sortType: "string",
 };
 
 const fieldSize: Field = {
@@ -34,36 +34,33 @@ const initialState: State = {
   files: [],
   filteredAndSorted: [],
   filteredSortedAndPaginated: [],
-  fields: [
-    fieldNew,
-    fieldLocal,
-    fieldMimetype,
-    fieldSize
-  ],
+  fields: [fieldNew, fieldLocal, fieldMimetype, fieldSize],
   filters: [
     {
       field: fieldNew,
       boolean: {
-        value: "checked"
-      }
+        value: "checked",
+      },
     },
     {
       field: fieldLocal,
       boolean: {
-        value: "checked"
-      }
+        value: "checked",
+      },
     },
     {
       field: fieldMimetype,
       boolean: {
-        value: "checked"
-      }
-    }
+        value: "checked",
+      },
+    },
   ],
-  sorts: [{
-    field: fieldSize,
-    direction: "desc"
-  }],
+  sorts: [
+    {
+      field: fieldSize,
+      direction: "desc",
+    },
+  ],
   prefilter: "",
   page: {
     index: 0,

@@ -32,9 +32,7 @@ const Butt = ({
   </button>
 );
 
-export const SplitButt = (
-  props: SplitButtonProps & { options: DropdownOption[]; onClick: () => void }
-) => {
+export const SplitButt = (props: SplitButtonProps & { options: DropdownOption[]; onClick: () => void }) => {
   const { options, title, id, onClick, disabled } = props;
   return (
     <Dropdown as={ButtonGroup}>

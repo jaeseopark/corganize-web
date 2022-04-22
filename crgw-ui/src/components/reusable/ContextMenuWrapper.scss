@@ -79,8 +79,7 @@
 .react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item {
 }
 
-.react-contextmenu-item.react-contextmenu-submenu
-  > .react-contextmenu-item:after {
+.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item:after {
   content: "▶";
   display: inline-block;
   position: absolute;

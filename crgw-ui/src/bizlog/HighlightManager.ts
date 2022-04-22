@@ -1,12 +1,12 @@
 /* eslint-disable for-direction */
 /* eslint-disable no-plusplus */
 
-import { createRange } from 'utils/arrayUtils';
+import { createRange } from "utils/arrayUtils";
 
 const expand = (range: string): number[] =>
-  range.split(',').reduce((acc: number[], val) => {
-    if (val.includes('-')) {
-      const split = val.split('-');
+  range.split(",").reduce((acc: number[], val) => {
+    if (val.includes("-")) {
+      const split = val.split("-");
       const lowerBound = parseInt(split[0], 10);
       const upperBound = parseInt(split[1], 10);
       acc.push(...createRange(lowerBound, upperBound));
@@ -27,11 +27,11 @@ class HighlightManager {
   }
 
   isHighlighted = (value: number): boolean => this.highlights.includes(value);
+  isEmpty = () => this.highlights.length === 0;
 
   toRanges = (): number[][] => {
     if (this.highlights.length === 0) return [];
-    if (this.highlights.length === 1)
-      return [[this.highlights[0], this.highlights[0]]];
+    if (this.highlights.length === 1) return [[this.highlights[0], this.highlights[0]]];
 
     const ranges: number[][] = [];
     let curr = [this.highlights[0], this.highlights[0]];
@@ -81,9 +81,7 @@ class HighlightManager {
   next = (current: number): number | null => {
     if (this.highlights.length === 0) return null;
     const nextIndex = this.bsearchLargerIndex(current);
-    return nextIndex < this.highlights.length
-      ? this.highlights[nextIndex]
-      : this.highlights[0];
+    return nextIndex < this.highlights.length ? this.highlights[nextIndex] : this.highlights[0];
   };
 
   /**

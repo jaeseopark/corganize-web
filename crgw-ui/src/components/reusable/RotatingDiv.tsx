@@ -12,20 +12,14 @@ type NormalizedRotatingDivProps = RotatingDivProps & {
 
 const NormalizedRotatingDiv = styled.div`
   transform-origin: top left;
-  max-width: ${({
-    fillViewport,
-    isPerpendicular,
-  }: NormalizedRotatingDivProps) => {
+  max-width: ${({ fillViewport, isPerpendicular }: NormalizedRotatingDivProps) => {
     if (isPerpendicular) {
       return fillViewport ? "100vh" : "calc(100vh - 100px)";
     }
     return "100vw";
   }};
 
-  max-height: ${({
-    fillViewport,
-    isPerpendicular,
-  }: NormalizedRotatingDivProps) => {
+  max-height: ${({ fillViewport, isPerpendicular }: NormalizedRotatingDivProps) => {
     if (fillViewport) {
       return "100vh";
     }
@@ -49,11 +43,7 @@ const NormalizedRotatingDiv = styled.div`
 const RotatingDiv = ({ fillViewport, degrees, children }: RotatingDivProps) => {
   const normalizedDegrees = degrees % 360;
   return (
-    <NormalizedRotatingDiv
-      fillViewport={fillViewport}
-      degrees={normalizedDegrees}
-      isPerpendicular={degrees % 180 > 0}
-    >
+    <NormalizedRotatingDiv fillViewport={fillViewport} degrees={normalizedDegrees} isPerpendicular={degrees % 180 > 0}>
       {children}
     </NormalizedRotatingDiv>
   );

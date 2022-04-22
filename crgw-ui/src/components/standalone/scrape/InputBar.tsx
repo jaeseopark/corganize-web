@@ -27,8 +27,7 @@ const ScrapeInputBar = ({
   rawScrapeCount,
 }: ScrapeInputBarProps) => {
   const { enableHotkey, disableHotkey } = useBlanket();
-  const filterCards = (status: string) =>
-    cards.filter((c) => c.status === status);
+  const filterCards = (status: string) => cards.filter((c) => c.status === status);
 
   const getAvailableCards = () => filterCards(CARD_STATUS.AVAILABLE);
 
@@ -79,9 +78,7 @@ const ScrapeInputBar = ({
               title="Add All"
               onClick={() => addCards(filterCards(CARD_STATUS.AVAILABLE))}
               options={getSplitButtOptions()}
-              disabled={
-                disabled || filterCards(CARD_STATUS.AVAILABLE).length === 0
-              }
+              disabled={disabled || filterCards(CARD_STATUS.AVAILABLE).length === 0}
             />
           }
           <Butt type="submit" disabled={disabled || !url}>
