@@ -6,7 +6,7 @@ type SetBlanketProps = {
   title: string;
   body: JSX.Element;
   onClose?: () => void;
-  keepPrevOnClose?: boolean
+  keepPrevOnClose?: boolean;
 };
 
 export const useBlanket = () => {

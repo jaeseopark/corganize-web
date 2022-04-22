@@ -8,12 +8,15 @@ export const shorten = (n: number, log = 1000, units = METRIC) => {
   return `${value} ${units[i]}`.trimEnd();
 };
 
-export const toHumanFileSize = (sizeInBytes: number): string => shorten(sizeInBytes, 1024, FILESIZE_UNITS);
+export const toHumanFileSize = (sizeInBytes: number): string =>
+  shorten(sizeInBytes, 1024, FILESIZE_UNITS);
 
 // min and max included
-export const randomIntFromInterval = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
+export const randomIntFromInterval = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
 
-export const closeEnough = (val1: number, val2: number, margin: number) => Math.abs(val1 - val2) < margin;
+export const closeEnough = (val1: number, val2: number, margin: number) =>
+  Math.abs(val1 - val2) < margin;
 
 export const toHumanDuration = (seconds: number): string =>
   new Date(seconds * 1000)

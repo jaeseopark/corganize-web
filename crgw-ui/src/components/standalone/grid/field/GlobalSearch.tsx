@@ -22,7 +22,12 @@ const GlobalSearch = () => {
   return (
     <InputGroup>
       <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />} />
-      <Input placeholder="Filter by keyword" value={prefilter} onChange={onChange} onKeyDown={onKeyDown} />
+      <Input
+        placeholder="Filter by keyword"
+        value={prefilter}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+      />
       <label>{fileCount}</label>
     </InputGroup>
   );

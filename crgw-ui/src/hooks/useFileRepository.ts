@@ -63,7 +63,7 @@ export const useFileRepository = () => {
     const updatePayload = {
       ...file,
       dateactivated: newDateActivated,
-    }
+    };
 
     return updateFile(updatePayload).then(() => ({
       activated: isActivating,

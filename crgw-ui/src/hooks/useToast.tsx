@@ -59,18 +59,21 @@ export const useToast = () => {
     type?: AlertStatus;
     duration?: number;
     onClick?: () => void;
-  }) => showChakraToast({
-    duration: duration || DEFAULT_DURATION,
-    position: "bottom-left",
-    isClosable: false,
-    render: () => <ToastComponent
-      type={type || "info"}
-      title={title || "Corganize"}
-      body={body}
-      createdAt={getPosixSeconds()}
-      onClick={onClick}
-    />,
-  });
+  }) =>
+    showChakraToast({
+      duration: duration || DEFAULT_DURATION,
+      position: "bottom-left",
+      isClosable: false,
+      render: () => (
+        <ToastComponent
+          type={type || "info"}
+          title={title || "Corganize"}
+          body={body}
+          createdAt={getPosixSeconds()}
+          onClick={onClick}
+        />
+      ),
+    });
 
   return { enqueue };
 };

@@ -52,15 +52,15 @@ const InnerGrid = () => {
       setBlanket({
         title: mostRecentFile.filename,
         body: <ScrapePanel defaultUrls={[mostRecentFile.sourceurl]} />,
-        onClose: refocus
-      })
+        onClose: refocus,
+      });
     } else if (key === "i") {
       if (!mostRecentFile) return;
       setBlanket({
         title: mostRecentFile.filename,
         body: <FileMetadataView file={mostRecentFile} />,
-        onClose: refocus
-      })
+        onClose: refocus,
+      });
     } else if (key === "w") {
       if (!mostRecentFile) return;
       // TODO

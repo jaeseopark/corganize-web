@@ -43,7 +43,11 @@ const NormalizedRotatingDiv = styled.div`
 const RotatingDiv = ({ fillViewport, degrees, children }: RotatingDivProps) => {
   const normalizedDegrees = degrees % 360;
   return (
-    <NormalizedRotatingDiv fillViewport={fillViewport} degrees={normalizedDegrees} isPerpendicular={degrees % 180 > 0}>
+    <NormalizedRotatingDiv
+      fillViewport={fillViewport}
+      degrees={normalizedDegrees}
+      isPerpendicular={degrees % 180 > 0}
+    >
       {children}
     </NormalizedRotatingDiv>
   );
