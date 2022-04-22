@@ -24,7 +24,7 @@ const TimeCounter = ({ created }: { created: number }) => {
   useEffect(() => {
     const iid = setInterval(() => rerender(), 100);
     return () => clearInterval(iid);
-  });
+  }, []);
   return <small>{toRelativeHumanTime(created)} ago</small>;
 };
 
@@ -54,31 +54,23 @@ export const useToast = () => {
     duration,
     onClick,
   }: {
-    title: string;
+    title?: string;
     body: string;
     type?: AlertStatus;
     duration?: number;
     onClick?: () => void;
-  }) => {
-    const createdAt = getPosixSeconds();
-    type = type || "info";
-    duration = duration || DEFAULT_DURATION;
-
-    const toast: Toast = {
-      type,
-      title,
-      body,
-      createdAt,
-      onClick,
-    };
-
-    showChakraToast({
-      duration,
-      position: "bottom-left",
-      isClosable: false,
-      render: () => <ToastComponent {...toast} />,
-    });
-  };
+  }) => showChakraToast({
+    duration: duration || DEFAULT_DURATION,
+    position: "bottom-left",
+    isClosable: false,
+    render: () => <ToastComponent
+      type={type || "info"}
+      title={title || "Corganize"}
+      body={body}
+      createdAt={getPosixSeconds()}
+      onClick={onClick}
+    />,
+  });
 
   return { enqueue };
 };

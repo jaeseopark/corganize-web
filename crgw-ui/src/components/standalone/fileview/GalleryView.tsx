@@ -3,7 +3,7 @@ import { getObjectUrls } from "utils/zipUtils";
 import screenfull from "screenfull";
 import cls from "classnames";
 
-import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
+import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "hooks/useToast";
 import { getPosixMilliseconds } from "utils/dateUtils";
 import { createRange } from "utils/arrayUtils";
@@ -11,6 +11,7 @@ import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
+import { FileViewComponentProps } from "./types";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -39,13 +40,8 @@ const Img = forwardRef(({ src, isHighlighted, isSelected, onClick }: ImgProps, r
   );
 });
 
-type GalleryViewProps = {
-  path: string;
-  multimedia?: Multimedia;
-  updateFile: (f: CorganizeFile) => Promise<CorganizeFile>;
-};
 
-const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
+const GalleryView = ({ file: { multimedia, streamingurl }, updateFile }: FileViewComponentProps) => {
   const { enqueue } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -65,7 +61,6 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
         return { ...multimedia, ...newProps };
       };
 
-      // @ts-ignore
       return updateFile({
         multimedia: getNewMultimedia(),
       });
@@ -74,7 +69,7 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   );
 
   useEffect(() => {
-    getObjectUrls(path)
+    getObjectUrls(streamingurl)
       .then((sourcePaths: string[]) => {
         if (sourcePaths.length === 0) {
           setErrorMessage("No images");
@@ -161,9 +156,8 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
 
   const deltaJump = (delta: number) => safeJump(currentIndex + delta);
 
-  // @ts-ignore
-  const onKeyDown = (event) => {
-    const key = event.key.toLowerCase();
+  const onKeyDown = (e: any) => {
+    const key = e.key.toLowerCase();
     if (key === "f") {
       toggleFullscreen();
     } else if (key === "g") {

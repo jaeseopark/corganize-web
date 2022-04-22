@@ -13,7 +13,7 @@ type State = {
 
 type Action =
   | { type: "ADD"; payload: CorganizeFile[] }
-  | { type: "UPDATE"; payload: CorganizeFile }
+  | { type: "UPDATE"; payload: Partial<CorganizeFile> }
   | { type: "SET_MOST_RECENT"; payload: string };
 
 const initialState: State = {

@@ -10,8 +10,6 @@ export const FILEID_TOO_LONG = "'fileid' too long (>128)";
 
 export const FILE_NOT_STORED_ANYWHERE = "Not stored anywhere";
 
-export const COPIED_TO_CLIPBOARD = "Source URL copied to clipboard";
-
 export const DOWNLOAD_IN_PROGRESS = "Download still in progress";
 
 export const favAsEmoji = (file: CorganizeFile) => (file.dateactivated ? "👍" : "👎");

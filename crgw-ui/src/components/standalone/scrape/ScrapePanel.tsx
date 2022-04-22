@@ -64,7 +64,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
     if (defaultUrls) {
       scrape();
     }
-  }, [defaultUrls, scrape]);
+  }, []);
 
   const createFilesFromCards = (cards: Card[]) => {
     const files = cards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);

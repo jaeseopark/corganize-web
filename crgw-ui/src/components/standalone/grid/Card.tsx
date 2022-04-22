@@ -3,8 +3,8 @@ import { InfoIcon } from "@chakra-ui/icons";
 import { Box, Divider, HStack, useColorModeValue, VStack } from "@chakra-ui/react";
 import { useBlanket } from "hooks/useBlanket";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import FileMetadataView from "../FileMetadataView";
-import FileView from "../FileView";
+import FileMetadataView from "components/standalone/fileview/FileMetadataView";
+import FileView from "components/standalone/fileview/FileView";
 
 import "./Card.scss";
 import FileMetadataTags from "components/reusable/FileMetadataTag";

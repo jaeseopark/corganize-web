@@ -115,16 +115,16 @@ class CorganizeClient {
       });
   }
 
-  updateFile(file: CorganizeFile): Promise<CorganizeFile> {
+  updateFile(partialProps: Partial<CorganizeFile>): Promise<Partial<CorganizeFile>> {
     return fetch("/remote/files", {
       method: "PATCH",
-      body: JSON.stringify(file),
+      body: JSON.stringify(partialProps),
       headers: {
         "Content-Type": "application/json",
       },
       mode: "cors",
     }).then(() => ({
-      ...file,
+      ...partialProps,
       lastupdated: getPosixSeconds(),
     }));
   }

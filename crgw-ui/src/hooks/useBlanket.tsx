@@ -6,16 +6,17 @@ type SetBlanketProps = {
   title: string;
   body: JSX.Element;
   onClose?: () => void;
+  keepPrevOnClose?: boolean
 };
 
 export const useBlanket = () => {
   const {
-    state: { title, body },
+    state: { title, body, onClose: prevOnClose },
     dispatch,
   } = useContext(BlanketContext);
   const isBlanketEnabled = !!title && !!body;
 
-  const setBlanket = ({ title, body, onClose }: SetBlanketProps) => {
+  const setBlanket = ({ title, body, onClose, keepPrevOnClose }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
@@ -26,7 +27,7 @@ export const useBlanket = () => {
       title,
       body,
       userActions: [defaultUserAction],
-      onClose,
+      onClose: keepPrevOnClose ? prevOnClose : onClose,
     };
 
     dispatch!({ type: "SET", payload });

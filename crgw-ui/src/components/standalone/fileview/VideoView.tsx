@@ -1,12 +1,13 @@
-import { SyntheticEvent, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import cls from "classnames";
 import screenfull from "screenfull";
 import "./VideoView.scss";
-import { toHumanDuration } from "utils/numberUtils";
-import HighlightManager from "bizlog/HighlightManager";
-import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
-import RotatingDiv from "components/reusable/RotatingDiv";
+import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "hooks/useToast";
+import HighlightManager from "bizlog/HighlightManager";
+import { toHumanDuration } from "utils/numberUtils";
+import RotatingDiv from "components/reusable/RotatingDiv";
+import { FileViewComponentProps } from "./types";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   z: -15,
@@ -16,13 +17,8 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   b: 300,
 };
 
-type VideoViewProps = {
-  path: string;
-  updateFile: (f: CorganizeFile) => Promise<CorganizeFile>;
-  multimedia?: Multimedia;
-};
+const VideoView = ({ file: { multimedia: multimediaSeed, streamingurl }, updateFile }: FileViewComponentProps) => {
 
-const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewProps) => {
   const { enqueue } = useToast();
   const divRef = useRef();
   const [rotationDegrees, setRotationDegrees] = useState(0);
@@ -42,11 +38,9 @@ const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewPr
     return newMultimedia;
   };
 
-  const onMetadata = (e: SyntheticEvent<HTMLVideoElement, Event>) => {
-    // @ts-ignore
+  const onMetadata = (e: any) => {
     const { videoWidth, videoHeight, duration } = e.target;
     if (!videoWidth || !videoHeight || !duration) return;
-    // @ts-ignore
     updateFile({
       multimedia: getNewMultimedia({
         width: videoWidth,
@@ -56,14 +50,12 @@ const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewPr
     });
   };
 
-  // @ts-ignore
-  const onKeyDown = (event) => {
-    const { target: vid, shiftKey } = event;
-    const key = event.key.toLowerCase();
+  const onKeyDown = (e: any) => {
+    const { target: vid, shiftKey } = e;
+    const key = e.key.toLowerCase();
 
     const addHighlight = () => {
       highlightManager.add(Math.floor(vid.currentTime));
-      // @ts-ignore
       updateFile({
         multimedia: getNewMultimedia({
           highlights: highlightManager.toString(),
@@ -79,7 +71,7 @@ const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewPr
     const jumpTimeByDelta = (deltaInSeconds: number) => {
       try {
         vid.currentTime += deltaInSeconds;
-      } catch (e) {}
+      } catch (e) { }
     };
 
     /**
@@ -88,7 +80,7 @@ const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewPr
     const jumpTimeByPercentage = (percentage: number) => {
       try {
         vid.currentTime = vid.duration * percentage;
-      } catch (e) {}
+      } catch (e) { }
     };
 
     const jumptToNextHighlight = () => {
@@ -127,16 +119,14 @@ const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewPr
 
   const renderVideo = () => (
     <RotatingDiv fillViewport={isFullscreen} degrees={rotationDegrees}>
-      <video onKeyDown={onKeyDown} onLoadedMetadata={onMetadata} src={path} muted autoPlay loop controls />
+      <video onKeyDown={onKeyDown} onLoadedMetadata={onMetadata} src={streamingurl} muted autoPlay loop controls />
     </RotatingDiv>
   );
 
+  const divCls = cls("video-view", { fullscreen: isFullscreen })
   return (
-    <div
-      className={cls("video-view", { fullscreen: isFullscreen })}
-      // @ts-ignore
-      ref={divRef}
-    >
+    // @ts-ignore
+    <div className={divCls} ref={divRef}>
       {renderVideo()}
     </div>
   );

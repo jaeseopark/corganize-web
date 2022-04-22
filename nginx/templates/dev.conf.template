@@ -26,7 +26,8 @@ server {
         rewrite /remote/(.*) ${CRG_REMOTE_HOST}/$1?apikey=${CRG_REOMTE_APIKEY} redirect;
     }
 
-    location /scrape/ {
+    location /scrape {
         proxy_pass ${SCRAPE_HOST};
+        proxy_set_header Host ${SCRAPE_HOST};
     }
 }

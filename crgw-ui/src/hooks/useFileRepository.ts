@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { CreateResponse, getInstance } from "clients/corganize";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { getPosixSeconds } from "utils/dateUtils";
-import { didChange } from "utils/objectUtils";
 import { FileRepository } from "providers/fileRepository";
 
 export const useFileRepository = () => {
@@ -14,6 +13,10 @@ export const useFileRepository = () => {
 
   const findById = (fid: string) => files.find((f) => f.fileid === fid)!;
 
+  const mostRecentFile = findById(mostRecentFileid);
+
+  const isMostRecentFile = (f: CorganizeFile) => f.fileid === mostRecentFileid;
+
   const createThenAddFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
     return getInstance()
       .createFiles(fs)
@@ -23,45 +26,48 @@ export const useFileRepository = () => {
       });
   };
 
-  const updateFile = (newFile: CorganizeFile): Promise<CorganizeFile> => {
-    const file = findById(newFile.fileid);
-    if (didChange(file, newFile)) {
-      // TODO: update remote server first
-      return new Promise((resolve) => {
-        dispatch!({ type: "UPDATE", payload: newFile });
-        resolve(newFile);
-      });
+  const updateFile = (partialProps: Partial<CorganizeFile>) => {
+    if (!partialProps.fileid) {
+      return Promise.reject();
     }
-    return Promise.reject();
+
+    return getInstance()
+      .updateFile(partialProps)
+      .then(() => {
+        dispatch!({ type: "UPDATE", payload: partialProps })
+      })
   };
 
-  const markAsOpened = (fid: string) => {
-    const file = findById(fid);
-    dispatch!({
-      type: "UPDATE",
-      payload: {
-        ...file,
-        lastopened: getPosixSeconds(),
-        isnewfile: false,
-      },
-    });
-    dispatch!({ type: "SET_MOST_RECENT", payload: fid });
+  const markAsOpened = (fileid: string) => {
+    const partialProps: Partial<CorganizeFile> = {
+      fileid,
+      lastopened: getPosixSeconds(),
+      isnewfile: false,
+    };
+
+    updateFile(partialProps)
+      .then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
   };
 
-  const toggleFavourite = (fid: string) => {
-    const file = findById(fid);
-    dispatch!({
-      type: "UPDATE",
-      payload: {
-        ...file,
-        dateactivated: !file.dateactivated ? getPosixSeconds() : 0,
-      },
-    });
+  /**
+   * De/activates a file by its fileid.
+   * 
+   * @param fileid ID of the file to de/activate.
+   * @returns A boolean value indicating the new activation state
+   */
+  const toggleFavourite = (fileid: string) => {
+    const { dateactivated } = findById(fileid);
+    const partialProps: Partial<CorganizeFile> = {
+      fileid,
+      dateactivated: !dateactivated ? getPosixSeconds() : 0,
+    };
+    return updateFile(partialProps).then(() => ({ activated: !!partialProps.dateactivated, emoji: !!partialProps.dateactivated ? "👍" : "👎" }));
   };
 
   return {
     files,
-    mostRecentFileid,
+    isMostRecentFile,
+    mostRecentFile,
     createThenAddFiles,
     updateFile,
     markAsOpened,
