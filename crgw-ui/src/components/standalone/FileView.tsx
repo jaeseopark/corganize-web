@@ -47,13 +47,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
         });
     };
 
-    return (
-      <InnerComponent
-        path={streamingurl}
-        updateFile={updateFileWrapper}
-        multimedia={multimedia}
-      />
-    );
+    return <InnerComponent path={streamingurl} updateFile={updateFileWrapper} multimedia={multimedia} />;
   }, [enqueue, file, fileid, updateFile]);
 
   useEffect(() => {
@@ -71,7 +65,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   }, [content]);
 
   if (!file) {
-    return <label>file not found. fileid: {fileid}</label>
+    return <label>file not found. fileid: {fileid}</label>;
   }
 
   return (

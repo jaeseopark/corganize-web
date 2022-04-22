@@ -25,12 +25,7 @@ type CardViewProps = {
   disableScrapeButton: boolean;
 };
 
-const CardView = ({
-  card,
-  onSend,
-  onScrape,
-  disableScrapeButton,
-}: CardViewProps) => {
+const CardView = ({ card, onSend, onScrape, disableScrapeButton }: CardViewProps) => {
   const { file, status, error } = card;
   const { sourceurl, thumbnailurl, filename, fileid } = file;
 
@@ -51,11 +46,7 @@ const CardView = ({
           alt={title}
         />
       </div>
-      <Butt
-        className="scrape"
-        onClick={() => onScrape(sourceurl)}
-        disabled={disableScrapeButton}
-      >
+      <Butt className="scrape" onClick={() => onScrape(sourceurl)} disabled={disableScrapeButton}>
         Scrape
       </Butt>
     </div>

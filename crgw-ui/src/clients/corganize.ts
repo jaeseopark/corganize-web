@@ -149,9 +149,7 @@ class CorganizeClient {
 
   scrapeAsync(...urls: string[]): Promise<CorganizeFile[]> {
     const dedupFilesById = (files: CorganizeFile[]) =>
-      files.filter(
-        (v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i
-      );
+      files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
 
     const scrapeSingleUrl = (url: string) =>
       fetch("/scrape", {
@@ -163,9 +161,7 @@ class CorganizeClient {
         mode: "cors",
       })
         .then((res) => res.json())
-        .then(({ files }: { files: CorganizeFile[] }) =>
-          files.map((f) => ({ ...f, storageservice: "None" }))
-        );
+        .then(({ files }: { files: CorganizeFile[] }) => files.map((f) => ({ ...f, storageservice: "None" })));
 
     return Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
       .then((results) =>

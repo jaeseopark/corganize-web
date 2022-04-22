@@ -22,22 +22,13 @@ type VideoViewProps = {
   multimedia?: Multimedia;
 };
 
-const VideoView = ({
-  path,
-  updateFile,
-  multimedia: multimediaSeed,
-}: VideoViewProps) => {
+const VideoView = ({ path, updateFile, multimedia: multimediaSeed }: VideoViewProps) => {
   const { enqueue } = useToast();
   const divRef = useRef();
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [isFullscreen, setFullscreen] = useState(false);
-  const highlightManager: HighlightManager = useMemo(
-    () => new HighlightManager(multimediaSeed?.highlights),
-    [multimediaSeed]
-  );
-  const [multimedia, setMultimedia] = useState<Multimedia>(
-    multimediaSeed || {}
-  );
+  const highlightManager: HighlightManager = useMemo(() => new HighlightManager(multimediaSeed?.highlights), [multimediaSeed]);
+  const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
 
   const quarterRotation = () => setRotationDegrees(rotationDegrees + 90);
   const resetRotation = () => setRotationDegrees(0);
@@ -136,15 +127,7 @@ const VideoView = ({
 
   const renderVideo = () => (
     <RotatingDiv fillViewport={isFullscreen} degrees={rotationDegrees}>
-      <video
-        onKeyDown={onKeyDown}
-        onLoadedMetadata={onMetadata}
-        src={path}
-        muted
-        autoPlay
-        loop
-        controls
-      />
+      <video onKeyDown={onKeyDown} onLoadedMetadata={onMetadata} src={path} muted autoPlay loop controls />
     </RotatingDiv>
   );
 

@@ -34,7 +34,7 @@ const InnerGrid = () => {
       body: <FileView fileid={fileid} />,
       onClose: refocus,
     });
-  }
+  };
 
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();

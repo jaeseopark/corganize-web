@@ -2,19 +2,8 @@ import { useEffect } from "react";
 
 import { useUpdate } from "react-use";
 import styled from "styled-components";
-import {
-  AlertStatus,
-  Box,
-  Flex,
-  Spacer,
-  useToast as useChakraToast,
-} from "@chakra-ui/react";
-import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-} from "@chakra-ui/react";
+import { AlertStatus, Box, Flex, Spacer, useToast as useChakraToast } from "@chakra-ui/react";
+import { Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/react";
 
 import { getPosixSeconds } from "utils/dateUtils";
 import { toRelativeHumanTime } from "utils/numberUtils";

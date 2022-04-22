@@ -14,8 +14,7 @@ export const COPIED_TO_CLIPBOARD = "Source URL copied to clipboard";
 
 export const DOWNLOAD_IN_PROGRESS = "Download still in progress";
 
-export const favAsEmoji = (file: CorganizeFile) =>
-  file.dateactivated ? "👍" : "👎";
+export const favAsEmoji = (file: CorganizeFile) => (file.dateactivated ? "👍" : "👎");
 
 export const favToggleMessage = (file: CorganizeFile) => {
   const emoji = favAsEmoji(file);

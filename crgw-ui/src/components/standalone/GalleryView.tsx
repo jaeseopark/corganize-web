@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getObjectUrls } from "utils/zipUtils";
 import screenfull from "screenfull";
 import cls from "classnames";
@@ -18,7 +11,6 @@ import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
-
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -39,15 +31,13 @@ type ImgProps = {
   onClick: () => void;
 };
 
-const Img = forwardRef(
-  ({ src, isHighlighted, isSelected, onClick }: ImgProps, ref) => {
-    const c = cls({ selected: isSelected, highlighted: isHighlighted });
-    return (
-      // @ts-ignore
-      <img className={c} src={src} alt={src} onClick={onClick} ref={ref} />
-    );
-  }
-);
+const Img = forwardRef(({ src, isHighlighted, isSelected, onClick }: ImgProps, ref) => {
+  const c = cls({ selected: isSelected, highlighted: isHighlighted });
+  return (
+    // @ts-ignore
+    <img className={c} src={src} alt={src} onClick={onClick} ref={ref} />
+  );
+});
 
 type GalleryViewProps = {
   path: string;
@@ -64,10 +54,7 @@ const GalleryView = ({ path, updateFile, multimedia }: GalleryViewProps) => {
   const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
-  const highlightManager = useMemo(
-    () => new HighlightManager(multimedia?.highlights),
-    [multimedia]
-  );
+  const highlightManager = useMemo(() => new HighlightManager(multimedia?.highlights), [multimedia]);
   const mainref = useRef();
   const selectedImgRef = useRef();
 

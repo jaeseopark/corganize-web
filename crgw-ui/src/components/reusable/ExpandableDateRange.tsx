@@ -18,10 +18,7 @@ const STATIC_PROPS = {
   maxDate: new Date(),
 };
 
-const ExpandableDateRange = ({
-  dateRange,
-  setDateRange,
-}: ExpandableDateRangeProps) => {
+const ExpandableDateRange = ({ dateRange, setDateRange }: ExpandableDateRangeProps) => {
   const [isOpen, setOpen] = useState(false);
 
   const startString = dateRange.startDate.toLocaleDateString();

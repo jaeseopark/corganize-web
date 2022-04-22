@@ -10,11 +10,11 @@ export type Field = {
   displayName: string;
   filterType: FilterType;
   sortType: SortType;
-}
+};
 
 export interface FieldReferer {
   field: Field;
-};
+}
 
 /**
  * Filter-related items
@@ -35,9 +35,9 @@ export type NumberFilter = {
 };
 
 export interface Filter extends FieldReferer {
-  number?: NumberFilter,
-  boolean?: BooleanFilter
-  dropdown?: DropdownFilter
+  number?: NumberFilter;
+  boolean?: BooleanFilter;
+  dropdown?: DropdownFilter;
 }
 
 /**
@@ -46,7 +46,7 @@ export interface Filter extends FieldReferer {
 export type SortDirection = "asc" | "desc";
 export interface Sort extends FieldReferer {
   direction: SortDirection;
-};
+}
 
 /**
  * Page-related items
@@ -67,10 +67,10 @@ export type State = {
   files: CorganizeFile[];
   filteredAndSorted: CorganizeFile[];
   filteredSortedAndPaginated: CorganizeFile[];
-  fields: Field[],
-  filters: Filter[],
-  sorts: Sort[],
-  prefilter: string,
+  fields: Field[];
+  filters: Filter[];
+  sorts: Sort[];
+  prefilter: string;
   page: Page;
 };
 

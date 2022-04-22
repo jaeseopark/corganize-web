@@ -16,13 +16,7 @@ const getDivider = (label: string): ContextMenuOption => ({
   isDivider: true,
 });
 
-const WithFileContextMenu = ({
-  fileid,
-  children,
-}: {
-  fileid: string;
-  children: JSX.Element;
-}) => {
+const WithFileContextMenu = ({ fileid, children }: { fileid: string; children: JSX.Element }) => {
   const { enqueue } = useToast();
   const { findById, toggleFavourite } = useFileRepository();
   const { setBlanket } = useBlanket();
@@ -36,16 +30,16 @@ const WithFileContextMenu = ({
   const getRemoteActions = (): ContextMenuOption[] => {
     const remoetActions: ContextMenuOption[] = [];
     if (sourceurl) {
-      const sanitizedSourceurl = `https://${sourceurl
-        .split("://")
-        .slice(-1)
-        .pop()}`;
+      const sanitizedSourceurl = `https://${sourceurl.split("://").slice(-1).pop()}`;
       remoetActions.push(
         {
           label: "Copy Source URL",
           onClick: () => {
             copyTextToClipboard(sanitizedSourceurl).then(() =>
-              enqueue({ title: COPIED_TO_CLIPBOARD, body: filename })
+              enqueue({
+                title: COPIED_TO_CLIPBOARD,
+                body: filename,
+              })
             );
           },
         },
@@ -60,8 +54,7 @@ const WithFileContextMenu = ({
         }
       );
     }
-    if (remoetActions.length > 0)
-      remoetActions.push(getDivider("remote-divier"));
+    if (remoetActions.length > 0) remoetActions.push(getDivider("remote-divier"));
     return remoetActions;
   };
 

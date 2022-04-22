@@ -13,20 +13,13 @@ const VideoIcons = ({ file }: { file: CorganizeFile }) => {
 
   if (!videoMetadata) return null;
 
-  const {
-    isVertical: vertical,
-    resolution,
-    bitrate,
-    highlights,
-  } = videoMetadata;
+  const { isVertical: vertical, resolution, bitrate, highlights } = videoMetadata;
   const ortCls = cls("icon", "orientation", { vertical });
 
   return (
     <>
       {highlights && <span className="tag highlights">⭐</span>}
-      <span className="tag duration">
-        {toHumanDuration(file.multimedia?.duration as number)}
-      </span>
+      <span className="tag duration">{toHumanDuration(file.multimedia?.duration as number)}</span>
       {resolution && <span className="tag resolution">{resolution}</span>}
       <span className="tag bitrate">{bitrate}</span>
       <span className={ortCls} />
@@ -42,9 +35,7 @@ const ZipIcons = ({ file }: { file: CorganizeFile }) => {
   return (
     <>
       {highlights && <span className="tag">⭐</span>}
-      {filecount && (
-        <span className="tag">{file.multimedia?.filecount}pcs</span>
-      )}
+      {filecount && <span className="tag">{file.multimedia?.filecount}pcs</span>}
     </>
   );
 };
@@ -77,12 +68,7 @@ type FileSummaryProps = {
   withStorage?: boolean;
 };
 
-const FileSummary = ({
-  fileid,
-  withSize,
-  withFav,
-  withStorage,
-}: FileSummaryProps) => {
+const FileSummary = ({ fileid, withSize, withFav, withStorage }: FileSummaryProps) => {
   const { findById } = useFileRepository();
 
   const file = findById(fileid);

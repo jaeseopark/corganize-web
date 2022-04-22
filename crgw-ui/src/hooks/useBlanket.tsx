@@ -32,8 +32,7 @@ export const useBlanket = () => {
     dispatch!({ type: "SET", payload });
   };
 
-  const addUserAction = (ua: UserAction) =>
-    dispatch!({ type: "ADD_USER_ACTION", payload: ua });
+  const addUserAction = (ua: UserAction) => dispatch!({ type: "ADD_USER_ACTION", payload: ua });
 
   const exitBlanket = () => dispatch!({ type: "UNSET" });
 

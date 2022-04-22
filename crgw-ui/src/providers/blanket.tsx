@@ -45,10 +45,7 @@ export const BlanketContext = React.createContext<{
   dispatch?: Dispatch<ReducerAction>;
 }>({ state: initialState });
 
-const blanketReducer = (
-  { title, body, isHotkeyEnabled, userActions, onClose }: State,
-  action: ReducerAction
-): State => {
+const blanketReducer = ({ title, body, isHotkeyEnabled, userActions, onClose }: State, action: ReducerAction): State => {
   switch (action.type) {
     case "SET":
       return {
@@ -106,11 +103,7 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
     };
 
     return (
-      <Flex
-        direction="column"
-        className="blanket-provider"
-        onKeyDown={onKeyDown}
-      >
+      <Flex direction="column" className="blanket-provider" onKeyDown={onKeyDown}>
         <Box className="blanket-header">
           <label className="blanket-title">{title}</label>
         </Box>
@@ -120,13 +113,7 @@ const BlanketProvider = ({ children }: { children: JSX.Element }) => {
         <Center className="blanket-footer">
           <>
             {userActions.map(({ name, icon, onClick }) => (
-              <Button
-                key={name}
-                rightIcon={icon}
-                colorScheme="blue"
-                variant="outline"
-                onClick={onClick}
-              >
+              <Button key={name} rightIcon={icon} colorScheme="blue" variant="outline" onClick={onClick}>
                 {name}
               </Button>
             ))}

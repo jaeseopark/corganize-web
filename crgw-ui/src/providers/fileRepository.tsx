@@ -39,17 +39,11 @@ const sanitizeStorageService = (f: CorganizeFile) => {
   return clone;
 };
 
-const fileReducer = (
-  { files, mostRecentFileid }: State,
-  action: Action
-): State => {
+const fileReducer = ({ files, mostRecentFileid }: State, action: Action): State => {
   switch (action.type) {
     case "ADD":
       return {
-        files: [
-          ...files,
-          ...action.payload.map((f) => sanitizeStorageService(f)),
-        ],
+        files: [...files, ...action.payload.map((f) => sanitizeStorageService(f))],
         mostRecentFileid,
       };
     case "UPDATE":
@@ -101,9 +95,7 @@ const FileRepositoryProvider = ({ children }: { children: JSX.Element }) => {
     addFiles,
   };
 
-  return (
-    <FileRepository.Provider value={value}>{children}</FileRepository.Provider>
-  );
+  return <FileRepository.Provider value={value}>{children}</FileRepository.Provider>;
 };
 
 export default FileRepositoryProvider;

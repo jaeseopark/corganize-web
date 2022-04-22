@@ -2,10 +2,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 import { SessionInfo } from "typedefs/Session";
 import { getPosixSeconds } from "utils/dateUtils";
 import { getInstance } from "clients/corganize";
-import {
-  initWithLocalFilenames,
-  getLocalFilename,
-} from "shared/globalstore";
+import { initWithLocalFilenames, getLocalFilename } from "shared/globalstore";
 
 const NEW_FILE_THRESHOLD = getPosixSeconds() - 30 * 86400; // in the last 30 days
 
@@ -16,10 +13,7 @@ const isnewfile = (lastopened?: number) => {
   return true; // never opened before
 };
 
-export const retrieveFiles = (
-  sessionInfo: SessionInfo,
-  addToRedux: (moreFiles: CorganizeFile[]) => void
-) => {
+export const retrieveFiles = (sessionInfo: SessionInfo, addToRedux: (moreFiles: CorganizeFile[]) => void) => {
   const decorate = (f: CorganizeFile): CorganizeFile => {
     const decorated: CorganizeFile = {
       ...f,
@@ -45,11 +39,5 @@ export const retrieveFiles = (
   getInstance()
     .getLocalFilenames()
     .then(initWithLocalFilenames)
-    .then(() =>
-      getInstance().getFilesBySessionInfo(
-        sessionInfo,
-        addToRedux,
-        decorateAndFilter
-      )
-    );
+    .then(() => getInstance().getFilesBySessionInfo(sessionInfo, addToRedux, decorateAndFilter));
 };
