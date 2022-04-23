@@ -11,10 +11,13 @@ const FileMetadataView = ({ file }) => {
   const [newFile, setNewFile] = useState(JSON.stringify(file, null, 2));
   const { enableHotkey, disableHotkey, addUserAction } = useBlanket();
   const { updateFile } = useFileRepository();
-  const { enqueue } = useToast();
+  const { enqueueSuccess } = useToast();
 
   useEffect(() => {
-    const save = () => updateFile(JSON.parse(newFile)).then(() => enqueue({ body: "Saved" }));
+    const save = () => {
+      updateFile(JSON.parse(newFile))
+        .then(() => enqueueSuccess({ message: "Saved" }));
+    };
 
     addUserAction({
       name: "Save",

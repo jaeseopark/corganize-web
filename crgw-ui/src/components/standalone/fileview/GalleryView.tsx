@@ -43,7 +43,7 @@ const GalleryView = ({
   file: { multimedia, streamingurl },
   updateFile,
 }: FileViewComponentProps) => {
-  const { enqueue } = useToast();
+  const { enqueue, enqueueError } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isLightboxEnabled, setLightboxEnabled] = useState(false);
@@ -126,7 +126,7 @@ const GalleryView = ({
   const saveHighlights = () =>
     updateMultimedia({
       highlights: highlightManager.toString(),
-    }).then(() => enqueue({ title: "Gallery", body: "Highlights saved" }));
+    }).then(() => enqueue({ header: "Highlight", message: "Saved" }));
 
   const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
   const enterLightbox = () => setLightboxEnabled(true);
@@ -158,9 +158,8 @@ const GalleryView = ({
     const key = e.key.toLowerCase();
     if (key === "g") {
       if (isBulkHighlightMode) {
-        return enqueue({
-          title: "Error",
-          body: "You must exit Bulk mode first",
+        return enqueueError({
+          message: "You must exit Bulk mode first",
         });
       }
       toggleLightbox();

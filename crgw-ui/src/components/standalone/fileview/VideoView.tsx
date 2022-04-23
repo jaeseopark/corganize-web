@@ -65,8 +65,8 @@ const VideoView = ({
         }),
       }).then(() =>
         enqueue({
-          title: toHumanDuration(vid.currentTime),
-          body: "Highlight added",
+          header: "Highlight",
+          message: `Added: ${toHumanDuration(vid.currentTime)}`,
         })
       );
     };

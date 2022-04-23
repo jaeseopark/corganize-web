@@ -1,16 +1,14 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import { ToastProvider } from "react-toast-notifications";
 
 import FileRepositoryProvider from "providers/fileRepository/fileRepository";
 import BlanketProvider from "providers/blanket/blanket";
 
-import FullscreenProvider from "providers/fullscreen/fullscreen";
-import ToastPortal from "providers/toast/portal";
 import BlanketPortal from "providers/blanket/portal";
-
+import ToastPortal from "providers/toast/portal";
 import MainView from "components/standalone/MainView";
 
 import "./App.scss";
+import ToastProvider from "providers/toast/toast";
 
 const App = () => (
   <div>
@@ -23,13 +21,11 @@ const App = () => (
 const AppWithProviders = () => (
   <FileRepositoryProvider>
     <ChakraProvider>
-      <FullscreenProvider>
-        <ToastProvider placement="bottom-left" autoDismiss={true} autoDismissTimeout={4000}>
-          <BlanketProvider>
-            <App />
-          </BlanketProvider>
-        </ToastProvider>
-      </FullscreenProvider>
+      <ToastProvider>
+        <BlanketProvider>
+          <App />
+        </BlanketProvider>
+      </ToastProvider>
     </ChakraProvider>
   </FileRepositoryProvider>
 );

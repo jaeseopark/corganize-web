@@ -33,7 +33,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   useEffect(() => {
     if (!mimetype || !streamingurl) {
       const body = "mimetype or streamingurl is missing";
-      enqueue({ type: "error", body });
+      enqueue({ type: "error", message: body });
       return;
     }
 
@@ -78,8 +78,8 @@ const FileView = ({ fileid }: { fileid: string }) => {
     if (key === "w") {
       toggleFavourite(fileid).then(({ emoji }) =>
         enqueue({
-          title: file.filename,
-          body: emoji,
+          header: file.filename,
+          message: emoji,
         })
       );
     } else if (key === "f") {

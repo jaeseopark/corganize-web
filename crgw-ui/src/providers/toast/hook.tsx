@@ -1,86 +1,49 @@
-import { useEffect } from "react";
-
-import { useUpdate } from "react-use";
-import styled from "styled-components";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertStatus,
-  AlertTitle,
-  Box,
-  Flex,
-  Spacer,
-} from "@chakra-ui/react";
+import { useContext } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import { getPosixSeconds } from "utils/dateUtils";
-import { toRelativeHumanTime } from "utils/numberUtils";
-import { useToasts as useToastsss } from "react-toast-notifications";
+import { Context, Toast, ToastType } from "./toast";
 
-type Toast = {
-  type: AlertStatus;
-  title: string;
-  body: string;
-  createdAt: number;
+const DEFAULT_DELAY = 4000;
+
+type EnqueueProps = {
+  header?: string;
+  message: string;
+  duration?: number;
   onClick?: () => void;
 };
 
-const TimeCounter = ({ created }: { created: number }) => {
-  const rerender = useUpdate();
-
-  useEffect(() => {
-    const iid = setInterval(() => rerender(), 100);
-    return () => clearInterval(iid);
-  }, []);
-  return <small>{toRelativeHumanTime(created)} ago</small>;
-};
-
-const ToastComponent = ({ title, type, body, onClick, createdAt }: Toast) => (
-  <StyledAlert status={type} onClick={onClick}>
-    <AlertIcon />
-    <Box>
-      <AlertTitle>
-        <Flex>
-          <Box>{title}</Box>
-          <Spacer />
-          <TimeCounter created={createdAt} />
-        </Flex>
-      </AlertTitle>
-      <AlertDescription>{body}</AlertDescription>
-    </Box>
-  </StyledAlert>
-);
-
 export const useToast = () => {
-  const { addToast } = useToastsss();
+  const {
+    state: { toasts },
+    dispatch,
+  } = useContext(Context);
 
-  const enqueue = ({
-    title,
-    body,
-    type,
-    duration,
+  const enqueueWithType = ({
+    header = "Corganize",
+    message,
+    type = "info",
+    duration = DEFAULT_DELAY,
     onClick,
-  }: {
-    title?: string;
-    body: string;
-    type?: AlertStatus;
-    duration?: number;
-    onClick?: () => void;
-  }) =>
-    addToast(
-      <ToastComponent
-        type={type || "info"}
-        title={title || "Corganize"}
-        body={body}
-        createdAt={getPosixSeconds()}
-        onClick={onClick}
-      />,
-      { duration }
-    );
+  }: EnqueueProps & {
+    type?: ToastType;
+  }) => {
+    const toast: Toast = {
+      id: uuidv4().toString(),
+      type,
+      header,
+      message,
+      createdAt: getPosixSeconds(),
+      onClick: onClick,
+    };
+    setTimeout(() => dispatch!({ type: "REMOVE", payload: toast.id }), duration);
+    dispatch!({ type: "ADD", payload: toast });
+  };
 
-  return { enqueue };
+  const enqueueInfo = (props: EnqueueProps) => enqueueWithType({ ...props, type: "info" });
+  const enqueueSuccess = (props: EnqueueProps) => enqueueWithType({ ...props, type: "success" });
+  const enqueueWarning = (props: EnqueueProps) => enqueueWithType({ ...props, type: "warning" });
+  const enqueueError = (props: EnqueueProps) => enqueueWithType({ ...props, type: "error" });
+
+  return { toasts, enqueue: enqueueInfo, enqueueSuccess, enqueueWarning, enqueueError };
 };
-
-const StyledAlert = styled(Alert)`
-  border-radius: 10px;
-`;
