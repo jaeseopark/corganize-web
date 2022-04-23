@@ -44,7 +44,9 @@ const paginate = (files: CorganizeFile[], page: Page) => {
 
 const recompute = (state: State): State => {
   const { files, filters, prefilter, sorts, page } = state;
-  const newFilteredAndSorted = files.filter(createMegaFilter(filters, prefilter)).sort(createMegaComparer(sorts));
+  const newFilteredAndSorted = files
+    .filter(createMegaFilter(filters, prefilter))
+    .sort(createMegaComparer(sorts));
   const newPage = getNewPage(page, newFilteredAndSorted.length);
   const newFilteredSortedAndPaginated = paginate(newFilteredAndSorted, newPage);
   return {

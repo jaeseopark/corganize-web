@@ -1,13 +1,12 @@
 import { useMemo, useRef, useState } from "react";
-import cls from "classnames";
-import screenfull from "screenfull";
-import "./VideoView.scss";
-import { Multimedia } from "typedefs/CorganizeFile";
-import { useToast } from "hooks/useToast";
-import HighlightManager from "bizlog/HighlightManager";
-import { toHumanDuration } from "utils/numberUtils";
-import RotatingDiv from "components/reusable/RotatingDiv";
+
 import { FileViewComponentProps } from "./types";
+import { Multimedia } from "typedefs/CorganizeFile";
+import { useToast } from "providers/toast/hook";
+import { toHumanDuration } from "utils/numberUtils";
+import HighlightManager from "bizlog/HighlightManager";
+
+import "./VideoView.scss";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   z: -15,
@@ -23,7 +22,6 @@ const VideoView = ({
 }: FileViewComponentProps) => {
   const mainref = useRef();
   const { enqueue } = useToast();
-  const [isFullscreen, setFullscreen] = useState(false);
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
   const highlightManager: HighlightManager = useMemo(
@@ -67,8 +65,8 @@ const VideoView = ({
         }),
       }).then(() =>
         enqueue({
-          title: toHumanDuration(vid.currentTime),
-          body: "Highlight added",
+          header: "Highlight",
+          message: `Added: ${toHumanDuration(vid.currentTime)}`,
         })
       );
     };
@@ -93,12 +91,7 @@ const VideoView = ({
       if (nextHighlight !== null) vid.currentTime = nextHighlight;
     };
 
-    if (key === "f") {
-      if (screenfull.isEnabled) {
-        screenfull.toggle(mainref.current);
-        setFullscreen(!isFullscreen);
-      }
-    } else if (key === "e") {
+    if (key === "e") {
       if (highlightManager.isEmpty()) {
         jumpTimeByDelta(vid.duration / 10); // jump by 10%
       } else {
@@ -123,8 +116,9 @@ const VideoView = ({
     }
   };
 
-  const renderVideo = () => (
-    <RotatingDiv fillViewport={isFullscreen} degrees={rotationDegrees}>
+  return (
+    // @ts-ignore
+    <div className="video-view" ref={mainref}>
       <video
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}
@@ -134,14 +128,6 @@ const VideoView = ({
         loop
         controls
       />
-    </RotatingDiv>
-  );
-
-  const divCls = cls("video-view", { fullscreen: isFullscreen });
-  return (
-    // @ts-ignore
-    <div className={divCls} ref={mainref}>
-      {renderVideo()}
     </div>
   );
 };

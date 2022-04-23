@@ -13,7 +13,10 @@ const isnewfile = (lastopened?: number) => {
   return true; // never opened before
 };
 
-export const retrieveFiles = (sessionInfo: SessionInfo, addToRedux: (moreFiles: CorganizeFile[]) => void) => {
+export const retrieveFiles = (
+  sessionInfo: SessionInfo,
+  addToRedux: (moreFiles: CorganizeFile[]) => void
+) => {
   const decorate = (f: CorganizeFile): CorganizeFile => {
     const decorated: CorganizeFile = {
       ...f,

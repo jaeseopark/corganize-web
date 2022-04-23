@@ -1,10 +1,9 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getObjectUrls } from "utils/zipUtils";
-import screenfull from "screenfull";
 import cls from "classnames";
 
 import { Multimedia } from "typedefs/CorganizeFile";
-import { useToast } from "hooks/useToast";
+import { useToast } from "providers/toast/hook";
 import { getPosixMilliseconds } from "utils/dateUtils";
 import { createRange } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
@@ -44,12 +43,11 @@ const GalleryView = ({
   file: { multimedia, streamingurl },
   updateFile,
 }: FileViewComponentProps) => {
-  const { enqueue } = useToast();
+  const { enqueue, enqueueError } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
   const highlightManager = useMemo(
@@ -128,21 +126,7 @@ const GalleryView = ({
   const saveHighlights = () =>
     updateMultimedia({
       highlights: highlightManager.toString(),
-    }).then(() => enqueue({ title: "Gallery", body: "Highlights saved" }));
-
-  const toggleFullscreen = () => {
-    if (screenfull.isEnabled && mainref?.current) {
-      setFullscreen(!isFullscreen);
-      screenfull.toggle(mainref.current);
-    }
-  };
-
-  const enterFullscreen = () => {
-    if (isFullscreen) {
-      return;
-    }
-    toggleFullscreen();
-  };
+    }).then(() => enqueue({ header: "Highlight", message: "Saved" }));
 
   const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
   const enterLightbox = () => setLightboxEnabled(true);
@@ -172,19 +156,15 @@ const GalleryView = ({
 
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
-    if (key === "f") {
-      toggleFullscreen();
-    } else if (key === "g") {
+    if (key === "g") {
       if (isBulkHighlightMode) {
-        return enqueue({
-          title: "Error",
-          body: "You must exit Bulk mode first",
+        return enqueueError({
+          message: "You must exit Bulk mode first",
         });
       }
       toggleLightbox();
     } else if (key === "e") {
-      // jump by 10% in fullscreen.
-      enterFullscreen();
+      // jump by 10%
       enterLightbox();
       const i = currentIndex + Math.floor(srcs.length / 10);
       safeJump(i % srcs.length);
@@ -270,11 +250,6 @@ const GalleryView = ({
     );
   };
 
-  const maybeRenderAlertProvider = () => {
-    if (!isFullscreen) return null; // TODO
-    //return <AlertProvider />;
-  };
-
   if (errorMessage) {
     return (
       // @ts-ignore
@@ -288,14 +263,12 @@ const GalleryView = ({
     return null;
   }
 
-  const divCls = cls("zip-view", { windowed: !isFullscreen });
   return (
     // @ts-ignore
-    <div className={divCls} tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
+    <div className="zip-view" tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
       {maybeRenderLightbox()}
       {maybeRenderBulkModeControls()}
       {maybeRenderGrid()}
-      {maybeRenderAlertProvider()}
     </div>
   );
 };

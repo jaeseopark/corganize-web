@@ -161,7 +161,9 @@ class CorganizeClient {
         mode: "cors",
       })
         .then((res) => res.json())
-        .then(({ files }: { files: CorganizeFile[] }) => files.map((f) => ({ ...f, storageservice: "None" })));
+        .then(({ files }: { files: CorganizeFile[] }) =>
+          files.map((f) => ({ ...f, storageservice: "None" }))
+        );
 
     return Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
       .then((results) =>

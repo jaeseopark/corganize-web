@@ -46,8 +46,10 @@ const getFileProps = (state: State, dispatch: Dispatch<Action>) => {
 const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
   const { prefilter, fields, filters, sorts } = state;
 
-  const getFilter = (field: Field) => filters.find((flt) => flt.field.displayName === field.displayName);
-  const getSort = (field: Field) => sorts.find((flt) => flt.field.displayName === field.displayName);
+  const getFilter = (field: Field) =>
+    filters.find((flt) => flt.field.displayName === field.displayName);
+  const getSort = (field: Field) =>
+    sorts.find((flt) => flt.field.displayName === field.displayName);
 
   const setPrefilter = (value: string) => dispatch({ type: "SET_PREFILTER", payload: value });
 

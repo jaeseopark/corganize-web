@@ -1,23 +1,33 @@
 import { ChakraProvider } from "@chakra-ui/react";
 
+import FileRepositoryProvider from "providers/fileRepository/fileRepository";
+import BlanketProvider from "providers/blanket/blanket";
+
+import BlanketPortal from "providers/blanket/portal";
+import ToastPortal from "providers/toast/portal";
 import MainView from "components/standalone/MainView";
-import FileRepositoryProvider from "providers/fileRepository";
-import BlanketProvider from "providers/blanket";
 
 import "./App.scss";
+import ToastProvider from "providers/toast/toast";
 
 const App = () => (
+  <div>
+    <ToastPortal />
+    <BlanketPortal />
+    <MainView />
+  </div>
+);
+
+const AppWithProviders = () => (
   <FileRepositoryProvider>
-    <BlanketProvider>
-      <MainView />
-    </BlanketProvider>
+    <ChakraProvider>
+      <ToastProvider>
+        <BlanketProvider>
+          <App />
+        </BlanketProvider>
+      </ToastProvider>
+    </ChakraProvider>
   </FileRepositoryProvider>
 );
 
-const ChakraApp = () => (
-  <ChakraProvider>
-    <App />
-  </ChakraProvider>
-);
-
-export default ChakraApp;
+export default AppWithProviders;

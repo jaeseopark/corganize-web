@@ -1,7 +1,8 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Field, Sort } from "./types";
 
-const DEFAULT_COMPARER = (a: CorganizeFile, b: CorganizeFile): number => (a.fileid > b.fileid ? 1 : -1);
+const DEFAULT_COMPARER = (a: CorganizeFile, b: CorganizeFile): number =>
+  a.fileid > b.fileid ? 1 : -1;
 
 const getFieldValue = (file: CorganizeFile, fld: Field) => {
   if (fld.sortType === "number") {

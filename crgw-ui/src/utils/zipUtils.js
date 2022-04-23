@@ -11,5 +11,7 @@ export const getObjectUrls = (remoteZipPath) =>
         return [];
       }
 
-      return Promise.all(mediaFiles.map(([, image]) => image.async("blob").then((blob) => URL.createObjectURL(blob))));
+      return Promise.all(
+        mediaFiles.map(([, image]) => image.async("blob").then((blob) => URL.createObjectURL(blob)))
+      );
     });

@@ -61,7 +61,11 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   );
 
   const renderLocalCheckbox = () => (
-    <input type="checkbox" checked={showLocalOnly} onChange={(e) => setLocalOnly(e.target.checked)} />
+    <input
+      type="checkbox"
+      checked={showLocalOnly}
+      onChange={(e) => setLocalOnly(e.target.checked)}
+    />
   );
 
   const renderConfigTable = () => (

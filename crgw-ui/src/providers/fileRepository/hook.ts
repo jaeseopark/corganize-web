@@ -2,13 +2,13 @@ import { useContext } from "react";
 import { CreateResponse, getInstance } from "clients/corganize";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { getPosixSeconds } from "utils/dateUtils";
-import { FileRepository } from "providers/fileRepository";
+import { FileRepository } from "providers/fileRepository/fileRepository";
+import { addAll } from "shared/globalstore";
 
 export const useFileRepository = () => {
   const {
     state: { files, mostRecentFileid },
     dispatch,
-    addFiles,
   } = useContext(FileRepository);
 
   const findById = (fid: string) => files.find((f) => f.fileid === fid)!;
@@ -16,6 +16,11 @@ export const useFileRepository = () => {
   const mostRecentFile = findById(mostRecentFileid);
 
   const isMostRecentFile = (f: CorganizeFile) => f.fileid === mostRecentFileid;
+
+  const addFiles = (fs: CorganizeFile[]) => {
+    addAll(fs);
+    dispatch!({ type: "ADD", payload: fs });
+  };
 
   const createThenAddFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
     return getInstance()
@@ -63,7 +68,7 @@ export const useFileRepository = () => {
     const updatePayload = {
       ...file,
       dateactivated: newDateActivated,
-    }
+    };
 
     return updateFile(updatePayload).then(() => ({
       activated: isActivating,
@@ -75,6 +80,7 @@ export const useFileRepository = () => {
     files,
     isMostRecentFile,
     mostRecentFile,
+    addFiles,
     createThenAddFiles,
     updateFile,
     markAsOpened,

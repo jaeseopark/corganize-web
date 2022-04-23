@@ -2,7 +2,7 @@ import { Tag } from "@chakra-ui/react";
 
 import { TriangleUpIcon, TriangleDownIcon, MinusIcon } from "@chakra-ui/icons";
 
-import { useGrid } from "hooks/useGrid";
+import { useGrid } from "providers/grid/hook";
 import { Field, SortDirection } from "providers/grid/types";
 
 import BooleanControl from "./BooleanControl";
@@ -64,15 +64,11 @@ const FieldComponent = ({ field }: { field: Field }) => {
 
   return (
     <Tag size="lg">
-      <>
-        <div className="clickable" onClick={updateSortOrder}>
-          <>
-            {renderSortIcon()}
-            <label>{displayName}</label>
-          </>
-        </div>
-        {renderFilterControl()}
-      </>
+      <div className="clickable" onClick={updateSortOrder}>
+        {renderSortIcon()}
+        <label>{displayName}</label>
+      </div>
+      {renderFilterControl()}
     </Tag>
   );
 };
