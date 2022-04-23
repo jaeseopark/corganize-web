@@ -91,16 +91,13 @@ const FileView = ({ fileid }: { fileid: string }) => {
     }
   };
 
-  const renderInnerContent = () => {
-    const toastPortal = handle.active ? <ToastPortal /> : null;
-    return (
-      // @ts-ignore
-      <div className="file-view" onKeyDown={onKeyDown} ref={contentRef}>
-        {toastPortal}
-        {content}
-      </div>
-    );
-  };
+  const renderInnerContent = () => (
+    // @ts-ignore
+    <div className="file-view" onKeyDown={onKeyDown} ref={contentRef}>
+      {handle.active && <ToastPortal />}
+      {content}
+    </div>
+  );
 
   return (
     // @ts-ignore
