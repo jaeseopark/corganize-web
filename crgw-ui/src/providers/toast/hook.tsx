@@ -2,13 +2,20 @@ import { useEffect } from "react";
 
 import { useUpdate } from "react-use";
 import styled from "styled-components";
-import { AlertStatus, Box, Flex, Spacer, useToast as useChakraToast } from "@chakra-ui/react";
-import { Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertStatus,
+  AlertTitle,
+  Box,
+  Flex,
+  Spacer,
+} from "@chakra-ui/react";
 
 import { getPosixSeconds } from "utils/dateUtils";
 import { toRelativeHumanTime } from "utils/numberUtils";
-
-const DEFAULT_DURATION = 4000;
+import { useToasts as useToastsss } from "react-toast-notifications";
 
 type Toast = {
   type: AlertStatus;
@@ -45,7 +52,7 @@ const ToastComponent = ({ title, type, body, onClick, createdAt }: Toast) => (
 );
 
 export const useToast = () => {
-  const showChakraToast = useChakraToast();
+  const { addToast } = useToastsss();
 
   const enqueue = ({
     title,
@@ -60,20 +67,16 @@ export const useToast = () => {
     duration?: number;
     onClick?: () => void;
   }) =>
-    showChakraToast({
-      duration: duration || DEFAULT_DURATION,
-      position: "bottom-left",
-      isClosable: false,
-      render: () => (
-        <ToastComponent
-          type={type || "info"}
-          title={title || "Corganize"}
-          body={body}
-          createdAt={getPosixSeconds()}
-          onClick={onClick}
-        />
-      ),
-    });
+    addToast(
+      <ToastComponent
+        type={type || "info"}
+        title={title || "Corganize"}
+        body={body}
+        createdAt={getPosixSeconds()}
+        onClick={onClick}
+      />,
+      { duration }
+    );
 
   return { enqueue };
 };

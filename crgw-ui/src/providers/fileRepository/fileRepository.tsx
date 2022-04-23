@@ -1,9 +1,5 @@
-import React, { Dispatch, useEffect, useReducer, useState } from "react";
-import { retrieveFiles } from "clients/adapter";
-import SessionConfigurer from "components/standalone/SessionConfigurer";
-import { addAll } from "shared/globalstore";
+import React, { Dispatch, useReducer } from "react";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { SessionInfo } from "typedefs/Session";
 import { getPosixSeconds } from "utils/dateUtils";
 
 type State = {
@@ -24,7 +20,6 @@ const initialState: State = {
 export const FileRepository = React.createContext<{
   state: State;
   dispatch?: Dispatch<Action>;
-  addFiles?: (fs: CorganizeFile[]) => void;
 }>({
   state: initialState,
 });
@@ -71,28 +66,11 @@ const fileReducer = ({ files, mostRecentFileid }: State, action: Action): State 
 };
 
 const FileRepositoryProvider = ({ children }: { children: JSX.Element }) => {
-  const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
   const [state, dispatch] = useReducer(fileReducer, initialState);
-
-  const addFiles = (fs: CorganizeFile[]) => {
-    addAll(fs);
-    dispatch({ type: "ADD", payload: fs });
-  };
-
-  useEffect(() => {
-    if (sessionInfo) {
-      retrieveFiles(sessionInfo!, addFiles);
-    }
-  }, [sessionInfo]);
-
-  if (!sessionInfo) {
-    return <SessionConfigurer setInfo={setSessionInfo} />;
-  }
 
   const value = {
     state,
     dispatch,
-    addFiles,
   };
 
   return <FileRepository.Provider value={value}>{children}</FileRepository.Provider>;

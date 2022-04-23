@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useFileRepository } from "hooks/useFileRepository";
+import { useFileRepository } from "providers/fileRepository/hook";
+import { useToast } from "providers/toast/hook";
+
 import VideoView from "components/standalone/fileview/VideoView";
 import GalleryView from "components/standalone/fileview/GalleryView";
 
-import { useToast } from "hooks/useToast";
+import { getInnermostChild } from "utils/elementUtils";
 
 import "./FileView.scss";
-import { getInnermostChild } from "utils/elementUtils";
+import { CorganizeFile } from "typedefs/CorganizeFile";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
@@ -38,7 +40,13 @@ const FileView = ({ fileid }: { fileid: string }) => {
         return <span>{`Unsupported: ${mimetype}`}</span>;
       }
 
-      return <InnerComponent file={file} updateFile={updateFile} />;
+      const updateWithFileid = (partialProps: Partial<CorganizeFile>) =>
+        updateFile({
+          fileid,
+          ...partialProps,
+        });
+
+      return <InnerComponent file={file} updateFile={updateWithFileid} />;
     };
 
     setContent(getContent());

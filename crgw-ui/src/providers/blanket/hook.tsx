@@ -1,5 +1,5 @@
 import { CloseIcon } from "@chakra-ui/icons";
-import { BlanketContext, UserAction } from "providers/blanket";
+import { BlanketContext, UserAction } from "providers/blanket/blanket";
 import { useContext } from "react";
 
 type SetBlanketProps = {
@@ -11,7 +11,7 @@ type SetBlanketProps = {
 
 export const useBlanket = () => {
   const {
-    state: { title, body, onClose: prevOnClose },
+    state: { title, body, onClose: prevOnClose, isHotkeyEnabled, userActions },
     dispatch,
   } = useContext(BlanketContext);
   const isBlanketEnabled = !!title && !!body;
@@ -41,7 +41,11 @@ export const useBlanket = () => {
   const disableHotkey = () => dispatch!({ type: "SET_HOTKEY", payload: false });
 
   return {
+    title,
+    body,
+    userActions,
     isBlanketEnabled,
+    isHotkeyEnabled,
     setBlanket,
     exitBlanket,
     addUserAction,

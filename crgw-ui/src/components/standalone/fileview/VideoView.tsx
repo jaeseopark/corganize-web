@@ -1,13 +1,15 @@
 import { useMemo, useRef, useState } from "react";
 import cls from "classnames";
-import screenfull from "screenfull";
-import "./VideoView.scss";
-import { Multimedia } from "typedefs/CorganizeFile";
-import { useToast } from "hooks/useToast";
-import HighlightManager from "bizlog/HighlightManager";
-import { toHumanDuration } from "utils/numberUtils";
-import RotatingDiv from "components/reusable/RotatingDiv";
+
 import { FileViewComponentProps } from "./types";
+import { Multimedia } from "typedefs/CorganizeFile";
+import { useToast } from "providers/toast/hook";
+import { toHumanDuration } from "utils/numberUtils";
+import HighlightManager from "bizlog/HighlightManager";
+import RotatingDiv from "components/reusable/RotatingDiv";
+
+import "./VideoView.scss";
+import { useFullscreen } from "providers/fullscreen/hook";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   z: -15,
@@ -23,9 +25,9 @@ const VideoView = ({
 }: FileViewComponentProps) => {
   const mainref = useRef();
   const { enqueue } = useToast();
-  const [isFullscreen, setFullscreen] = useState(false);
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
+  const { isFullscreen, toggleFullscreen, enterFullscreen } = useFullscreen();
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimediaSeed?.highlights),
     [multimediaSeed]
@@ -94,12 +96,10 @@ const VideoView = ({
     };
 
     if (key === "f") {
-      if (screenfull.isEnabled) {
-        screenfull.toggle(mainref.current);
-        setFullscreen(!isFullscreen);
-      }
+      toggleFullscreen(mainref.current);
     } else if (key === "e") {
       if (highlightManager.isEmpty()) {
+        enterFullscreen(vid);
         jumpTimeByDelta(vid.duration / 10); // jump by 10%
       } else {
         jumptToNextHighlight();

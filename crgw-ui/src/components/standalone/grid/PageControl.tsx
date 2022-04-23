@@ -1,6 +1,6 @@
 import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { HStack, IconButton } from "@chakra-ui/react";
-import { useGrid } from "hooks/useGrid";
+import { useGrid } from "providers/grid/hook";
 
 const PageControl = () => {
   const {

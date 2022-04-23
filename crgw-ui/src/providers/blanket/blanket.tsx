@@ -1,10 +1,6 @@
 import React, { Dispatch, useReducer } from "react";
 import cls from "classnames";
 
-import { Box, Button, Center, Flex } from "@chakra-ui/react";
-
-import "./blanket.scss";
-
 export type UserAction = {
   name: string;
   icon: JSX.Element;
@@ -86,60 +82,15 @@ const blanketReducer = (
 
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
-  const { title, body, userActions, isHotkeyEnabled } = state;
+  const { title, body } = state;
   const isBlanketEnabled = !!title && !!body;
 
-  const maybeRenderBlanket = () => {
-    if (!isBlanketEnabled) {
-      return null;
-    }
-
-    const onKeyDown = (e: any) => {
-      if (!isHotkeyEnabled) {
-        return;
-      }
-
-      const key = e.key.toLowerCase();
-      if (key === "q") {
-        dispatch({ type: "UNSET" });
-      }
-    };
-
-    return (
-      <Flex direction="column" className="blanket-provider" onKeyDown={onKeyDown}>
-        <Box className="blanket-header">
-          <label className="blanket-title">{title}</label>
-        </Box>
-        <Box flex="1" className="blanket-body">
-          {body}
-        </Box>
-        <Center className="blanket-footer">
-          <>
-            {userActions.map(({ name, icon, onClick }) => (
-              <Button
-                key={name}
-                rightIcon={icon}
-                colorScheme="blue"
-                variant="outline"
-                onClick={onClick}
-              >
-                {name}
-              </Button>
-            ))}
-          </>
-        </Center>
-      </Flex>
-    );
-  };
-
-  const childrenClassName = cls("children", { hidden: isBlanketEnabled });
+  const childrenClassName = cls({ hidden: isBlanketEnabled });
 
   return (
     <BlanketContext.Provider value={{ state, dispatch }}>
-      <>
-        {maybeRenderBlanket()}
-        <div className={childrenClassName}>{children}</div>
-      </>
+      {children}
+      {/* <div className={childrenClassName}></div> */}
     </BlanketContext.Provider>
   );
 };

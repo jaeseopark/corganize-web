@@ -1,10 +1,9 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getObjectUrls } from "utils/zipUtils";
-import screenfull from "screenfull";
 import cls from "classnames";
 
 import { Multimedia } from "typedefs/CorganizeFile";
-import { useToast } from "hooks/useToast";
+import { useToast } from "providers/toast/hook";
 import { getPosixMilliseconds } from "utils/dateUtils";
 import { createRange } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
@@ -12,6 +11,7 @@ import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
 import { FileViewComponentProps } from "./types";
+import { useFullscreen } from "providers/fullscreen/hook";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -49,9 +49,9 @@ const GalleryView = ({
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullscreen, setFullscreen] = useState(false);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
+  const { isFullscreen, toggleFullscreen, enterFullscreen } = useFullscreen();
   const highlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
@@ -130,20 +130,6 @@ const GalleryView = ({
       highlights: highlightManager.toString(),
     }).then(() => enqueue({ title: "Gallery", body: "Highlights saved" }));
 
-  const toggleFullscreen = () => {
-    if (screenfull.isEnabled && mainref?.current) {
-      setFullscreen(!isFullscreen);
-      screenfull.toggle(mainref.current);
-    }
-  };
-
-  const enterFullscreen = () => {
-    if (isFullscreen) {
-      return;
-    }
-    toggleFullscreen();
-  };
-
   const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
   const enterLightbox = () => setLightboxEnabled(true);
   const leaveLightbox = () => setLightboxEnabled(false);
@@ -173,7 +159,7 @@ const GalleryView = ({
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
     if (key === "f") {
-      toggleFullscreen();
+      toggleFullscreen(mainref.current);
     } else if (key === "g") {
       if (isBulkHighlightMode) {
         return enqueue({
@@ -184,10 +170,10 @@ const GalleryView = ({
       toggleLightbox();
     } else if (key === "e") {
       // jump by 10% in fullscreen.
-      enterFullscreen();
       enterLightbox();
       const i = currentIndex + Math.floor(srcs.length / 10);
       safeJump(i % srcs.length);
+      enterFullscreen(mainref.current);
     } else if (key === "b") {
       toggleHighlight(currentIndex);
       if (!isBulkHighlightMode) {

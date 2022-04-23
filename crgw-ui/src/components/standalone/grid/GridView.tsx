@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import { SimpleGrid } from "@chakra-ui/react";
-import { useGrid } from "hooks/useGrid";
-import { useFileRepository } from "hooks/useFileRepository";
+import { useGrid } from "providers/grid/hook";
+import { useFileRepository } from "providers/fileRepository/hook";
 import FieldBar from "./field/FieldBar";
 import GlobalSearch from "./field/GlobalSearch";
 import Card from "./Card";
-import { useBlanket } from "hooks/useBlanket";
+import { useBlanket } from "providers/blanket/hook";
 import PageControl from "./PageControl";
 import FileView from "components/standalone/fileview/FileView";
 import { CorganizeFile } from "typedefs/CorganizeFile";
