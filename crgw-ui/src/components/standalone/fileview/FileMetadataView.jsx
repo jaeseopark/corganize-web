@@ -14,10 +14,8 @@ const FileMetadataView = ({ file }) => {
   const { enqueueSuccess } = useToast();
 
   useEffect(() => {
-    const save = () => {
-      updateFile(JSON.parse(newFile))
-        .then(() => enqueueSuccess({ message: "Saved" }));
-    };
+    const save = () =>
+      updateFile(JSON.parse(newFile)).then(() => enqueueSuccess({ message: "Saved" }));
 
     addUserAction({
       name: "Save",
