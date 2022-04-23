@@ -8,8 +8,10 @@ import GalleryView from "components/standalone/fileview/GalleryView";
 
 import { getInnermostChild } from "utils/elementUtils";
 
-import "./FileView.scss";
 import { CorganizeFile } from "typedefs/CorganizeFile";
+import "./FileView.scss";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import ToastPortal from "providers/toast/portal";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
@@ -21,6 +23,7 @@ COMPONENT_BY_MIMETYPE.set("application/zip", GalleryView);
 const FileView = ({ fileid }: { fileid: string }) => {
   const { findById, markAsOpened, updateFile, toggleFavourite } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
+  const handle = useFullScreenHandle();
   const { enqueue } = useToast();
   const contentRef = useRef();
 
@@ -79,14 +82,29 @@ const FileView = ({ fileid }: { fileid: string }) => {
           body: emoji,
         })
       );
+    } else if (key === "f") {
+      if (handle.active) {
+        handle.exit();
+      } else {
+        handle.enter();
+      }
     }
+  };
+
+  const renderInnerContent = () => {
+    const toastPortal = handle.active ? <ToastPortal /> : null;
+    return (
+      // @ts-ignore
+      <div className="file-view" onKeyDown={onKeyDown} ref={contentRef}>
+        {toastPortal}
+        {content}
+      </div>
+    );
   };
 
   return (
     // @ts-ignore
-    <div className="file-view" onKeyDown={onKeyDown} ref={contentRef}>
-      {content}
-    </div>
+    <FullScreen handle={handle}>{renderInnerContent()}</FullScreen>
   );
 };
 

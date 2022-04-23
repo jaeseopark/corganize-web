@@ -1,15 +1,12 @@
 import { useMemo, useRef, useState } from "react";
-import cls from "classnames";
 
 import { FileViewComponentProps } from "./types";
 import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "providers/toast/hook";
 import { toHumanDuration } from "utils/numberUtils";
 import HighlightManager from "bizlog/HighlightManager";
-import RotatingDiv from "components/reusable/RotatingDiv";
 
 import "./VideoView.scss";
-import { useFullscreen } from "providers/fullscreen/hook";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   z: -15,
@@ -27,7 +24,6 @@ const VideoView = ({
   const { enqueue } = useToast();
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
-  const { isFullscreen, toggleFullscreen, enterFullscreen } = useFullscreen();
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimediaSeed?.highlights),
     [multimediaSeed]
@@ -95,11 +91,8 @@ const VideoView = ({
       if (nextHighlight !== null) vid.currentTime = nextHighlight;
     };
 
-    if (key === "f") {
-      toggleFullscreen(mainref.current);
-    } else if (key === "e") {
+    if (key === "e") {
       if (highlightManager.isEmpty()) {
-        enterFullscreen(vid);
         jumpTimeByDelta(vid.duration / 10); // jump by 10%
       } else {
         jumptToNextHighlight();
@@ -123,8 +116,9 @@ const VideoView = ({
     }
   };
 
-  const renderVideo = () => (
-    <RotatingDiv fillViewport={isFullscreen} degrees={rotationDegrees}>
+  return (
+    // @ts-ignore
+    <div className="video-view" ref={mainref}>
       <video
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}
@@ -134,14 +128,6 @@ const VideoView = ({
         loop
         controls
       />
-    </RotatingDiv>
-  );
-
-  const divCls = cls("video-view", { fullscreen: isFullscreen });
-  return (
-    // @ts-ignore
-    <div className={divCls} ref={mainref}>
-      {renderVideo()}
     </div>
   );
 };

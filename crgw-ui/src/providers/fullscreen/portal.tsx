@@ -7,19 +7,7 @@ import { FullScreen } from "@chiragrupani/fullscreen-react";
 const FullscreenPortal = () => {
   const { component, leaveFullscreen } = useFullscreen();
 
-  return (
-    <FullScreen
-      isFullScreen={!!component}
-      onChange={(isFullscreen) => {
-        if (!isFullscreen) {
-          leaveFullscreen();
-        }
-      }}
-    >
-      <ToastPortal />
-      {component}
-    </FullScreen>
-  );
+  return { component };
 };
 
 export default FullscreenPortal;

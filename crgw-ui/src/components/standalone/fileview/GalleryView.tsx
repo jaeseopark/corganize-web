@@ -11,7 +11,6 @@ import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
 import { FileViewComponentProps } from "./types";
-import { useFullscreen } from "providers/fullscreen/hook";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -51,7 +50,6 @@ const GalleryView = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
   const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
-  const { isFullscreen, toggleFullscreen, enterFullscreen } = useFullscreen();
   const highlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
@@ -158,9 +156,7 @@ const GalleryView = ({
 
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
-    if (key === "f") {
-      toggleFullscreen(mainref.current);
-    } else if (key === "g") {
+    if (key === "g") {
       if (isBulkHighlightMode) {
         return enqueue({
           title: "Error",
@@ -169,11 +165,10 @@ const GalleryView = ({
       }
       toggleLightbox();
     } else if (key === "e") {
-      // jump by 10% in fullscreen.
+      // jump by 10%
       enterLightbox();
       const i = currentIndex + Math.floor(srcs.length / 10);
       safeJump(i % srcs.length);
-      enterFullscreen(mainref.current);
     } else if (key === "b") {
       toggleHighlight(currentIndex);
       if (!isBulkHighlightMode) {
@@ -256,11 +251,6 @@ const GalleryView = ({
     );
   };
 
-  const maybeRenderAlertProvider = () => {
-    if (!isFullscreen) return null; // TODO
-    //return <AlertProvider />;
-  };
-
   if (errorMessage) {
     return (
       // @ts-ignore
@@ -274,14 +264,12 @@ const GalleryView = ({
     return null;
   }
 
-  const divCls = cls("zip-view", { windowed: !isFullscreen });
   return (
     // @ts-ignore
-    <div className={divCls} tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
+    <div className="zip-view" tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
       {maybeRenderLightbox()}
       {maybeRenderBulkModeControls()}
       {maybeRenderGrid()}
-      {maybeRenderAlertProvider()}
     </div>
   );
 };
