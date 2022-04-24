@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useUpdate } from "react-use";
 
-import { useFileRepository } from "providers/fileRepository/hook";
 import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
 import ScrapeInputBar from "components/standalone/scrape/InputBar";
 import ScrapeGrid from "components/standalone/scrape/Grid";
+import { useFileRepository } from "hooks/fileRepository";
 
 import { useBlanket } from "providers/blanket/hook";
 import { getInstance } from "clients/corganize";

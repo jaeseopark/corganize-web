@@ -7,7 +7,7 @@ import GridView from "./grid/GridView";
 import { useEffect, useState } from "react";
 import { SessionInfo } from "typedefs/Session";
 import { retrieveFiles } from "clients/adapter";
-import { useFileRepository } from "providers/fileRepository/hook";
+import { useFileRepository } from "hooks/fileRepository";
 import SessionConfigurer from "./SessionConfigurer";
 
 const SelfClosingBurgerMenu = () => <div />;

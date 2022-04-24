@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useFileRepository } from "providers/fileRepository/hook";
+import { useFileRepository } from "hooks/fileRepository";
 import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
 

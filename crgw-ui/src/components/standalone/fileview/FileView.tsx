@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useFileRepository } from "providers/fileRepository/hook";
+import { useFileRepository } from "hooks/fileRepository";
 import { useToast } from "providers/toast/hook";
 
 import VideoView from "components/standalone/fileview/VideoView";
