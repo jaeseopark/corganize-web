@@ -1,8 +1,10 @@
-import { useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "redux/store";
+
 import { v4 as uuidv4 } from "uuid";
 
 import { getPosixSeconds } from "utils/dateUtils";
-import { Context, Toast, ToastType } from "./toast";
+import { add, CorganizeToast, remove, ToastType } from "redux/toast";
 
 const DEFAULT_DELAY = 4000;
 
@@ -14,10 +16,8 @@ type EnqueueProps = {
 };
 
 export const useToast = () => {
-  const {
-    state: { toasts },
-    dispatch,
-  } = useContext(Context);
+  const dispatch = useDispatch();
+  const { toasts } = useSelector((state: RootState) => state.toast);
 
   const enqueueWithType = ({
     header = "Corganize",
@@ -28,7 +28,7 @@ export const useToast = () => {
   }: EnqueueProps & {
     type?: ToastType;
   }) => {
-    const toast: Toast = {
+    const toast: CorganizeToast = {
       id: uuidv4().toString(),
       type,
       header,
@@ -36,8 +36,8 @@ export const useToast = () => {
       createdAt: getPosixSeconds(),
       onClick: onClick,
     };
-    setTimeout(() => dispatch!({ type: "REMOVE", payload: toast.id }), duration);
-    dispatch!({ type: "ADD", payload: toast });
+    setTimeout(() => dispatch(remove(toast.id)), duration);
+    dispatch(add(toast));
   };
 
   const enqueueInfo = (props: EnqueueProps) => enqueueWithType({ ...props, type: "info" });

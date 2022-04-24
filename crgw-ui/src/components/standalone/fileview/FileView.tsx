@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useFileRepository } from "hooks/fileRepository";
-import { useToast } from "providers/toast/hook";
+import { useToast } from "hooks/toast";
 
 import VideoView from "components/standalone/fileview/VideoView";
 
@@ -10,12 +10,12 @@ import { madFocus } from "utils/elementUtils";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import ToastPortal from "providers/toast/portal";
 
 import "./FileView.scss";
 import GalleryView from "./gallery/GalleryView";
 import { useBlanket } from "hooks/blanket";
 import { StarIcon } from "@chakra-ui/icons";
+import ToastPortal from "components/portals/toast";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);

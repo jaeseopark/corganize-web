@@ -14,8 +14,8 @@ import {
 
 import { toRelativeHumanTime } from "utils/numberUtils";
 
-import { useToast } from "./hook";
-import { Toast } from "./toast";
+import { useToast } from "../../hooks/toast";
+import { Toast } from "../../providers/toast/toast";
 
 const TimeCounter = ({ created }: { created: number }) => {
   const rerender = useUpdate();

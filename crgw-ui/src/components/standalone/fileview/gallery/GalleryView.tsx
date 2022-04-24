@@ -3,7 +3,7 @@ import { getObjectUrls } from "utils/zipUtils";
 import cls from "classnames";
 
 import { Multimedia } from "typedefs/CorganizeFile";
-import { useToast } from "providers/toast/hook";
+import { useToast } from "hooks/toast";
 import { createRange } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
