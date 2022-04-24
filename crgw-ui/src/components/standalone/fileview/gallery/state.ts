@@ -22,7 +22,6 @@ export type GalleryContextProps = {
   updateMultimedia: (p: Partial<Multimedia>) => Promise<void>;
 };
 
-
 export const initialState: GalleryState = {
   highlights: [],
   mode: "grid",
@@ -73,6 +72,9 @@ export const useGalleryContext = (context: React.Context<GalleryContextProps>) =
     }
   };
 
+  const incrementIndexWithWraparound = (delta: number) =>
+    setIndex((index + delta) % sources.length);
+
   const incrementIndex = (delta: number) => setIndex(index + delta);
 
   const enterMode = (newMode: Mode) => {
@@ -92,7 +94,7 @@ export const useGalleryContext = (context: React.Context<GalleryContextProps>) =
         dispatch!({ type: "SET_INDEX", payload: nextIndex });
       }
     } else {
-      incrementIndex(Math.floor(sources.length / 10));
+      incrementIndexWithWraparound(Math.floor(sources.length / 10));
     }
   };
 

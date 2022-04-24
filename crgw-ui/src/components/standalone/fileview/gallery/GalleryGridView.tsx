@@ -4,9 +4,9 @@ import { Context, useEffect, useRef } from "react";
 import Img from "./Img";
 import { GalleryContextProps, useGalleryContext } from "./state";
 
-const GRID_CELL_MIN_WIDTH = "120px";
-const GRID_CELL_MAX_WIDTH = "400px";
-const GRID_CELL_MAX_HEIGHT = "20vh";
+const GRID_CELL_MIN_WIDTH = "250px";
+const GRID_CELL_MAX_WIDTH = "100vw";
+const GRID_CELL_MAX_HEIGHT = "30vh";
 
 const GalleryGridView = ({ context }: { context: Context<GalleryContextProps> }) => {
   const selectedImgRef = useRef<HTMLDivElement | null>(null);
