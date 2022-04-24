@@ -20,7 +20,7 @@ const VideoView = ({
   file: { multimedia: multimediaSeed, streamingurl },
   updateFile,
 }: FileViewComponentProps) => {
-  const mainref = useRef();
+  const mainref = useRef<HTMLDivElement | null>(null);
   const { enqueue } = useToast();
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
@@ -117,7 +117,6 @@ const VideoView = ({
   };
 
   return (
-    // @ts-ignore
     <div className="video-view" ref={mainref}>
       <video
         onKeyDown={onKeyDown}

@@ -4,13 +4,14 @@ import cls from "classnames";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "providers/toast/hook";
-import { getPosixMilliseconds } from "utils/dateUtils";
 import { createRange } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
-import { FileViewComponentProps } from "./types";
+import { FileViewComponentProps } from "../types";
+import { Box, SimpleGrid } from "@chakra-ui/react";
+import { useUpdate } from "react-use";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -26,9 +27,9 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 
 type ImgProps = {
   src: string;
-  isHighlighted: boolean;
-  isSelected: boolean;
-  onClick: () => void;
+  isHighlighted?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
 };
 
 const Img = forwardRef(({ src, isHighlighted, isSelected, onClick }: ImgProps, ref) => {
@@ -49,13 +50,14 @@ const GalleryView = ({
   const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
-  const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
   const highlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
   );
   const mainref = useRef();
   const selectedImgRef = useRef();
+
+  const rerender = () => useUpdate();
 
   const updateMultimedia = useCallback(
     (newProps: Multimedia) => {
@@ -105,8 +107,6 @@ const GalleryView = ({
     }
   }, [currentIndex, isLightboxEnabled]);
 
-  const rerender = () => setLastBulkHighlightActivity(getPosixMilliseconds());
-
   const toggleHighlight = (index: number) => {
     // The first line isn't going to cause a rerender because the pointers stay unchanged.
     highlightManager.toggle(index);
@@ -130,7 +130,6 @@ const GalleryView = ({
 
   const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
   const enterLightbox = () => setLightboxEnabled(true);
-  const leaveLightbox = () => setLightboxEnabled(false);
 
   const toggleBulkHighlightMode = () => {
     if (isBulkHighlightMode) {
@@ -200,15 +199,8 @@ const GalleryView = ({
 
     return (
       <div className="lightbox-with-progress">
-        {/* <LinearProgress
-          variant="determinate"
-          value={((currentIndex + 1) * 100) / srcs.length}
-        /> */}
         <div className="lightbox">
-          {
-            // @ts-ignore
-            <Img src={srcs[currentIndex]} />
-          }
+          <Img src={srcs[currentIndex]} />
         </div>
       </div>
     );
@@ -229,12 +221,11 @@ const GalleryView = ({
   const maybeRenderGrid = () => {
     if (isLightboxEnabled) return null;
     return (
-      <div className="zip-grid">
-        {srcs.map((imgSrc, i) => {
-          return (
+      <SimpleGrid minChildWidth="400px" spacing={6} tabIndex={1}>
+        {srcs.map((src, i) => (
+          <Box key={src} bg="white">
             <Img
-              src={imgSrc}
-              key={imgSrc}
+              src={src}
               isHighlighted={highlightManager.isHighlighted(i)}
               isSelected={i === currentIndex}
               ref={i === currentIndex ? selectedImgRef : null}
@@ -244,9 +235,9 @@ const GalleryView = ({
                 }
               }}
             />
-          );
-        })}
-      </div>
+          </Box>
+        ))}
+      </SimpleGrid>
     );
   };
 

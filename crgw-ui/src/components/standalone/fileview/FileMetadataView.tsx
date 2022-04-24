@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
@@ -6,17 +6,22 @@ import { useToast } from "providers/toast/hook";
 import { CheckIcon } from "@chakra-ui/icons";
 
 import "./FileMetadataView.scss";
+import { CorganizeFile } from "typedefs/CorganizeFile";
 
-const FileMetadataView = ({ file }) => {
-  const [newFile, setNewFile] = useState(JSON.stringify(file, null, 2));
+const FileMetadataView = ({ file }: { file: CorganizeFile }) => {
+  const serializedFile = useMemo(() => JSON.stringify(file, null, 2), []);
+  const [edit, setEdit] = useState<string>(serializedFile);
   const { enableHotkey, disableHotkey, addUserAction } = useBlanket();
   const { updateFile } = useFileRepository();
   const { enqueueSuccess } = useToast();
 
-  useEffect(() => {
-    const save = () =>
-      updateFile(JSON.parse(newFile)).then(() => enqueueSuccess({ message: "Saved" }));
+  const save = () => {
+    const enq = () => enqueueSuccess({ message: "Saved" });
+    const deserialized = JSON.parse(edit);
+    updateFile(deserialized).then(enq);
+  };
 
+  useEffect(() => {
     addUserAction({
       name: "Save",
       icon: <CheckIcon />,
@@ -27,8 +32,10 @@ const FileMetadataView = ({ file }) => {
   return (
     <textarea
       className="file-metadata"
-      onChange={(e) => setNewFile(e.target.value)}
-      value={newFile}
+      onChange={(e) => {
+        setEdit(e.target.value);
+      }}
+      value={edit}
       onFocus={disableHotkey}
       onBlur={enableHotkey}
     />

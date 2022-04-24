@@ -1,17 +1,15 @@
 .zip-view {
   background: white;
   outline: none;
-  height: 100vh;
+  height: 100%;
+
+  * {
+    outline: none;
+  }
 
   .lightbox-with-progress {
     width: 100%;
     height: 100%;
-  }
-
-  .MuiLinearProgress-determinate {
-    * {
-      transition: none;
-    }
   }
 
   .lightbox {

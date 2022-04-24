@@ -1,22 +1,24 @@
-import { CloseIcon } from "@chakra-ui/icons";
-import { BlanketContext, UserAction } from "providers/blanket/blanket";
+import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
+import { BlanketContext, BlanketState, UserAction } from "providers/blanket/blanket";
 import { useContext } from "react";
 
 type SetBlanketProps = {
   title: string;
   body: JSX.Element;
   onClose?: () => void;
-  keepPrevOnClose?: boolean;
+  userActions?: UserAction[];
 };
+
+export let isHotkeyEnabled = true;
 
 export const useBlanket = () => {
   const {
-    state: { title, body, onClose: prevOnClose, isHotkeyEnabled, userActions },
+    state: { title, body, onClose, userActions },
     dispatch,
   } = useContext(BlanketContext);
   const isBlanketEnabled = !!title && !!body;
 
-  const setBlanket = ({ title, body, onClose, keepPrevOnClose }: SetBlanketProps) => {
+  const setBlanket = ({ title, body, onClose, userActions }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
@@ -26,24 +28,38 @@ export const useBlanket = () => {
     const payload = {
       title,
       body,
-      userActions: [defaultUserAction],
-      onClose: keepPrevOnClose ? prevOnClose : onClose,
+      userActions: userActions || [defaultUserAction],
+      onClose,
     };
 
     dispatch!({ type: "SET", payload });
   };
 
-  const addUserAction = (ua: UserAction) => dispatch!({ type: "ADD_USER_ACTION", payload: ua });
+  const addUserAction = ({ name, icon, onClick }: UserAction) =>
+    dispatch!({
+      type: "ADD_USER_ACTION",
+      payload: {
+        name,
+        onClick,
+        icon: icon || <MinusIcon />,
+      },
+    });
 
   const exitBlanket = () => dispatch!({ type: "UNSET" });
 
-  const enableHotkey = () => dispatch!({ type: "SET_HOTKEY", payload: true });
-  const disableHotkey = () => dispatch!({ type: "SET_HOTKEY", payload: false });
+  const enableHotkey = () => {
+    isHotkeyEnabled = true;
+  };
+
+  const disableHotkey = () => {
+    isHotkeyEnabled = false;
+  };
 
   return {
     title,
     body,
     userActions,
+    onClose,
     isBlanketEnabled,
     isHotkeyEnabled,
     setBlanket,

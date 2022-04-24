@@ -1,10 +1,12 @@
-import { Box, Button, Center, Flex } from "@chakra-ui/react";
+import styled from "styled-components";
+import { Button, Center } from "@chakra-ui/react";
 
-import { useBlanket } from "./hook";
+import { isHotkeyEnabled, useBlanket } from "./hook";
+
 import "./blanket.scss";
 
 const BlanketPortal = () => {
-  const { isBlanketEnabled, isHotkeyEnabled, exitBlanket, title, body, userActions } = useBlanket();
+  const { isBlanketEnabled, exitBlanket, title, body, userActions } = useBlanket();
 
   if (!isBlanketEnabled) {
     return null;
@@ -22,14 +24,11 @@ const BlanketPortal = () => {
   };
 
   return (
-    <Flex direction="column" className="blanket-provider" onKeyDown={onKeyDown}>
-      <Box className="blanket-header">
+    <div className="blanket-portal" onKeyDown={onKeyDown}>
+      <div className="blanket-header">
         <label className="blanket-title">{title}</label>
-      </Box>
-      <Box flex="1" className="blanket-body">
-        {body}
-      </Box>
-
+      </div>
+      <BlanketBody>{body}</BlanketBody>
       <Center className="blanket-footer">
         {userActions.map(({ name, icon, onClick }) => (
           <Button
@@ -43,8 +42,15 @@ const BlanketPortal = () => {
           </Button>
         ))}
       </Center>
-    </Flex>
+    </div>
   );
 };
 
 export default BlanketPortal;
+
+const BlanketBody = styled.div`
+  display: flex;
+  overflow-y: scroll;
+  flex-direction: column;
+  flex-grow: 1;
+`;

@@ -4,14 +4,18 @@ import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
 import VideoView from "components/standalone/fileview/VideoView";
-import GalleryView from "components/standalone/fileview/GalleryView";
 
-import { getInnermostChild } from "utils/elementUtils";
+import { madFocus } from "utils/elementUtils";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import "./FileView.scss";
+
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import ToastPortal from "providers/toast/portal";
+
+import "./FileView.scss";
+import GalleryView from "./gallery/GalleryView";
+import { useBlanket } from "providers/blanket/hook";
+import { StarIcon } from "@chakra-ui/icons";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
@@ -24,16 +28,25 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const { findById, markAsOpened, updateFile, toggleFavourite } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
-  const { enqueue } = useToast();
-  const contentRef = useRef();
+  const { enqueue, enqueueError } = useToast();
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const { addUserAction } = useBlanket();
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
 
+  const toggleFavouriteWithToast = () =>
+    toggleFavourite(fileid).then(({ emoji }) =>
+      enqueue({
+        header: file.filename,
+        message: emoji,
+      })
+    );
+
   useEffect(() => {
     if (!mimetype || !streamingurl) {
       const body = "mimetype or streamingurl is missing";
-      enqueue({ type: "error", message: body });
+      enqueueError({ message: body });
       return;
     }
 
@@ -54,34 +67,25 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
     setContent(getContent());
     markAsOpened(fileid);
+    addUserAction({
+      name: "Toggle Fav",
+      icon: <StarIcon />,
+      onClick: () => {
+        toggleFavouriteWithToast();
+      },
+    });
   }, []);
 
   useEffect(() => {
-    const focusElement = () => {
-      if (contentRef?.current) {
-        const child = getInnermostChild(contentRef.current);
-        if (child) {
-          child.focus();
-          return;
-        }
-      }
-      setTimeout(focusElement, 250);
-    };
-
     if (content) {
-      focusElement();
+      madFocus(contentRef?.current, true);
     }
   }, [content]);
 
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
     if (key === "w") {
-      toggleFavourite(fileid).then(({ emoji }) =>
-        enqueue({
-          header: file.filename,
-          message: emoji,
-        })
-      );
+      toggleFavouriteWithToast();
     } else if (key === "f") {
       if (handle.active) {
         handle.exit();
@@ -92,8 +96,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   };
 
   const renderInnerContent = () => (
-    // @ts-ignore
-    <div className="file-view" onKeyDown={onKeyDown} ref={contentRef}>
+    <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
       {handle.active && <ToastPortal />}
       {content}
     </div>
@@ -101,7 +104,9 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
   return (
     // @ts-ignore
-    <FullScreen handle={handle}>{renderInnerContent()}</FullScreen>
+    <FullScreen className="fullscreen-portal" handle={handle}>
+      {renderInnerContent()}
+    </FullScreen>
   );
 };
 
