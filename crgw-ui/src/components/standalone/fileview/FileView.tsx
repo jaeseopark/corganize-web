@@ -4,7 +4,6 @@ import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
 import VideoView from "components/standalone/fileview/VideoView";
-import GalleryView from "components/standalone/fileview/GalleryView";
 
 import { madFocus } from "utils/elementUtils";
 
@@ -14,6 +13,7 @@ import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import ToastPortal from "providers/toast/portal";
 
 import "./FileView.scss";
+import GalleryView from "./gallery/GalleryView";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
@@ -27,7 +27,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
   const { enqueue, enqueueError } = useToast();
-  const contentRef = useRef();
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
@@ -83,7 +83,6 @@ const FileView = ({ fileid }: { fileid: string }) => {
   };
 
   const renderInnerContent = () => (
-    // @ts-ignore
     <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
       {handle.active && <ToastPortal />}
       {content}

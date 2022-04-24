@@ -3,7 +3,7 @@ import { getObjectUrls } from "utils/zipUtils";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 import { FileViewComponentProps } from "components/standalone/fileview/types";
-import HighlightManager from "bizlog/HighlightManager";
+import { expand } from "bizlog/HighlightManager";
 
 import { GalleryContextProps, initialState, useGalleryContext, useGalleryReducer } from "./state";
 import GalleryGridView from "./GalleryGridView";
@@ -40,12 +40,11 @@ const GalleryViewWithContext = ({
 }: FileViewComponentProps & { context: React.Context<GalleryContextProps> }) => {
   const {
     sourceProps: { sources, setSources },
-    indexProps: { addIndex, setIndex, jumpToNextHighlight },
-    modeProps: { enterLightboxMode },
+    indexProps: { incrementIndex, setIndex },
   } = useGalleryContext(context);
   const [error, setError] = useState<Error>();
 
-  const mainref = useRef();
+  const mainref = useRef<HTMLDivElement | null>(null);
 
   const updateMultimedia = useCallback(
     (newProps: Multimedia) => {
@@ -79,15 +78,10 @@ const GalleryViewWithContext = ({
   const handleGlobalKey = (key: string) => {
     const delta = SEEK_HOTKEY_MAP[key];
     if (delta) {
-      addIndex(delta);
+      incrementIndex(delta);
     } else if (key >= "0" && key <= "9") {
       const newIndex = Math.floor((sources.length * parseInt(key)) / 10);
       setIndex(newIndex);
-    } else if (key === "`") {
-      jumpToNextHighlight();
-    } else if (key === "e") {
-      enterLightboxMode();
-      addIndex(Math.floor(sources.length / 10));
     }
   };
 
@@ -106,16 +100,32 @@ const GalleryViewWithContext = ({
 };
 
 const GalleryView = (props: FileViewComponentProps) => {
-  const { updateFile } = props;
-  const GalleryContext = createContext<GalleryContextProps>({
-    state: initialState,
+  const {
     updateFile,
+    file: { multimedia },
+  } = props;
+
+  const updateMultimedia = (p: Partial<Multimedia>) => {
+    return updateFile({
+      multimedia: {
+        ...(multimedia || {}),
+        ...p,
+      },
+    });
+  };
+
+  const GalleryContext = createContext<GalleryContextProps>({
+    state: {
+      ...initialState,
+      highlights: expand(multimedia?.highlights),
+    },
+    updateMultimedia,
   });
 
   const [state, dispatch] = useGalleryReducer();
 
   return (
-    <GalleryContext.Provider value={{ state, dispatch }}>
+    <GalleryContext.Provider value={{ state, dispatch, updateMultimedia }}>
       <GalleryViewWithContext {...props} context={GalleryContext} />
     </GalleryContext.Provider>
   );

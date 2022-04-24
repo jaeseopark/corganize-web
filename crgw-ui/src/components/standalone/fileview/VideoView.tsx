@@ -4,7 +4,7 @@ import { FileViewComponentProps } from "./types";
 import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "providers/toast/hook";
 import { toHumanDuration } from "utils/numberUtils";
-import HighlightManager from "bizlog/HighlightManager";
+import HighlightManager, { expand } from "bizlog/HighlightManager";
 
 import "./VideoView.scss";
 
@@ -20,12 +20,12 @@ const VideoView = ({
   file: { multimedia: multimediaSeed, streamingurl },
   updateFile,
 }: FileViewComponentProps) => {
-  const mainref = useRef();
+  const mainref = useRef<HTMLDivElement | null>(null);
   const { enqueue } = useToast();
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
   const highlightManager: HighlightManager = useMemo(
-    () => new HighlightManager(multimediaSeed?.highlights),
+    () => new HighlightManager(expand(multimediaSeed?.highlights)),
     [multimediaSeed]
   );
 
@@ -117,7 +117,6 @@ const VideoView = ({
   };
 
   return (
-    // @ts-ignore
     <div className="video-view" ref={mainref}>
       <video
         onKeyDown={onKeyDown}

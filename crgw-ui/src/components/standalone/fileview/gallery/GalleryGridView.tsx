@@ -1,4 +1,5 @@
 import { Box, SimpleGrid } from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
 
 import Img from "./Img";
 import { GalleryContextProps, useGalleryContext } from "./state";
@@ -9,68 +10,41 @@ const GRID_CELL_MAX_HEIGHT = "20vh";
 
 const GalleryGridView = ({ context }: { context: React.Context<GalleryContextProps> }) => {
   const {
-    modeProps: { mode },
+    modeProps: { mode, enterLightboxMode, enterGridMode, enterHighlightMode },
     sourceProps: { sources },
+    indexProps: { index, toggleAllHighlights, toggleHighlight },
   } = useGalleryContext(context);
-
-  if (mode === "lightbox") {
-    return null;
-  }
-
-  const toggleAllHighlights = () => {
-    const shouldClear = highlightManager.highlights.length === srcs.length;
-    if (shouldClear) {
-      highlightManager.clear();
-    } else {
-      createRange(0, srcs.length - 1).forEach((i) => highlightManager.add(i));
-    }
-    rerender();
-  };
+  const selectedImgRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const element = selectedImgRef?.current;
-    if (!isLightboxEnabled && element && (element as any) instanceof HTMLElement) {
+    if (element) {
       (element as HTMLElement).scrollIntoView();
     }
-  }, [currentIndex, isLightboxEnabled]);
-
-  // const rerender = () => setLastBulkHighlightActivity(getPosixMilliseconds());
-
-  // const toggleHighlight = (index: number) => {
-  //   // The first line isn't going to cause a rerender because the pointers stay unchanged.
-  //   highlightManager.toggle(index);
-  //   rerender();
-  // };
+  }, [index]);
 
   const handleGridKey = (key: string) => {
-    const handleGridKey = (key: string) => {
-      if (key === "g") {
-        enterLightboxMode();
-      } else if (key === "a") {
-        hMan.toggleAllHighlights();
-        if (mode === "grid-bulk-highlight") {
-          saveHighlights();
-        }
-      } else if (key === "b") {
-        toggleHighlight(currentIndex);
-        saveHighlights();
-      } else if (key === "enter") {
-        enterHighlightMode();
-      } else if (key === " ") {
-        enterLightboxMode();
+    if (key === "g") {
+      enterLightboxMode();
+    } else if (key === "a") {
+      if (mode === "grid-bulk-highlight") {
+        toggleAllHighlights();
       }
-    };
-
-    const handleBulkKey = (key: string) => {
-      } else if (key === "b") {
-        toggleHighlight(currentIndex);
-        if (!isBulkHighlightMode) {
-          saveHighlights();
-        }
-      } else if (key === "enter") {
+    } else if (key === "b") {
+      if (mode === "grid-bulk-highlight") {
+        toggleHighlight();
+      }
+    } else if (key === "enter") {
+      if (mode === "grid-bulk-highlight") {
         enterGridMode();
+      } else {
+        enterHighlightMode();
       }
-    };
+    } else if (key === " ") {
+      enterLightboxMode();
+    } else if (key === "e") {
+      enterLightboxMode();
+    }
   };
 
   return (
@@ -79,23 +53,17 @@ const GalleryGridView = ({ context }: { context: React.Context<GalleryContextPro
       spacing={6}
       onKeyDown={(e) => handleGridKey(e.key.toLowerCase())}
     >
-      {sources.map((src, i) => {
-        const isSelected = index === i;
-        return (
-          <Box key={src} bg="white" maxHeight={GRID_CELL_MAX_HEIGHT} maxW={GRID_CELL_MAX_WIDTH}>
-            <Img
-              src={src}
-              isHighlighted={highlightManager.isHighlighted(i)}
-              isSelected={isSelected}
-              onClick={() => {
-                if (isBulkHighlightMode) {
-                  toggleHighlight(i);
-                }
-              }}
-            />
-          </Box>
-        );
-      })}
+      {sources.map((src, i) => (
+        <Box
+          key={src}
+          bg="white"
+          maxHeight={GRID_CELL_MAX_HEIGHT}
+          maxW={GRID_CELL_MAX_WIDTH}
+          ref={selectedImgRef}
+        >
+          <Img context={context} index={i} src={src} />
+        </Box>
+      ))}
     </SimpleGrid>
   );
 };

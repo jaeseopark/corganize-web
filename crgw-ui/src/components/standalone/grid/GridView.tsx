@@ -21,7 +21,7 @@ const InnerGrid = () => {
   } = useGrid();
   const { mostRecentFile } = useFileRepository();
   const { setBlanket } = useBlanket();
-  const gridRef: any = useRef();
+  const gridRef: any = useRef<HTMLDivElement | null>(null);
 
   const refocus = () => madFocus(gridRef.current);
 
