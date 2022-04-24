@@ -1,5 +1,4 @@
 import HighlightManager from "bizlog/HighlightManager";
-import { useToast } from "providers/toast/hook";
 import React, { Dispatch, useContext, useReducer } from "react";
 import { Multimedia } from "typedefs/CorganizeFile";
 import { createRange } from "utils/arrayUtils";
@@ -7,13 +6,12 @@ import { createRange } from "utils/arrayUtils";
 type Mode = "grid" | "grid-bulk-highlight" | "lightbox";
 export type GalleryState = {
   sources: string[];
-  i: number;
+  index: number;
   mode: Mode;
   highlights: number[];
 };
 
 export type GalleryAction =
-  | { type: "SET_SOURCES"; payload: string[] }
   | { type: "SET_MODE"; payload: Mode }
   | { type: "SET_INDEX"; payload: number }
   | { type: "SET_HIGHLIGHTS"; payload: number[] };
@@ -24,26 +22,26 @@ export type GalleryContextProps = {
   updateMultimedia: (p: Partial<Multimedia>) => Promise<void>;
 };
 
+
 export const initialState: GalleryState = {
   highlights: [],
   mode: "grid",
   sources: [],
-  i: 0,
+  index: 0,
 };
 
 const reducer = (state: GalleryState, action: GalleryAction) => {
   switch (action.type) {
-    case "SET_SOURCES":
+    case "SET_INDEX":
       return {
         ...state,
-        sources: action.payload,
+        index: action.payload,
       };
-    case "SET_MODE": {
+    case "SET_MODE":
       return {
         ...state,
         mode: action.payload,
       };
-    }
     case "SET_HIGHLIGHTS":
       return {
         ...state,
@@ -54,19 +52,16 @@ const reducer = (state: GalleryState, action: GalleryAction) => {
   }
 };
 
-export const useGalleryReducer = () => useReducer(reducer, initialState);
+export const useGalleryReducer = (initialState: GalleryState) => useReducer(reducer, initialState);
 
 export const useGalleryContext = (context: React.Context<GalleryContextProps>) => {
   const {
-    state: { sources, i, mode, highlights },
+    state: { sources, index, mode, highlights },
     dispatch,
     updateMultimedia,
   } = useContext(context);
-  const { enqueue } = useToast();
 
   const highlightManager = new HighlightManager(Array.from(highlights));
-
-  const setSources = (sources: string[]) => dispatch!({ type: "SET_SOURCES", payload: sources });
 
   const setIndex = (newIndex: number) => {
     if (newIndex < 0) {
@@ -78,7 +73,7 @@ export const useGalleryContext = (context: React.Context<GalleryContextProps>) =
     }
   };
 
-  const incrementIndex = (delta: number) => setIndex(i + delta);
+  const incrementIndex = (delta: number) => setIndex(index + delta);
 
   const enterMode = (newMode: Mode) => {
     let p = Promise.resolve();
@@ -92,7 +87,7 @@ export const useGalleryContext = (context: React.Context<GalleryContextProps>) =
 
   const jumpToNextSnippet = () => {
     if (!highlightManager.isEmpty()) {
-      const nextIndex = highlightManager.next(i);
+      const nextIndex = highlightManager.next(index);
       if (nextIndex && nextIndex !== 0) {
         dispatch!({ type: "SET_INDEX", payload: nextIndex });
       }
@@ -108,7 +103,7 @@ export const useGalleryContext = (context: React.Context<GalleryContextProps>) =
   const toggleHighlightByIndex = (i: number) =>
     dispatch!({ type: "SET_HIGHLIGHTS", payload: highlightManager.toggle(i).highlights });
 
-  const toggleHighlight = () => toggleHighlightByIndex(i);
+  const toggleHighlight = () => toggleHighlightByIndex(index);
 
   const toggleAllHighlights = () => {
     const shouldClear = highlightManager.highlights.length === sources.length;
@@ -119,11 +114,10 @@ export const useGalleryContext = (context: React.Context<GalleryContextProps>) =
   return {
     sourceProps: {
       sources,
-      selectedSource: sources[i],
-      setSources,
+      selectedSource: sources[index],
     },
     indexProps: {
-      index: i,
+      index,
       incrementIndex,
       setIndex,
       jumpToNextSnippet,

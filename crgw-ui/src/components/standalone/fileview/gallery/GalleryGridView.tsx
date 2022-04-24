@@ -1,5 +1,5 @@
 import { Box, SimpleGrid } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { Context, useEffect, useRef } from "react";
 
 import Img from "./Img";
 import { GalleryContextProps, useGalleryContext } from "./state";
@@ -8,13 +8,13 @@ const GRID_CELL_MIN_WIDTH = "120px";
 const GRID_CELL_MAX_WIDTH = "400px";
 const GRID_CELL_MAX_HEIGHT = "20vh";
 
-const GalleryGridView = ({ context }: { context: React.Context<GalleryContextProps> }) => {
+const GalleryGridView = ({ context }: { context: Context<GalleryContextProps> }) => {
+  const selectedImgRef = useRef<HTMLDivElement | null>(null);
   const {
     modeProps: { mode, enterLightboxMode, enterGridMode, enterHighlightMode },
     sourceProps: { sources },
     indexProps: { index, toggleAllHighlights, toggleHighlight },
   } = useGalleryContext(context);
-  const selectedImgRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const element = selectedImgRef?.current;
@@ -24,7 +24,7 @@ const GalleryGridView = ({ context }: { context: React.Context<GalleryContextPro
   }, [index]);
 
   const handleGridKey = (key: string) => {
-    if (key === "g") {
+    if (["g", " ", "e"].includes(key)) {
       enterLightboxMode();
     } else if (key === "a") {
       if (mode === "grid-bulk-highlight") {
@@ -40,18 +40,19 @@ const GalleryGridView = ({ context }: { context: React.Context<GalleryContextPro
       } else {
         enterHighlightMode();
       }
-    } else if (key === " ") {
-      enterLightboxMode();
-    } else if (key === "e") {
-      enterLightboxMode();
     }
   };
+
+  if (mode === "lightbox") {
+    return null;
+  }
 
   return (
     <SimpleGrid
       minChildWidth={GRID_CELL_MIN_WIDTH}
       spacing={6}
       onKeyDown={(e) => handleGridKey(e.key.toLowerCase())}
+      tabIndex={1}
     >
       {sources.map((src, i) => (
         <Box

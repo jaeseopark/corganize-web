@@ -2,7 +2,7 @@ import React, { Dispatch, useReducer } from "react";
 
 export type UserAction = {
   name: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   onClick: () => void;
 };
 

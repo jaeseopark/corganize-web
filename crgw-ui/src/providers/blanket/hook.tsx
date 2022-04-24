@@ -1,4 +1,4 @@
-import { CloseIcon } from "@chakra-ui/icons";
+import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
 import { BlanketContext, UserAction } from "providers/blanket/blanket";
 import { useContext } from "react";
 
@@ -33,7 +33,15 @@ export const useBlanket = () => {
     dispatch!({ type: "SET", payload });
   };
 
-  const addUserAction = (ua: UserAction) => dispatch!({ type: "ADD_USER_ACTION", payload: ua });
+  const addUserAction = ({ name, icon, onClick }: UserAction) =>
+    dispatch!({
+      type: "ADD_USER_ACTION",
+      payload: {
+        name,
+        onClick,
+        icon: icon || <MinusIcon />,
+      },
+    });
 
   const exitBlanket = () => dispatch!({ type: "UNSET" });
 

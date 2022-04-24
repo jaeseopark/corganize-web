@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import { getObjectUrls } from "utils/zipUtils";
 
 import { Multimedia } from "typedefs/CorganizeFile";
@@ -22,7 +22,7 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "]": 10000,
 };
 
-const ErrorDisplay = ({ error }: { error?: Error }) => {
+const ErrorDisplay = ({ error }: { error: Error }) => {
   if (!error) {
     return null;
   }
@@ -33,47 +33,12 @@ const ErrorDisplay = ({ error }: { error?: Error }) => {
   );
 };
 
-const GalleryViewWithContext = ({
-  file: { multimedia, streamingurl },
-  updateFile,
-  context,
-}: FileViewComponentProps & { context: React.Context<GalleryContextProps> }) => {
+const GalleryViewWithContext = ({ context }: { context: React.Context<GalleryContextProps> }) => {
+  const mainref = useRef<HTMLDivElement | null>(null);
   const {
-    sourceProps: { sources, setSources },
+    sourceProps: { sources },
     indexProps: { incrementIndex, setIndex },
   } = useGalleryContext(context);
-  const [error, setError] = useState<Error>();
-
-  const mainref = useRef<HTMLDivElement | null>(null);
-
-  const updateMultimedia = useCallback(
-    (newProps: Multimedia) => {
-      const getNewMultimedia = () => {
-        if (!multimedia) return newProps;
-        return { ...multimedia, ...newProps };
-      };
-
-      return updateFile({
-        multimedia: getNewMultimedia(),
-      });
-    },
-    [multimedia, updateFile]
-  );
-
-  useEffect(() => {
-    getObjectUrls(streamingurl)
-      .then((sourcePaths: string[]) => {
-        if (sourcePaths.length === 0) {
-          throw new Error("No images");
-        }
-        updateMultimedia({ filecount: sourcePaths.length });
-        return sourcePaths;
-      })
-      .then(setSources)
-      .catch(setError);
-
-    return () => sources.forEach(URL.revokeObjectURL);
-  }, []);
 
   const handleGlobalKey = (key: string) => {
     const delta = SEEK_HOTKEY_MAP[key];
@@ -94,16 +59,30 @@ const GalleryViewWithContext = ({
     >
       <GalleryGridView context={context} />
       <Lightbox context={context} />
-      <ErrorDisplay error={error} />
     </div>
+  );
+};
+
+const GalleryViewWithContextProps = ({ contextProps }: { contextProps: GalleryContextProps }) => {
+  const GalleryContext = createContext<GalleryContextProps>(contextProps);
+  const [state, dispatch] = useGalleryReducer(contextProps.state);
+  const { updateMultimedia } = contextProps;
+
+  return (
+    <GalleryContext.Provider value={{ state, dispatch, updateMultimedia }}>
+      <GalleryViewWithContext context={GalleryContext} />
+    </GalleryContext.Provider>
   );
 };
 
 const GalleryView = (props: FileViewComponentProps) => {
   const {
     updateFile,
-    file: { multimedia },
+    file: { multimedia, streamingurl },
   } = props;
+
+  const [sources, setSources] = useState<string[]>();
+  const [error, setError] = useState<Error>();
 
   const updateMultimedia = (p: Partial<Multimedia>) => {
     return updateFile({
@@ -114,20 +93,44 @@ const GalleryView = (props: FileViewComponentProps) => {
     });
   };
 
-  const GalleryContext = createContext<GalleryContextProps>({
-    state: {
-      ...initialState,
-      highlights: expand(multimedia?.highlights),
-    },
-    updateMultimedia,
-  });
+  useEffect(() => {
+    getObjectUrls(streamingurl)
+      .then((sourcePaths: string[]) => {
+        if (sourcePaths.length === 0) {
+          throw new Error("No images");
+        }
+        updateMultimedia({ filecount: sourcePaths.length });
+        return sourcePaths;
+      })
+      .then(setSources)
+      .catch(setError);
 
-  const [state, dispatch] = useGalleryReducer();
+    return () => {
+      if (sources) {
+        sources.forEach(URL.revokeObjectURL);
+      }
+    };
+  }, []);
+
+  if (error) {
+    return <ErrorDisplay error={error} />;
+  }
+
+  if (!sources) {
+    return null;
+  }
 
   return (
-    <GalleryContext.Provider value={{ state, dispatch, updateMultimedia }}>
-      <GalleryViewWithContext {...props} context={GalleryContext} />
-    </GalleryContext.Provider>
+    <GalleryViewWithContextProps
+      contextProps={{
+        state: {
+          ...initialState,
+          highlights: expand(multimedia?.highlights),
+          sources,
+        },
+        updateMultimedia,
+      }}
+    />
   );
 };
 
