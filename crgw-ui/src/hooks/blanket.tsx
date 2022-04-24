@@ -1,6 +1,7 @@
 import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
-import { BlanketContext, BlanketState, UserAction } from "providers/blanket/blanket";
-import { useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { clear, set, addUserAction as addUserActionnn, UserAction } from "redux/blanket";
+import { RootState } from "redux/store";
 
 type SetBlanketProps = {
   title: string;
@@ -12,17 +13,20 @@ type SetBlanketProps = {
 export let isHotkeyEnabled = true;
 
 export const useBlanket = () => {
+  const dispatch = useDispatch();
   const {
-    state: { title, body, onClose, userActions },
-    dispatch,
-  } = useContext(BlanketContext);
+    blanket: { title, body, onClose, userActions },
+  } = useSelector((state: RootState) => state.blanket);
+
   const isBlanketEnabled = !!title && !!body;
+
+  const exitBlanket = () => dispatch(clear());
 
   const setBlanket = ({ title, body, onClose, userActions }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
-      onClick: () => dispatch!({ type: "UNSET" }),
+      onClick: exitBlanket,
     };
 
     const payload = {
@@ -32,20 +36,17 @@ export const useBlanket = () => {
       onClose,
     };
 
-    dispatch!({ type: "SET", payload });
+    dispatch(set(payload));
   };
 
   const addUserAction = ({ name, icon, onClick }: UserAction) =>
-    dispatch!({
-      type: "ADD_USER_ACTION",
-      payload: {
+    dispatch(
+      addUserActionnn({
         name,
         onClick,
         icon: icon || <MinusIcon />,
-      },
-    });
-
-  const exitBlanket = () => dispatch!({ type: "UNSET" });
+      })
+    );
 
   const enableHotkey = () => {
     isHotkeyEnabled = true;

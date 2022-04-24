@@ -6,7 +6,7 @@ import ScrapeInputBar from "components/standalone/scrape/InputBar";
 import ScrapeGrid from "components/standalone/scrape/Grid";
 import { useFileRepository } from "hooks/fileRepository";
 
-import { useBlanket } from "providers/blanket/hook";
+import { useBlanket } from "hooks/blanket";
 import { getInstance } from "clients/corganize";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { isDiscovered } from "shared/globalstore";

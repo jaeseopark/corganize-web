@@ -1,7 +1,7 @@
 import cls from "classnames";
 import styled from "styled-components";
 
-import { useBlanket } from "providers/blanket/hook";
+import { useBlanket } from "hooks/blanket";
 import GridProvider from "providers/grid/grid";
 import GridView from "./grid/GridView";
 import { useEffect, useState } from "react";

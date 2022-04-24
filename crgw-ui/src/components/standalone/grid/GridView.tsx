@@ -5,7 +5,7 @@ import { useFileRepository } from "hooks/fileRepository";
 import FieldBar from "./field/FieldBar";
 import GlobalSearch from "./field/GlobalSearch";
 import Card from "./Card";
-import { useBlanket } from "providers/blanket/hook";
+import { useBlanket } from "hooks/blanket";
 import PageControl from "./PageControl";
 import FileView from "components/standalone/fileview/FileView";
 import { CorganizeFile } from "typedefs/CorganizeFile";

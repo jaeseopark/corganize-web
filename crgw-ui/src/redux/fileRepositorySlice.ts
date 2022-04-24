@@ -17,8 +17,8 @@ const sanitizeStorageService = (f: Partial<CorganizeFile>) => {
   return clone;
 };
 
-const fileRepositorySlice = createSlice({
-  name: "counter",
+const slice = createSlice({
+  name: "fileRepository",
   initialState: {
     files: new Array<CorganizeFile>(),
     mostRecentFileid: "",
@@ -44,8 +44,8 @@ const fileRepositorySlice = createSlice({
   },
 });
 
-export const { add, patch, setMostRecent } = fileRepositorySlice.actions;
+export const { add, patch, setMostRecent } = slice.actions;
 
-const fileRepositoryReducer = fileRepositorySlice.reducer;
+const fileRepositoryReducer = slice.reducer;
 
 export default fileRepositoryReducer;

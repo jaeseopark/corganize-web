@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useFileRepository } from "hooks/fileRepository";
-import { useBlanket } from "providers/blanket/hook";
+import { useBlanket } from "hooks/blanket";
 import { useToast } from "providers/toast/hook";
 
 import { CheckIcon } from "@chakra-ui/icons";

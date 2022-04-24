@@ -1,7 +1,7 @@
 import cls from "classnames";
 import { InfoIcon } from "@chakra-ui/icons";
 import { Box, Divider, HStack, useColorModeValue, VStack } from "@chakra-ui/react";
-import { useBlanket } from "providers/blanket/hook";
+import { useBlanket } from "hooks/blanket";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";

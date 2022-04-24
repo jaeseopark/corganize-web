@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Button, Center } from "@chakra-ui/react";
 
-import { isHotkeyEnabled, useBlanket } from "./hook";
+import { isHotkeyEnabled, useBlanket } from "hooks/blanket";
 
 import "./blanket.scss";
 

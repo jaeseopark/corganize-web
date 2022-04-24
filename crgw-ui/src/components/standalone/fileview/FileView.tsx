@@ -14,7 +14,7 @@ import ToastPortal from "providers/toast/portal";
 
 import "./FileView.scss";
 import GalleryView from "./gallery/GalleryView";
-import { useBlanket } from "providers/blanket/hook";
+import { useBlanket } from "hooks/blanket";
 import { StarIcon } from "@chakra-ui/icons";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
