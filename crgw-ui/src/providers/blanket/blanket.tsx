@@ -13,10 +13,9 @@ type BlanketPayload = {
   onClose?: () => void;
 };
 
-type State = {
+export type BlanketState = {
   title?: string;
   body?: JSX.Element;
-  isHotkeyEnabled: boolean;
   userActions: UserAction[];
   onClose?: () => void;
 };
@@ -30,52 +29,41 @@ type ReducerAction =
   | { type: "UNSET" }
   | { type: "SET_HOTKEY"; payload: boolean };
 
-const initialState: State = {
-  isHotkeyEnabled: true,
+const initialState: BlanketState = {
   userActions: [],
 };
 
 export const BlanketContext = React.createContext<{
-  state: State;
+  state: BlanketState;
   dispatch?: Dispatch<ReducerAction>;
 }>({ state: initialState });
 
 const blanketReducer = (
-  { title, body, isHotkeyEnabled, userActions, onClose }: State,
+  { title, body, userActions, onClose }: BlanketState,
   action: ReducerAction
-): State => {
+): BlanketState => {
   switch (action.type) {
     case "SET":
       return {
         title: action.payload.title,
         body: action.payload.body,
         userActions: action.payload.userActions,
-        isHotkeyEnabled: true,
         onClose: action.payload.onClose,
       };
     case "UNSET":
       if (onClose) {
         onClose();
       }
-      return { isHotkeyEnabled: false, userActions: [] };
+      return { userActions: [] };
     case "ADD_USER_ACTION":
       return {
         title,
         body,
-        isHotkeyEnabled,
         userActions: [...userActions, action.payload],
         onClose,
       };
-    case "SET_HOTKEY":
-      return {
-        title,
-        body,
-        isHotkeyEnabled: action.payload,
-        userActions,
-        onClose,
-      };
     default:
-      return { title, body, isHotkeyEnabled, userActions, onClose };
+      return { title, body, userActions, onClose };
   }
 };
 

@@ -14,6 +14,8 @@ import ToastPortal from "providers/toast/portal";
 
 import "./FileView.scss";
 import GalleryView from "./gallery/GalleryView";
+import { useBlanket } from "providers/blanket/hook";
+import { StarIcon } from "@chakra-ui/icons";
 
 const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
@@ -28,9 +30,18 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const handle = useFullScreenHandle();
   const { enqueue, enqueueError } = useToast();
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const { addUserAction } = useBlanket();
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
+
+  const toggleFavouriteWithToast = () =>
+    toggleFavourite(fileid).then(({ emoji }) =>
+      enqueue({
+        header: file.filename,
+        message: emoji,
+      })
+    );
 
   useEffect(() => {
     if (!mimetype || !streamingurl) {
@@ -56,6 +67,13 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
     setContent(getContent());
     markAsOpened(fileid);
+    addUserAction({
+      name: "Toggle Fav",
+      icon: <StarIcon />,
+      onClick: () => {
+        toggleFavouriteWithToast();
+      },
+    });
   }, []);
 
   useEffect(() => {
@@ -67,12 +85,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
     if (key === "w") {
-      toggleFavourite(fileid).then(({ emoji }) =>
-        enqueue({
-          header: file.filename,
-          message: emoji,
-        })
-      );
+      toggleFavouriteWithToast();
     } else if (key === "f") {
       if (handle.active) {
         handle.exit();

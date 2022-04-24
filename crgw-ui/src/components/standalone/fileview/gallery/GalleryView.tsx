@@ -4,7 +4,6 @@ import cls from "classnames";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "providers/toast/hook";
-import { getPosixMilliseconds } from "utils/dateUtils";
 import { createRange } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
 import Butt from "components/reusable/Button";
@@ -12,6 +11,7 @@ import Butt from "components/reusable/Button";
 import "./GalleryView.scss";
 import { FileViewComponentProps } from "../types";
 import { Box, SimpleGrid } from "@chakra-ui/react";
+import { useUpdate } from "react-use";
 
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
@@ -50,13 +50,14 @@ const GalleryView = ({
   const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
-  const [, setLastBulkHighlightActivity] = useState(getPosixMilliseconds());
   const highlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
   );
   const mainref = useRef();
   const selectedImgRef = useRef();
+
+  const rerender = () => useUpdate();
 
   const updateMultimedia = useCallback(
     (newProps: Multimedia) => {
@@ -106,8 +107,6 @@ const GalleryView = ({
     }
   }, [currentIndex, isLightboxEnabled]);
 
-  const rerender = () => setLastBulkHighlightActivity(getPosixMilliseconds());
-
   const toggleHighlight = (index: number) => {
     // The first line isn't going to cause a rerender because the pointers stay unchanged.
     highlightManager.toggle(index);
@@ -131,7 +130,6 @@ const GalleryView = ({
 
   const toggleLightbox = () => setLightboxEnabled(!isLightboxEnabled);
   const enterLightbox = () => setLightboxEnabled(true);
-  const leaveLightbox = () => setLightboxEnabled(false);
 
   const toggleBulkHighlightMode = () => {
     if (isBulkHighlightMode) {
