@@ -1,8 +1,9 @@
 import { Button, Center } from "@chakra-ui/react";
+import styled from "styled-components";
 
 import { useBlanket } from "./hook";
+
 import "./blanket.scss";
-import styled from "styled-components";
 
 const BlanketPortal = () => {
   const { isBlanketEnabled, isHotkeyEnabled, exitBlanket, title, body, userActions } = useBlanket();

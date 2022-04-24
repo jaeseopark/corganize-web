@@ -4,7 +4,7 @@ import { FileViewComponentProps } from "./types";
 import { Multimedia } from "typedefs/CorganizeFile";
 import { useToast } from "providers/toast/hook";
 import { toHumanDuration } from "utils/numberUtils";
-import HighlightManager, { expand } from "bizlog/HighlightManager";
+import HighlightManager from "bizlog/HighlightManager";
 
 import "./VideoView.scss";
 
@@ -25,7 +25,7 @@ const VideoView = ({
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
   const highlightManager: HighlightManager = useMemo(
-    () => new HighlightManager(expand(multimediaSeed?.highlights)),
+    () => new HighlightManager(multimediaSeed?.highlights),
     [multimediaSeed]
   );
 
