@@ -27,9 +27,9 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 
 type ImgProps = {
   src: string;
-  isHighlighted: boolean;
-  isSelected: boolean;
-  onClick: () => void;
+  isHighlighted?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
 };
 
 const Img = forwardRef(({ src, isHighlighted, isSelected, onClick }: ImgProps, ref) => {
@@ -201,15 +201,8 @@ const GalleryView = ({
 
     return (
       <div className="lightbox-with-progress">
-        {/* <LinearProgress
-          variant="determinate"
-          value={((currentIndex + 1) * 100) / srcs.length}
-        /> */}
         <div className="lightbox">
-          {
-            // @ts-ignore
-            <Img src={srcs[currentIndex]} />
-          }
+          <Img src={srcs[currentIndex]} />
         </div>
       </div>
     );
