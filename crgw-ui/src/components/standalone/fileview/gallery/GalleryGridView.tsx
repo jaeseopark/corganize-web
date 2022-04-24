@@ -4,10 +4,6 @@ import { Context, useEffect, useRef } from "react";
 import Img from "./Img";
 import { GalleryContextProps, useGalleryContext } from "./state";
 
-const GRID_CELL_MIN_WIDTH = "250px";
-const GRID_CELL_MAX_WIDTH = "100vw";
-const GRID_CELL_MAX_HEIGHT = "30vh";
-
 const GalleryGridView = ({ context }: { context: Context<GalleryContextProps> }) => {
   const selectedImgRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -49,19 +45,13 @@ const GalleryGridView = ({ context }: { context: Context<GalleryContextProps> })
 
   return (
     <SimpleGrid
-      minChildWidth={GRID_CELL_MIN_WIDTH}
+      minChildWidth="400px"
       spacing={6}
       onKeyDown={(e) => handleGridKey(e.key.toLowerCase())}
       tabIndex={1}
     >
       {sources.map((src, i) => (
-        <Box
-          key={src}
-          bg="white"
-          maxHeight={GRID_CELL_MAX_HEIGHT}
-          maxW={GRID_CELL_MAX_WIDTH}
-          ref={selectedImgRef}
-        >
+        <Box key={src} bg="white" ref={selectedImgRef}>
           <Img context={context} index={i} src={src} />
         </Box>
       ))}
