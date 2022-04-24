@@ -17,7 +17,7 @@ const sanitizeStorageService = (f: Partial<CorganizeFile>) => {
   return clone;
 };
 
-export const fileRepositorySlice = createSlice({
+const fileRepositorySlice = createSlice({
   name: "counter",
   initialState: {
     files: new Array<CorganizeFile>(),

@@ -57,7 +57,7 @@ const GalleryView = ({
   const mainref = useRef();
   const selectedImgRef = useRef();
 
-  const rerender = () => useUpdate();
+  const rerender = useUpdate();
 
   const updateMultimedia = useCallback(
     (newProps: Multimedia) => {
