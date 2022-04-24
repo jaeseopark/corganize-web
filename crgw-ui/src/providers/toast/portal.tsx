@@ -27,7 +27,7 @@ const TimeCounter = ({ created }: { created: number }) => {
   return <small>{toRelativeHumanTime(created)} ago</small>;
 };
 
-const ToastComponent = ({ header, type, message: message, onClick, createdAt }: Toast) => (
+const ToastComponent = ({ header, type, message, onClick, createdAt }: Toast) => (
   <StyledAlert status={type} onClick={onClick}>
     <AlertIcon />
     <Box>

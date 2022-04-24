@@ -22,7 +22,7 @@ const BlanketPortal = () => {
   };
 
   return (
-    <Flex direction="column" className="blanket-provider" onKeyDown={onKeyDown}>
+    <Flex direction="column" className="blanket-portal" onKeyDown={onKeyDown}>
       <Box className="blanket-header">
         <label className="blanket-title">{title}</label>
       </Box>

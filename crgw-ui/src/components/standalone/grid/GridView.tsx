@@ -11,6 +11,7 @@ import FileView from "components/standalone/fileview/FileView";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import ScrapePanel from "../scrape/ScrapePanel";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
+import { madFocus } from "utils/elementUtils";
 
 const MIN_WIDTH = 200;
 
@@ -22,13 +23,9 @@ const InnerGrid = () => {
   const { setBlanket } = useBlanket();
   const gridRef: any = useRef();
 
-  const [firstLocalFile] = files.filter((f) => true); // TODO test
+  const refocus = () => madFocus(gridRef.current);
 
-  const refocus = () => {
-    setTimeout(() => {
-      gridRef.current.focus();
-    }, 100);
-  };
+  const [firstLocalFile] = files.filter((f) => f.streamingurl);
 
   const openFile = (f: CorganizeFile) => {
     if (!f) return;

@@ -1,5 +1,4 @@
 import React, { Dispatch, useReducer } from "react";
-import cls from "classnames";
 
 export type UserAction = {
   name: string;
@@ -82,17 +81,7 @@ const blanketReducer = (
 
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
-  const { title, body } = state;
-  const isBlanketEnabled = !!title && !!body;
-
-  const childrenClassName = cls({ hidden: isBlanketEnabled });
-
-  return (
-    <BlanketContext.Provider value={{ state, dispatch }}>
-      {children}
-      {/* <div className={childrenClassName}></div> */}
-    </BlanketContext.Provider>
-  );
+  return <BlanketContext.Provider value={{ state, dispatch }}>{children}</BlanketContext.Provider>;
 };
 
 export default BlanketProvider;
