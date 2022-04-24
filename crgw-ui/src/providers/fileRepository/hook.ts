@@ -1,15 +1,14 @@
-import { useContext } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { CreateResponse, getInstance } from "clients/corganize";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { getPosixSeconds } from "utils/dateUtils";
-import { FileRepository } from "providers/fileRepository/fileRepository";
 import { addAll } from "shared/globalstore";
+import { add, patch, setMostRecent } from "redux/fileRepositorySlice";
+import { RootState } from "redux/store";
 
 export const useFileRepository = () => {
-  const {
-    state: { files, mostRecentFileid },
-    dispatch,
-  } = useContext(FileRepository);
+  const dispatch = useDispatch();
+  const { files, mostRecentFileid } = useSelector((state: RootState) => state.fileRepository);
 
   const findById = (fid: string) => files.find((f) => f.fileid === fid)!;
 
@@ -19,7 +18,7 @@ export const useFileRepository = () => {
 
   const addFiles = (fs: CorganizeFile[]) => {
     addAll(fs);
-    dispatch!({ type: "ADD", payload: fs });
+    dispatch(add(fs));
   };
 
   const createThenAddFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
@@ -39,7 +38,7 @@ export const useFileRepository = () => {
     return getInstance()
       .updateFile(partialProps)
       .then(() => {
-        dispatch!({ type: "UPDATE", payload: partialProps });
+        dispatch(patch(partialProps));
       });
   };
 
@@ -50,7 +49,7 @@ export const useFileRepository = () => {
       isnewfile: false,
     };
 
-    updateFile(partialProps).then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
+    updateFile(partialProps).then(() => dispatch(setMostRecent(fileid)));
   };
 
   /**

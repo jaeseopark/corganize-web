@@ -1,14 +1,15 @@
+import store from "redux/store";
+import { Provider as ReduxProvider } from "react-redux";
 import { ChakraProvider } from "@chakra-ui/react";
 
-import FileRepositoryProvider from "providers/fileRepository/fileRepository";
 import BlanketProvider from "providers/blanket/blanket";
-
+import ToastProvider from "providers/toast/toast";
 import BlanketPortal from "providers/blanket/portal";
+
 import ToastPortal from "providers/toast/portal";
 import MainView from "components/standalone/MainView";
 
 import "./App.scss";
-import ToastProvider from "providers/toast/toast";
 
 const App = () => (
   <div>
@@ -19,7 +20,7 @@ const App = () => (
 );
 
 const AppWithProviders = () => (
-  <FileRepositoryProvider>
+  <ReduxProvider store={store}>
     <ChakraProvider>
       <ToastProvider>
         <BlanketProvider>
@@ -27,7 +28,7 @@ const AppWithProviders = () => (
         </BlanketProvider>
       </ToastProvider>
     </ChakraProvider>
-  </FileRepositoryProvider>
+  </ReduxProvider>
 );
 
 export default AppWithProviders;

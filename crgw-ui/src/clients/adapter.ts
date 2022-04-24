@@ -15,7 +15,7 @@ const isnewfile = (lastopened?: number) => {
 
 export const retrieveFiles = (
   sessionInfo: SessionInfo,
-  addToRedux: (moreFiles: CorganizeFile[]) => void
+  addToFileRepo: (moreFiles: CorganizeFile[]) => void
 ) => {
   const decorate = (f: CorganizeFile): CorganizeFile => {
     const decorated: CorganizeFile = {
@@ -42,5 +42,5 @@ export const retrieveFiles = (
   getInstance()
     .getLocalFilenames()
     .then(initWithLocalFilenames)
-    .then(() => getInstance().getFilesBySessionInfo(sessionInfo, addToRedux, decorateAndFilter));
+    .then(() => getInstance().getFilesBySessionInfo(sessionInfo, addToFileRepo, decorateAndFilter));
 };

@@ -1,4 +1,4 @@
-import React, { Dispatch, useReducer } from "react";
+import React, { Dispatch, useMemo, useReducer } from "react";
 
 export type UserAction = {
   name: string;
@@ -69,7 +69,12 @@ const blanketReducer = (
 
 const BlanketProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(blanketReducer, initialState);
-  return <BlanketContext.Provider value={{ state, dispatch }}>{children}</BlanketContext.Provider>;
+  const { title, body, onClose, userActions } = state;
+  const value = useMemo(
+    () => ({ state: { title, body, onClose, userActions }, dispatch }),
+    [title, body, onClose, userActions]
+  );
+  return <BlanketContext.Provider value={value}>{children}</BlanketContext.Provider>;
 };
 
 export default BlanketProvider;
