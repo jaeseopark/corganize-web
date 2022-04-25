@@ -1,8 +1,9 @@
 import cls from "classnames";
 
-import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
-import { sample } from "utils/arrayUtils";
 import { useBlanket } from "providers/blanket/hook";
+import { sample } from "utils/arrayUtils";
+
+import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
 import Butt, { SplitButt } from "components/reusable/Button";
 
 const BULK_ADD_OPTIONS = [10, 50, 100, 200];
@@ -87,19 +88,16 @@ const ScrapeInputBar = ({
         </div>
         <div className="form-row metadata">
           <div className="tag-container">
-            {
-              // @ts-ignore
-              [...new Set(cards.map((c) => c.status))]
-                .map((status) => ({
-                  status,
-                  length: filterCards(status).length,
-                }))
-                .map(({ status, length }) => (
-                  <span className={cls("tag", status)} key={status}>
-                    {status}: {length}
-                  </span>
-                ))
-            }
+            {Array.from(new Set(cards.map((c) => c.status)))
+              .map((status) => ({
+                status,
+                length: filterCards(status).length,
+              }))
+              .map(({ status, length }) => (
+                <span className={cls("tag", status)} key={status}>
+                  {status}: {length}
+                </span>
+              ))}
             <span className="tag" key="hidden">
               Hidden: {rawScrapeCount - cards.length}
             </span>
