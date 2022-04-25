@@ -36,3 +36,15 @@ export const createRandomIds = (count: number) =>
     acc.push(uuidv4().toString());
     return acc;
   }, new Array<string>());
+
+export const upsert = <T>(elements: T[], key: keyof T): T[] =>
+  elements.reduce((acc, next) => {
+    const i = acc.findIndex((element) => element[key] === next[key]);
+    if (i == -1) {
+      acc.push(next);
+      return acc;
+    }
+
+    acc.splice(i, 1, next);
+    return acc;
+  }, new Array<T>());

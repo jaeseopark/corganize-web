@@ -1,4 +1,5 @@
 import React, { Dispatch, useReducer } from "react";
+import { upsert } from "utils/arrayUtils";
 
 export type UserAction = {
   name: string;
@@ -25,7 +26,7 @@ type ReducerAction =
       type: "SET";
       payload: BlanketPayload;
     }
-  | { type: "ADD_USER_ACTION"; payload: UserAction }
+  | { type: "UPSERT_USER_ACTION"; payload: UserAction }
   | { type: "UNSET" }
   | { type: "SET_HOTKEY"; payload: boolean };
 
@@ -38,10 +39,8 @@ export const BlanketContext = React.createContext<{
   dispatch?: Dispatch<ReducerAction>;
 }>({ state: initialState });
 
-const blanketReducer = (
-  { title, body, userActions, onClose }: BlanketState,
-  action: ReducerAction
-): BlanketState => {
+const blanketReducer = (state: BlanketState, action: ReducerAction): BlanketState => {
+  const { title, body, userActions, onClose } = state;
   switch (action.type) {
     case "SET":
       return {
@@ -55,15 +54,15 @@ const blanketReducer = (
         onClose();
       }
       return { userActions: [] };
-    case "ADD_USER_ACTION":
+    case "UPSERT_USER_ACTION":
       return {
         title,
         body,
-        userActions: [...userActions, action.payload],
+        userActions: upsert([...userActions, action.payload], "name"),
         onClose,
       };
     default:
-      return { title, body, userActions, onClose };
+      return state;
   }
 };
 
