@@ -1,5 +1,5 @@
 import { Checkbox } from "@chakra-ui/react";
-import { useGrid} from "hooks/grid";
+import { useGrid } from "hooks/grid";
 import { Filter, MaybeBoolean } from "providers/grid/types";
 
 const ROTATION: MaybeBoolean[] = ["checked", "unchecked", "maybe"];

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { SimpleGrid } from "@chakra-ui/react";
-import { useGrid} from "hooks/grid";
+import { useGrid } from "hooks/grid";
 import { useFileRepository } from "hooks/fileRepository";
 import FieldBar from "./field/FieldBar";
 import GlobalSearch from "./field/GlobalSearch";
