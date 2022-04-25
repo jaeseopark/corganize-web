@@ -1,6 +1,4 @@
-import React, { Dispatch, useReducer } from "react";
-import { gridReducer } from "./reducer";
-import { Action, Field, State } from "./types";
+import { Field, GridState } from "./types";
 
 const fieldNew: Field = {
   displayName: "New",
@@ -30,7 +28,7 @@ const fieldSize: Field = {
   filterType: "number",
 };
 
-const initialState: State = {
+export const initialState: GridState = {
   files: [],
   filteredAndSorted: [],
   filteredSortedAndPaginated: [],
@@ -69,18 +67,3 @@ const initialState: State = {
     itemsPerPage: 10,
   },
 };
-
-export const GridContext = React.createContext<{
-  state: State;
-  dispatch?: Dispatch<Action>;
-}>({
-  state: initialState,
-});
-
-const GridProvider = ({ children }: { children: JSX.Element }) => {
-  const [state, dispatch] = useReducer(gridReducer, initialState);
-  const value = { state, dispatch };
-  return <GridContext.Provider value={value}>{children}</GridContext.Provider>;
-};
-
-export default GridProvider;

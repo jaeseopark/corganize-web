@@ -63,7 +63,7 @@ export type Page = {
 /**
  *  Reducer boilerplate
  */
-export type State = {
+export type GridState = {
   files: CorganizeFile[];
   filteredAndSorted: CorganizeFile[];
   filteredSortedAndPaginated: CorganizeFile[];
@@ -73,12 +73,3 @@ export type State = {
   prefilter: string;
   page: Page;
 };
-
-export type Action =
-  | { type: "SET_FILES"; payload: CorganizeFile[] }
-  | { type: "UPSERT_FILTERS"; payload: Filter[] }
-  | { type: "REMOVE_FILTERS"; payload: Filter[] }
-  | { type: "UPSERT_SORTS"; payload: Sort[] }
-  | { type: "REMOVE_SORTS"; payload: Sort[] }
-  | { type: "SET_PREFILTER"; payload: string }
-  | { type: "SET_PAGE"; payload: Page };

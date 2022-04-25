@@ -1,4 +1,4 @@
-import { useGrid } from "providers/grid/hook";
+import { useGrid} from "hooks/grid";
 import FieldComponent from "./FieldComponent";
 
 const FieldBar = () => {

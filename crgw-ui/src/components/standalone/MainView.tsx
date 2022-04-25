@@ -2,7 +2,6 @@ import cls from "classnames";
 import styled from "styled-components";
 
 import { useBlanket } from "hooks/blanket";
-import GridProvider from "providers/grid/grid";
 import GridView from "./grid/GridView";
 import { useEffect, useState } from "react";
 import { SessionInfo } from "typedefs/Session";
@@ -30,9 +29,7 @@ const MainView = () => {
   return (
     <StyledMainView className={cls({ hidden: isBlanketEnabled })}>
       <SelfClosingBurgerMenu />
-      <GridProvider>
-        <GridView />
-      </GridProvider>
+      <GridView />
     </StyledMainView>
   );
 };

@@ -1,6 +1,6 @@
 import { Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import { useGrid } from "providers/grid/hook";
+import { useGrid} from "hooks/grid";
 import { ChangeEvent } from "react";
 
 const GlobalSearch = () => {

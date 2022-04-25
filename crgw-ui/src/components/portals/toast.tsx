@@ -13,9 +13,8 @@ import {
 } from "@chakra-ui/react";
 
 import { toRelativeHumanTime } from "utils/numberUtils";
-
-import { useToast } from "../../hooks/toast";
-import { Toast } from "../../providers/toast/toast";
+import { useToast } from "hooks/toast";
+import { CorganizeToast } from "redux/toast";
 
 const TimeCounter = ({ created }: { created: number }) => {
   const rerender = useUpdate();
@@ -27,7 +26,7 @@ const TimeCounter = ({ created }: { created: number }) => {
   return <small>{toRelativeHumanTime(created)} ago</small>;
 };
 
-const ToastComponent = ({ header, type, message, onClick, createdAt }: Toast) => (
+const ToastComponent = ({ header, type, message, onClick, createdAt }: CorganizeToast) => (
   <StyledAlert status={type} onClick={onClick}>
     <AlertIcon />
     <Box>

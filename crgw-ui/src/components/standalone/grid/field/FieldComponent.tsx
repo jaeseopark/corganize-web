@@ -2,7 +2,7 @@ import { Tag } from "@chakra-ui/react";
 
 import { TriangleUpIcon, TriangleDownIcon, MinusIcon } from "@chakra-ui/icons";
 
-import { useGrid } from "providers/grid/hook";
+import { useGrid} from "hooks/grid";
 import { Field, SortDirection } from "providers/grid/types";
 
 import BooleanControl from "./BooleanControl";
