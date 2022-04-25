@@ -5,18 +5,11 @@
   flex-grow: 1;
   overflow: auto;
 
-  .blanket-view {
-    .blanket-header {
-      padding: 10px 10px 10px 20px;
+  .blanket-header {
+    padding: 10px 10px 10px 20px;
 
-      .close {
-        padding: 0;
-        margin: 0 10px 0 0;
-      }
-
-      .blanket-title {
-        width: 100%;
-      }
+    .blanket-title {
+      font-size: larger
     }
   }
 }

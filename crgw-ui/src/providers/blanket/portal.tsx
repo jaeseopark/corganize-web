@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Button, Center } from "@chakra-ui/react";
 import styled from "styled-components";
 
@@ -16,8 +15,7 @@ const Header = () => {
 };
 
 const Body = () => {
-  const { title, body } = useBlanket();
-  // const memoizedBody = useMemo(() => body, [title]);
+  const { body } = useBlanket();
   return <StyledBlanketBody>{body}</StyledBlanketBody>;
 };
 

@@ -50,7 +50,7 @@ export const useFileRepository = () => {
       isnewfile: false,
     };
 
-    updateFile(partialProps).then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
+    return updateFile(partialProps).then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
   };
 
   /**

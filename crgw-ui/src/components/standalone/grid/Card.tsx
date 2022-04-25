@@ -9,6 +9,14 @@ import FileView from "components/standalone/fileview/FileView";
 import "./Card.scss";
 import FileMetadataTags from "components/reusable/FileMetadataTag";
 
+const IndexLabel = ({ index }: { index: number }) => {
+  if (index >= 10) {
+    // no hotkeys
+    return null;
+  }
+  return <label className="index">{index}</label>;
+};
+
 const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
   const { setBlanket } = useBlanket();
   const { streamingurl, mimetype, filename, fileid } = file;
@@ -31,7 +39,7 @@ const Card = ({ file, index }: { file: CorganizeFile; index: number }) => {
     >
       <VStack textAlign="center" p={6}>
         <label className={cls({ clickable: openable })} onClick={openFile}>
-          <label className="index">{index}</label>
+          <IndexLabel index={index} />
           {filename}
         </label>
         <Divider />

@@ -66,7 +66,7 @@ const initialState: State = {
     index: 0,
     normalizedIndex: 0,
     maxIndex: 0,
-    itemsPerPage: 10,
+    itemsPerPage: 20,
   },
 };
 

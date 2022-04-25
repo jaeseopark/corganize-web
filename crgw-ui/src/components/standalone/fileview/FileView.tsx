@@ -28,19 +28,20 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const { findById, markAsOpened, updateFile, toggleFavourite } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
-  const { enqueue, enqueueError } = useToast();
+  const { enqueue, enqueueSuccess, enqueueError } = useToast();
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
 
   const toggleFavouriteWithToast = () =>
-    toggleFavourite(fileid).then(({ emoji }) =>
-      enqueue({
-        header: file.filename,
-        message: emoji,
-      })
-    );
+    toggleFavourite(fileid)
+      .then(({ emoji }) =>
+        enqueue({
+          message: emoji,
+        })
+      )
+      .catch((error: Error) => enqueueError({ message: error.message }));
 
   useEffect(() => {
     if (!mimetype || !streamingurl) {
@@ -65,7 +66,9 @@ const FileView = ({ fileid }: { fileid: string }) => {
     };
 
     setContent(getContent());
-    markAsOpened(fileid);
+    markAsOpened(fileid)
+      .then(() => enqueueSuccess({ message: "File marked as open" }))
+      .catch((error: Error) => enqueueError({ message: error.message }));
   }, []);
 
   useEffect(() => {

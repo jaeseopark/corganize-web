@@ -95,7 +95,7 @@ class CorganizeClient {
           // @ts-ignore
           return res.json() as RawCreateResponse;
         }
-        throw new Error("Something went wrong");
+        throw new Error(`status ${res.status}`);
       })
       .then(({ created, skipped }: RawCreateResponse) => {
         const findFileById = (fileid: string) => {
@@ -123,10 +123,15 @@ class CorganizeClient {
         "Content-Type": "application/json",
       },
       mode: "cors",
-    }).then(() => ({
-      ...partialProps,
-      lastupdated: getPosixSeconds(),
-    }));
+    }).then((response) => {
+      if (response.status !== 200) {
+        throw new Error(`status ${response.status}`);
+      }
+      return {
+        ...partialProps,
+        lastupdated: getPosixSeconds(),
+      };
+    });
   }
 
   deleteFile(fileid: string): Promise<string> {

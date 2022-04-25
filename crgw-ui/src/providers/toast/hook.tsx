@@ -28,15 +28,17 @@ export const useToast = () => {
   }: EnqueueProps & {
     type?: ToastType;
   }) => {
+    const toastId = uuidv4().toString();
+    const close = () => dispatch!({ type: "REMOVE", payload: toastId });
     const toast: Toast = {
-      id: uuidv4().toString(),
+      id: toastId,
       type,
       header,
       message,
       createdAt: getPosixSeconds(),
-      onClick: onClick,
+      onClick: onClick || close,
     };
-    setTimeout(() => dispatch!({ type: "REMOVE", payload: toast.id }), duration);
+    setTimeout(close, duration);
     dispatch!({ type: "ADD", payload: toast });
   };
 

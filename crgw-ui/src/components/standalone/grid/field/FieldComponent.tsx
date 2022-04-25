@@ -6,6 +6,7 @@ import { useGrid } from "providers/grid/hook";
 import { Field, SortDirection } from "providers/grid/types";
 
 import BooleanControl from "./BooleanControl";
+import styled from "styled-components";
 
 const rotate = (direction: SortDirection): SortDirection | undefined => {
   if (direction === "desc") return "asc";
@@ -66,7 +67,7 @@ const FieldComponent = ({ field }: { field: Field }) => {
     <Tag size="lg">
       <div className="clickable" onClick={updateSortOrder}>
         {renderSortIcon()}
-        <label>{displayName}</label>
+        <StyledFieldLabel>{displayName}</StyledFieldLabel>
       </div>
       {renderFilterControl()}
     </Tag>
@@ -74,3 +75,7 @@ const FieldComponent = ({ field }: { field: Field }) => {
 };
 
 export default FieldComponent;
+
+const StyledFieldLabel = styled.label`
+  margin: 0 0.3em;
+`;
