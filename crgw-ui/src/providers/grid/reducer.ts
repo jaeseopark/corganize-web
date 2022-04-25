@@ -1,22 +1,8 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
+import { upsert } from "utils/arrayUtils";
 import { createMegaFilter } from "./filter";
 import { createMegaComparer } from "./sort";
-import { Action, FieldReferer, Page, Sort, State } from "./types";
-
-const merge = (old: FieldReferer[], neww: FieldReferer[]) =>
-  neww.reduce(
-    (acc, next) => {
-      const i = acc.findIndex((f) => f.field.displayName === next.field.displayName);
-      if (i === -1) {
-        acc.push(next);
-        return acc;
-      }
-
-      acc.splice(i, 1, next);
-      return acc;
-    },
-    [...old]
-  );
+import { Action, Page, State } from "./types";
 
 const getNewPage = (oldPage: Page, fileCount: number): Page => {
   const { itemsPerPage, index } = oldPage;
@@ -68,7 +54,7 @@ export const gridReducer = (state: State, action: Action): State => {
       });
     }
     case "UPSERT_FILTERS": {
-      const newFilters = merge(filters, action.payload);
+      const newFilters = upsert([...filters, ...action.payload], "field");
       return recompute({
         ...state,
         filters: newFilters,
@@ -83,7 +69,7 @@ export const gridReducer = (state: State, action: Action): State => {
       });
     }
     case "UPSERT_SORTS": {
-      const newSorts = merge(sorts, action.payload) as Sort[];
+      const newSorts = upsert([...sorts, ...action.payload], "field");
       return recompute({
         ...state,
         sorts: newSorts,

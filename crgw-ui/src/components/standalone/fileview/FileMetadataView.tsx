@@ -1,33 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { CheckIcon } from "@chakra-ui/icons";
+
+import { CorganizeFile } from "typedefs/CorganizeFile";
+
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
 
-import { CheckIcon } from "@chakra-ui/icons";
-
 import "./FileMetadataView.scss";
-import { CorganizeFile } from "typedefs/CorganizeFile";
 
 const FileMetadataView = ({ file }: { file: CorganizeFile }) => {
-  const serializedFile = useMemo(() => JSON.stringify(file, null, 2), []);
-  const [edit, setEdit] = useState<string>(serializedFile);
-  const { enableHotkey, disableHotkey, addUserAction } = useBlanket();
+  const { enableHotkey, disableHotkey, upsertUserAction } = useBlanket();
   const { updateFile } = useFileRepository();
-  const { enqueueSuccess } = useToast();
+  const { enqueueSuccess, enqueueError } = useToast();
+  const [edit, setEdit] = useState<string>(JSON.stringify(file, null, 2));
 
   const save = () => {
-    const enq = () => enqueueSuccess({ message: "Saved" });
-    const deserialized = JSON.parse(edit);
-    updateFile(deserialized).then(enq);
+    (async () => JSON.parse(edit!))()
+      .then(updateFile)
+      .then(() => enqueueSuccess({ message: "Saved" }))
+      .catch((err) => enqueueError({ message: err.message }));
   };
 
   useEffect(() => {
-    addUserAction({
+    upsertUserAction({
       name: "Save",
       icon: <CheckIcon />,
       onClick: save,
     });
-  }, []);
+  });
 
   return (
     <textarea

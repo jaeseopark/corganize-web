@@ -1,12 +1,41 @@
-import styled from "styled-components";
+import { useMemo } from "react";
 import { Button, Center } from "@chakra-ui/react";
+import styled from "styled-components";
 
 import { isHotkeyEnabled, useBlanket } from "./hook";
 
 import "./blanket.scss";
 
+const Header = () => {
+  const { title } = useBlanket();
+  return (
+    <div className="blanket-header">
+      <label className="blanket-title">{title}</label>
+    </div>
+  );
+};
+
+const Body = () => {
+  const { title, body } = useBlanket();
+  // const memoizedBody = useMemo(() => body, [title]);
+  return <StyledBlanketBody>{body}</StyledBlanketBody>;
+};
+
+const Footer = () => {
+  const { userActions } = useBlanket();
+  return (
+    <Center className="blanket-footer">
+      {userActions.map(({ name, icon, onClick }) => (
+        <Button key={name} rightIcon={icon} colorScheme="blue" variant="outline" onClick={onClick}>
+          {name}
+        </Button>
+      ))}
+    </Center>
+  );
+};
+
 const BlanketPortal = () => {
-  const { isBlanketEnabled, exitBlanket, title, body, userActions } = useBlanket();
+  const { isBlanketEnabled, exitBlanket } = useBlanket();
 
   if (!isBlanketEnabled) {
     return null;
@@ -25,30 +54,16 @@ const BlanketPortal = () => {
 
   return (
     <div className="blanket-portal" onKeyDown={onKeyDown}>
-      <div className="blanket-header">
-        <label className="blanket-title">{title}</label>
-      </div>
-      <BlanketBody>{body}</BlanketBody>
-      <Center className="blanket-footer">
-        {userActions.map(({ name, icon, onClick }) => (
-          <Button
-            key={name}
-            rightIcon={icon}
-            colorScheme="blue"
-            variant="outline"
-            onClick={onClick}
-          >
-            {name}
-          </Button>
-        ))}
-      </Center>
+      <Header />
+      <Body />
+      <Footer />
     </div>
   );
 };
 
 export default BlanketPortal;
 
-const BlanketBody = styled.div`
+const StyledBlanketBody = styled.div`
   display: flex;
   overflow-y: scroll;
   flex-direction: column;

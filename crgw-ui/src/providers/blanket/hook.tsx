@@ -1,5 +1,5 @@
 import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
-import { BlanketContext, BlanketState, UserAction } from "providers/blanket/blanket";
+import { BlanketContext, UserAction } from "providers/blanket/blanket";
 import { useContext } from "react";
 
 type SetBlanketProps = {
@@ -35,9 +35,9 @@ export const useBlanket = () => {
     dispatch!({ type: "SET", payload });
   };
 
-  const addUserAction = ({ name, icon, onClick }: UserAction) =>
+  const upsertUserAction = ({ name, icon, onClick }: UserAction) =>
     dispatch!({
-      type: "ADD_USER_ACTION",
+      type: "UPSERT_USER_ACTION",
       payload: {
         name,
         onClick,
@@ -64,7 +64,7 @@ export const useBlanket = () => {
     isHotkeyEnabled,
     setBlanket,
     exitBlanket,
-    addUserAction,
+    upsertUserAction,
     enableHotkey,
     disableHotkey,
   };
