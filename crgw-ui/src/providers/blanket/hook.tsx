@@ -1,13 +1,19 @@
 import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
+import FileHeader from "components/reusable/FileHeader";
 import { BlanketContext, UserAction } from "providers/blanket/blanket";
 import { useContext } from "react";
+import { RequireOnlyOne } from "utils/typeUtils";
 
-type SetBlanketProps = {
-  title: string;
-  body: JSX.Element;
-  onClose?: () => void;
-  userActions?: UserAction[];
-};
+type SetBlanketProps = RequireOnlyOne<
+  {
+    title: string;
+    fileid: string;
+    body: JSX.Element;
+    onClose?: () => void;
+    userActions?: UserAction[];
+  },
+  "title" | "fileid"
+>;
 
 export let isHotkeyEnabled = true;
 
@@ -18,7 +24,7 @@ export const useBlanket = () => {
   } = useContext(BlanketContext);
   const isBlanketEnabled = !!title && !!body;
 
-  const setBlanket = ({ title, body, onClose, userActions }: SetBlanketProps) => {
+  const setBlanket = ({ title, fileid, body, onClose, userActions }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
@@ -26,7 +32,7 @@ export const useBlanket = () => {
     };
 
     const payload = {
-      title,
+      title: title || <FileHeader fileid={fileid!} />,
       body,
       userActions: userActions || [defaultUserAction],
       onClose,

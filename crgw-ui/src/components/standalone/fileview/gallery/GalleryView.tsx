@@ -197,10 +197,12 @@ const GalleryView = ({
       }
       toggleLightbox();
     } else if (key === "e") {
-      // jump by 10%
       enterLightbox();
-      const i = currentIndex + Math.floor(srcs.length / 10);
-      safeJump(i % srcs.length);
+      let i = (currentIndex + Math.floor(srcs.length / 10)) % srcs.length;
+      if (!highlightManager.isEmpty()) {
+        i = highlightManager.next(currentIndex)!;
+      }
+      safeJump(i);
     } else if (key === "b") {
       toggleHighlight(currentIndex);
       if (!isBulkHighlightMode) {
@@ -211,9 +213,6 @@ const GalleryView = ({
       if (!isBulkHighlightMode) {
         saveHighlights();
       }
-    } else if (key === "`") {
-      const nextIndex = highlightManager.next(currentIndex);
-      if (nextIndex !== null) setCurrentIndex(nextIndex);
     } else if (!isBulkHighlightMode && !isLightboxEnabled && key === " ") {
       toggleLightbox();
     } else if (key === "enter") {
@@ -256,10 +255,7 @@ const GalleryView = ({
   const maybeRenderGrid = () => {
     if (isLightboxEnabled) return null;
 
-    let srcsToRender = srcs;
-    if (isSummaryMode) {
-      srcsToRender = summarySrcs;
-    }
+    const srcsToRender = isSummaryMode ? summarySrcs : srcs;
 
     return (
       <SimpleGrid

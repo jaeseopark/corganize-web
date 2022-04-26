@@ -2,6 +2,7 @@ import { Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useGrid } from "providers/grid/hook";
 import { ChangeEvent } from "react";
+import styled from "styled-components";
 
 const GlobalSearch = () => {
   const {
@@ -20,7 +21,7 @@ const GlobalSearch = () => {
   };
 
   return (
-    <InputGroup>
+    <InputGroup marginY="1em">
       <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />} />
       <Input
         placeholder="Filter by keyword"
@@ -28,9 +29,15 @@ const GlobalSearch = () => {
         onChange={onChange}
         onKeyDown={onKeyDown}
       />
-      <label>{fileCount}</label>
+      <CounterLabel>{fileCount}</CounterLabel>
     </InputGroup>
   );
 };
 
 export default GlobalSearch;
+
+const CounterLabel = styled.label`
+  position: absolute;
+  right: 0;
+  padding: 0.5em;
+`;

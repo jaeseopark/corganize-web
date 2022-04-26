@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { CreateResponse, getInstance } from "clients/corganize";
-import { CorganizeFile } from "typedefs/CorganizeFile";
+import { CorganizeFile, getActivationEmoji } from "typedefs/CorganizeFile";
 import { getPosixSeconds } from "utils/dateUtils";
 import { FileRepository } from "providers/fileRepository/fileRepository";
 import { addAll } from "shared/globalstore";
@@ -50,7 +50,9 @@ export const useFileRepository = () => {
       isnewfile: false,
     };
 
-    return updateFile(partialProps).then(() => dispatch!({ type: "SET_MOST_RECENT", payload: fileid }));
+    return updateFile(partialProps).then(() =>
+      dispatch!({ type: "SET_MOST_RECENT", payload: fileid })
+    );
   };
 
   /**
@@ -59,7 +61,7 @@ export const useFileRepository = () => {
    * @param fileid ID of the file to de/activate.
    * @returns A boolean value indicating the new activation state along with the emoji representation.
    */
-  const toggleFavourite = (fileid: string) => {
+  const toggleActivation = (fileid: string) => {
     const file = findById(fileid);
     const isActivating = !file.dateactivated;
     const newDateActivated = isActivating ? getPosixSeconds() : 0;
@@ -72,7 +74,8 @@ export const useFileRepository = () => {
 
     return updateFile(updatePayload).then(() => ({
       activated: isActivating,
-      emoji: isActivating ? "👍" : "👎",
+      message: isActivating ? "Activated" : "Deactivated",
+      emoji: getActivationEmoji(updatePayload),
     }));
   };
 
@@ -85,6 +88,6 @@ export const useFileRepository = () => {
     updateFile,
     markAsOpened,
     findById,
-    toggleFavourite,
+    toggleActivation,
   };
 };

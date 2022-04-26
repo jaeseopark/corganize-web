@@ -27,3 +27,5 @@ export type CorganizeFile = {
   streamingurl?: string;
   thumbnailurl?: string;
 };
+
+export const getActivationEmoji = (f: CorganizeFile) => !!f.dateactivated ? "👍" : "👎";

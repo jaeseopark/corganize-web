@@ -8,14 +8,14 @@ export type UserAction = {
 };
 
 type BlanketPayload = {
-  title: string;
+  title: string | JSX.Element;
   body: JSX.Element;
   userActions: UserAction[];
   onClose?: () => void;
 };
 
 export type BlanketState = {
-  title?: string;
+  title?: string | JSX.Element;
   body?: JSX.Element;
   userActions: UserAction[];
   onClose?: () => void;

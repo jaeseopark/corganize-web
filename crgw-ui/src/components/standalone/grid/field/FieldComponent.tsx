@@ -1,4 +1,4 @@
-import { Tag } from "@chakra-ui/react";
+import { Box, Tag } from "@chakra-ui/react";
 
 import { TriangleUpIcon, TriangleDownIcon, MinusIcon } from "@chakra-ui/icons";
 
@@ -50,7 +50,7 @@ const FieldComponent = ({ field }: { field: Field }) => {
     upsertSort(newSort);
   };
 
-  const renderSortIcon = () => {
+  const SortIcon = () => {
     if (!sort) {
       return <MinusIcon className="semi-hidden" />;
     }
@@ -64,9 +64,9 @@ const FieldComponent = ({ field }: { field: Field }) => {
   };
 
   return (
-    <Tag size="lg">
+    <Tag size="lg" float="left" marginRight=".5em" marginBottom=".5em">
       <div className="clickable" onClick={updateSortOrder}>
-        {renderSortIcon()}
+        <SortIcon />
         <StyledFieldLabel>{displayName}</StyledFieldLabel>
       </div>
       {renderFilterControl()}
