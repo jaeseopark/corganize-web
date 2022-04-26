@@ -1,8 +1,9 @@
 import { useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { Context, Toast, ToastType } from "providers/toast/toast";
+
 import { getPosixSeconds } from "utils/dateUtils";
-import { Context, Toast, ToastType } from "./toast";
 
 const DEFAULT_DELAY = 4000;
 
@@ -47,5 +48,11 @@ export const useToast = () => {
   const enqueueWarning = (props: EnqueueProps) => enqueueWithType({ ...props, type: "warning" });
   const enqueueError = (props: EnqueueProps) => enqueueWithType({ ...props, type: "error" });
 
-  return { toasts, enqueue: enqueueInfo, enqueueSuccess, enqueueWarning, enqueueError };
+  return {
+    toasts,
+    enqueue: enqueueInfo,
+    enqueueSuccess,
+    enqueueWarning,
+    enqueueError,
+  };
 };

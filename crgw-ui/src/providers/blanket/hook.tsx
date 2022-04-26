@@ -1,8 +1,11 @@
 import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
-import FileHeader from "components/reusable/FileHeader";
-import { BlanketContext, UserAction } from "providers/blanket/blanket";
 import { useContext } from "react";
+
+import { BlanketContext, UserAction } from "providers/blanket/blanket";
+
 import { RequireOnlyOne } from "utils/typeUtils";
+
+import FileHeader from "components/reusable/FileHeader";
 
 type SetBlanketProps = RequireOnlyOne<
   {

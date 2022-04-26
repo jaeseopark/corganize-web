@@ -1,17 +1,21 @@
-import { useEffect, useRef } from "react";
 import { SimpleGrid } from "@chakra-ui/react";
-import { useGrid } from "providers/grid/hook";
-import { useFileRepository } from "providers/fileRepository/hook";
-import FieldBar from "./field/FieldBar";
-import GlobalSearch from "./field/GlobalSearch";
-import Card from "./Card";
-import { useBlanket } from "providers/blanket/hook";
-import PageControl from "./PageControl";
-import FileView from "components/standalone/fileview/FileView";
+import { useEffect, useRef } from "react";
+
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import ScrapePanel from "../scrape/ScrapePanel";
-import FileMetadataView from "components/standalone/fileview/FileMetadataView";
+
+import { useBlanket } from "providers/blanket/hook";
+import { useFileRepository } from "providers/fileRepository/hook";
+import { useGrid } from "providers/grid/hook";
+
 import { madFocus } from "utils/elementUtils";
+
+import FileMetadataView from "components/standalone/fileview/FileMetadataView";
+import FileView from "components/standalone/fileview/FileView";
+import Card from "components/standalone/grid/Card";
+import PageControl from "components/standalone/grid/PageControl";
+import FieldBar from "components/standalone/grid/field/FieldBar";
+import GlobalSearch from "components/standalone/grid/field/GlobalSearch";
+import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 const MIN_WIDTH = 200;
 

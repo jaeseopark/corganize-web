@@ -41,7 +41,7 @@ export const createRandomIds = (count: number) =>
 export const upsert = <T>(elements: T[], key: keyof T): T[] =>
   elements.reduce((acc, next) => {
     const i = acc.findIndex((element) => element[key] === next[key]);
-    if (i == -1) {
+    if (i === -1) {
       acc.push(next);
       return acc;
     }

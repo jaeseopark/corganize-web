@@ -1,14 +1,14 @@
 import { ChakraProvider } from "@chakra-ui/react";
 
-import FileRepositoryProvider from "providers/fileRepository/fileRepository";
 import BlanketProvider from "providers/blanket/blanket";
-
 import BlanketPortal from "providers/blanket/portal";
+import FileRepositoryProvider from "providers/fileRepository/fileRepository";
 import ToastPortal from "providers/toast/portal";
+import ToastProvider from "providers/toast/toast";
+
 import MainView from "components/standalone/MainView";
 
 import "./App.scss";
-import ToastProvider from "providers/toast/toast";
 
 const App = () => (
   <div>

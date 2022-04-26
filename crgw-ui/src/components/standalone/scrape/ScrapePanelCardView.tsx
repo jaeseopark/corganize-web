@@ -1,5 +1,6 @@
-import cls from "classnames";
 import { Button } from "@chakra-ui/react";
+import cls from "classnames";
+
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import "./ScrapePanelCardView.scss";

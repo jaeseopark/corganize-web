@@ -1,10 +1,14 @@
 import { useMemo, useRef, useState } from "react";
 
-import { FileViewComponentProps } from "./types";
 import { Multimedia } from "typedefs/CorganizeFile";
+
 import { useToast } from "providers/toast/hook";
-import { toHumanDuration } from "utils/numberUtils";
+
 import HighlightManager from "bizlog/HighlightManager";
+
+import { toHumanDuration } from "utils/numberUtils";
+
+import { FileViewComponentProps } from "components/standalone/fileview/types";
 
 import "./VideoView.scss";
 

@@ -1,5 +1,6 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { Field, Sort } from "./types";
+
+import { Field, Sort } from "providers/grid/types";
 
 const DEFAULT_COMPARER = (a: CorganizeFile, b: CorganizeFile): number =>
   a.fileid > b.fileid ? 1 : -1;

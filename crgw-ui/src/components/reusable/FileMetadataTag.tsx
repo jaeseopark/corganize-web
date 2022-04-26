@@ -1,5 +1,7 @@
 import { Badge, Wrap, WrapItem } from "@chakra-ui/react";
-import { CorganizeFile, getActivationEmoji, Multimedia } from "typedefs/CorganizeFile";
+
+import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
+
 import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
 const getHighlightEmoji = (f: CorganizeFile) => {
