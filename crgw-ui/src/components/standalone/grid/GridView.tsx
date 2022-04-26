@@ -47,7 +47,7 @@ const InnerGrid = () => {
     } else if (key === "s") {
       if (!mostRecentFile) return;
       setBlanket({
-        title: mostRecentFile.filename,
+        title: "Scrape",
         body: <ScrapePanel defaultUrls={[mostRecentFile.sourceurl]} />,
         onClose: refocus,
       });

@@ -12,6 +12,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 import { isDiscovered } from "shared/globalstore";
 
 import "./ScrapePanel.scss";
+import { useToast } from "providers/toast/hook";
 
 type ScrapePanelProps = {
   defaultUrls?: string[];
@@ -20,6 +21,7 @@ type ScrapePanelProps = {
 const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const { enableHotkey: enableFullscreenHotkey } = useBlanket();
   const { createThenAddFiles } = useFileRepository();
+  const { enqueueError } = useToast();
 
   const [isProcessing, setProcessing] = useState(false);
   const [cards, setCards] = useState(new Array<Card>());
@@ -80,6 +82,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         created.forEach((f) => updateCardStatus(f, CARD_STATUS.COMPLETE));
         skipped.forEach((f) => updateCardStatus(f, CARD_STATUS.ERROR, "already exists"));
       })
+      .catch(({ message }: Error) => enqueueError({ message }))
       .finally(rerender);
   };
 

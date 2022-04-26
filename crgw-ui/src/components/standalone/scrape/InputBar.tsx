@@ -5,6 +5,7 @@ import { sample } from "utils/arrayUtils";
 
 import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
 import Butt, { SplitButt } from "components/reusable/Button";
+import { Badge } from "@chakra-ui/react";
 
 const BULK_ADD_OPTIONS = [10, 50, 100, 200];
 
@@ -58,6 +59,17 @@ const ScrapeInputBar = ({
     return [...fromStartOptions, ...randomOptions, ...fromEndOptions];
   };
 
+  const countByStatus = Array.from(new Set(cards.map((c) => c.status)))
+    .sort()
+    .map((status) => ({
+      status,
+      length: filterCards(status).length,
+    }))
+    .concat(
+      { status: "Hidden", length: rawScrapeCount - cards.length },
+      { status: "Scraped", length: rawScrapeCount }
+    );
+
   return (
     <div className="control-bar">
       <form onSubmit={scrape}>
@@ -88,22 +100,11 @@ const ScrapeInputBar = ({
         </div>
         <div className="form-row metadata">
           <div className="tag-container">
-            {Array.from(new Set(cards.map((c) => c.status)))
-              .map((status) => ({
-                status,
-                length: filterCards(status).length,
-              }))
-              .map(({ status, length }) => (
-                <span className={cls("tag", status)} key={status}>
-                  {status}: {length}
-                </span>
-              ))}
-            <span className="tag" key="hidden">
-              Hidden: {rawScrapeCount - cards.length}
-            </span>
-            <span className="tag" key="scraped">
-              Scraped: {rawScrapeCount}
-            </span>
+            {countByStatus.map(({ status, length }) => (
+              <Badge className={cls("tag", status)} key={status}>
+                {status}: {length}
+              </Badge>
+            ))}
           </div>
         </div>
       </form>

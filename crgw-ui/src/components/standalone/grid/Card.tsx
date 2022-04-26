@@ -41,7 +41,7 @@ const Card = ({
 
   const openScrapePanel = () =>
     setBlanket({
-      title: filename,
+      title: "Scrape",
       body: <ScrapePanel defaultUrls={[file.sourceurl]} />,
       onClose: focusGrid,
     });

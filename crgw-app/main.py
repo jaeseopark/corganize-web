@@ -1,10 +1,11 @@
+import base64
 import logging
 import os
-from copy import deepcopy
-from urllib.parse import urljoin
+from urllib.parse import unquote_plus
 
 import requests
-from flask import Flask, request as freq
+from flask import Flask, request as freq, Response
+from pydash import url
 
 from crgw.handlers import get_local_files, teardown
 
@@ -37,23 +38,28 @@ def fwd_remote(subpath: str):
     """
 
     assert "CRG_REMOTE_HOST" in os.environ
-    assert "CRG_REOMTE_APIKEY" in os.environ
+    assert "CRG_REMOTE_APIKEY" in os.environ
+    ALLOWED_HEADERS = ("rangeend", "rangestart", "content-type", "order", "nexttoken", "crg-method", "crg-body")
 
-    url = urljoin(os.environ["CRG_REMOTE_HOST"], subpath)
-    headers = deepcopy(freq.headers)
-    headers["apikey"] = os.environ["CRG_REOMTE_APIKEY"]
+    urll = url(os.environ["CRG_REMOTE_HOST"], subpath)
 
-    r = requests.request(url=url, method=freq.method, data=freq.data, headers=headers)
-    return r.content, r.status_code, r.headers
+    headers = {k.lower(): v for k, v in dict(freq.headers).items() if k.lower() in ALLOWED_HEADERS}
+    headers["apikey"] = os.environ["CRG_REMOTE_APIKEY"]
 
+    method = freq.method
+    data = freq.data
+    if "crg-method" in headers:
+        assert "crg-body" in headers
+        method = headers.pop("crg-method")
+        headers["Content-Type"] = "application/json"
+        data = base64.b64decode(headers.pop("crg-body").encode()).decode().encode('utf-8')
 
-@app.post("/scrape/<path:subpath>")
-def fwd_scrape(subpath: str):
-    assert "SCRAPE_HOST" in os.environ
+    r = requests.request(url=urll, method=method, data=data, headers=headers)
 
-    url = urljoin(os.environ["SCRAPE_HOST"], subpath)
-    r = requests.post(url=url, data=freq.data, headers=freq.headers)
-    return r.content, r.status_code, r.headers
+    res = Response(r.content)
+    res.headers = dict(r.headers)
+    res.status_code = r.status_code
+    return res
 
 
 if __name__ == '__main__':

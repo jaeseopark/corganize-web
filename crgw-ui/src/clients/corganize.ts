@@ -16,6 +16,26 @@ export type CreateResponse = {
 
 type RawCreateResponse = { created: string[]; skipped: string[] };
 
+function b64EncodeUnicode(str: string) {
+  return window.btoa(
+    encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+      return String.fromCharCode(parseInt(p1, 16));
+    })
+  );
+}
+
+const proxyFetch = (url: string, method: "POST" | "PATCH", data: object) => {
+  const headers = {
+    "crg-method": method,
+    "crg-body": b64EncodeUnicode(JSON.stringify(data)),
+  };
+  return fetch(url, {
+    mode: "cors",
+    method: "GET",
+    headers,
+  });
+};
+
 class CorganizeClient {
   getFilesBySessionInfo(
     sessionInfo: SessionInfo,
@@ -23,7 +43,7 @@ class CorganizeClient {
     filterFiles: (files: CorganizeFile[]) => CorganizeFile[]
   ) {
     return this.getFilesWithPagination(
-      `/remote/files/${sessionInfo.endpoint}`,
+      `/api/remote/files/${sessionInfo.endpoint}`,
       sessionInfo,
       sessionInfo.limit,
       addFilesToRedux,
@@ -81,15 +101,7 @@ class CorganizeClient {
   }
 
   createFiles(files: CorganizeFile[]): Promise<CreateResponse> {
-    // @ts-ignore
-    return fetch("/remote/files/bulk", {
-      method: "POST",
-      body: JSON.stringify(files),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-    })
+    return proxyFetch("/api/remote/files", "POST", files)
       .then(async (res) => {
         if (res.status === 200) {
           // @ts-ignore
@@ -116,14 +128,7 @@ class CorganizeClient {
   }
 
   updateFile(partialProps: Partial<CorganizeFile>): Promise<Partial<CorganizeFile>> {
-    return fetch("/remote/files", {
-      method: "PATCH",
-      body: JSON.stringify(partialProps),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-    }).then((response) => {
+    return proxyFetch("/api/remote/files", "PATCH", partialProps).then((response) => {
       if (response.status !== 200) {
         throw new Error(`status ${response.status}`);
       }
@@ -132,17 +137,6 @@ class CorganizeClient {
         lastupdated: getPosixSeconds(),
       };
     });
-  }
-
-  deleteFile(fileid: string): Promise<string> {
-    return fetch("/remote/files", {
-      method: "DELETE",
-      body: JSON.stringify({ fileid }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-    }).then(() => fileid);
   }
 
   getLocalFilenames(): Promise<string[]> {
