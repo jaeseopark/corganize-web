@@ -1,6 +1,7 @@
 import React, { Dispatch, useReducer } from "react";
-import { gridReducer } from "./reducer";
-import { Action, Field, State } from "./types";
+
+import { gridReducer } from "providers/grid/reducer";
+import { Action, Field, State } from "providers/grid/types";
 
 const fieldNew: Field = {
   displayName: "New",

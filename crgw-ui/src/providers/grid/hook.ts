@@ -1,6 +1,8 @@
 import { Dispatch, useContext } from "react";
-import { GridContext } from "providers/grid/grid";
+
 import { CorganizeFile } from "typedefs/CorganizeFile";
+
+import { GridContext } from "providers/grid/grid";
 import { Action, Field, Filter, Sort, State } from "providers/grid/types";
 
 const getPageProps = (state: State, dispatch: Dispatch<Action>) => {

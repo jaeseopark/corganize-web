@@ -1,6 +1,6 @@
 /* eslint-disable for-direction */
-/* eslint-disable no-plusplus */
 
+/* eslint-disable no-plusplus */
 import { createRange } from "utils/arrayUtils";
 
 const expand = (range: string): number[] =>

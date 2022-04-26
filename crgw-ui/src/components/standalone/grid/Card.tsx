@@ -1,14 +1,15 @@
-import cls from "classnames";
 import { InfoIcon, SearchIcon } from "@chakra-ui/icons";
-import { Box, Divider, HStack, useColorModeValue, VStack } from "@chakra-ui/react";
+import { Box, Divider, HStack, VStack, useColorModeValue } from "@chakra-ui/react";
+import cls from "classnames";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
+
 import { useBlanket } from "providers/blanket/hook";
 
+import FileMetadataTags from "components/reusable/FileMetadataTag";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";
-import FileMetadataTags from "components/reusable/FileMetadataTag";
-import ScrapePanel from "../scrape/ScrapePanel";
+import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 import "./Card.scss";
 
@@ -35,11 +36,19 @@ const Card = ({
 
   const openFile = () => {
     if (openable)
-      setBlanket({ title: filename, body: <FileView fileid={fileid} />, onClose: focusGrid });
+      setBlanket({
+        title: filename,
+        body: <FileView fileid={fileid} />,
+        onClose: focusGrid,
+      });
   };
 
   const openJsonEditor = () =>
-    setBlanket({ title: filename, body: <FileMetadataView file={file} />, onClose: focusGrid });
+    setBlanket({
+      title: filename,
+      body: <FileMetadataView file={file} />,
+      onClose: focusGrid,
+    });
 
   const openScrapePanel = () =>
     setBlanket({

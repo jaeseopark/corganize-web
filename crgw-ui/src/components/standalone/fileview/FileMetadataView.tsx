@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
 import { CheckIcon } from "@chakra-ui/icons";
+import { useEffect, useState } from "react";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
-import { useFileRepository } from "providers/fileRepository/hook";
 import { useBlanket } from "providers/blanket/hook";
+import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
 import "./FileMetadataView.scss";

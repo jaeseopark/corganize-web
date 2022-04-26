@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import { Button } from "@chakra-ui/react";
 import cls from "classnames";
-
+import { useState } from "react";
 import { DateRangePicker } from "react-date-range";
-
-import Butt from "components/reusable//Button";
 
 import "./ExpandableDateRange.scss";
 
@@ -32,7 +30,7 @@ const ExpandableDateRange = ({ dateRange, setDateRange }: ExpandableDateRangePro
     <div className="expandable-date-range">
       <div className={cls("preview", { hidden: isOpen })}>
         <span>{previewString}</span>
-        <Butt onClick={toggle}>Edit</Butt>
+        <Button onClick={toggle}>Edit</Button>
       </div>
       <div className={cls("picker-container", { hidden: !isOpen })}>
         <DateRangePicker
@@ -40,7 +38,7 @@ const ExpandableDateRange = ({ dateRange, setDateRange }: ExpandableDateRangePro
           ranges={[{ ...dateRange, key: "selection" }]}
           onChange={({ selection }) => setDateRange(selection as DateRange)}
         />
-        <Butt onClick={toggle}>OK</Butt>
+        <Button onClick={toggle}>OK</Button>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Button, Center, HStack } from "@chakra-ui/react";
 
-import { isHotkeyEnabled, useBlanket } from "./hook";
+import { isHotkeyEnabled, useBlanket } from "providers/blanket/hook";
 
 import "./blanket.scss";
 

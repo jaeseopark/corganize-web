@@ -1,5 +1,6 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import { Filter, MaybeBoolean } from "./types";
+
+import { Filter, MaybeBoolean } from "providers/grid/types";
 
 const filterGlobalText = (value: string) => (f: CorganizeFile) => {
   const lowered = value.toLowerCase().trim();

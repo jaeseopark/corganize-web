@@ -1,12 +1,11 @@
+import { MinusIcon, TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { Box, Tag } from "@chakra-ui/react";
-
-import { TriangleUpIcon, TriangleDownIcon, MinusIcon } from "@chakra-ui/icons";
+import styled from "styled-components";
 
 import { useGrid } from "providers/grid/hook";
 import { Field, SortDirection } from "providers/grid/types";
 
-import BooleanControl from "./BooleanControl";
-import styled from "styled-components";
+import BooleanControl from "components/standalone/grid/field/BooleanControl";
 
 const rotate = (direction: SortDirection): SortDirection | undefined => {
   if (direction === "desc") return "asc";

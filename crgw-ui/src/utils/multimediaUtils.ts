@@ -1,4 +1,5 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
+
 import { closeEnough } from "utils/numberUtils";
 
 export const getVideoMetadata = (file: CorganizeFile) => {

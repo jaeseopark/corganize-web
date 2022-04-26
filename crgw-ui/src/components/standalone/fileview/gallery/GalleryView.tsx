@@ -1,19 +1,20 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getObjectUrls } from "utils/zipUtils";
-import { useUpdate } from "react-use";
-import { Progress, Box, SimpleGrid } from "@chakra-ui/react";
 import { ViewIcon } from "@chakra-ui/icons";
+import { Box, Button, Progress, SimpleGrid } from "@chakra-ui/react";
 import cls from "classnames";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useUpdate } from "react-use";
 
-import { FileViewComponentProps } from "../types";
 import { Multimedia } from "typedefs/CorganizeFile";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
-import { createRange, sample } from "utils/arrayUtils";
+
 import HighlightManager from "bizlog/HighlightManager";
 
-import Butt from "components/reusable/Button";
+import { createRange, sample } from "utils/arrayUtils";
+import { getObjectUrls } from "utils/zipUtils";
+
+import { FileViewComponentProps } from "components/standalone/fileview/types";
 
 import "./GalleryView.scss";
 
@@ -246,8 +247,8 @@ const GalleryView = ({
     return (
       <div className="bulk-mode">
         <span>Bulk Highlight Mode</span>
-        <Butt onClick={toggleAllHighlights}>Toggle All (A)</Butt>
-        <Butt onClick={toggleBulkHighlightMode}>Exit (⏎)</Butt>
+        <Button onClick={toggleAllHighlights}>Toggle All (A)</Button>
+        <Button onClick={toggleBulkHighlightMode}>Exit (⏎)</Button>
       </div>
     );
   };

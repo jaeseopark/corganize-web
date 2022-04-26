@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import cls from "classnames";
-import { useUpdate } from "react-use";
 import { Flex, Spacer } from "@chakra-ui/react";
+import cls from "classnames";
+import { useEffect } from "react";
+import { useUpdate } from "react-use";
 
-import { Toast } from "./toast";
-import { useToast } from "./hook";
+import { useToast } from "providers/toast/hook";
+import { Toast } from "providers/toast/toast";
 
 import { toRelativeHumanTime } from "utils/numberUtils";
 

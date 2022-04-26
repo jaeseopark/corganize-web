@@ -1,11 +1,12 @@
-import { Badge, Button, Flex, HStack, Spacer, VStack, Select, ButtonGroup } from "@chakra-ui/react";
+import { Badge, Button, ButtonGroup, Flex, HStack, Select, Spacer, VStack } from "@chakra-ui/react";
 import cls from "classnames";
+import { useRef } from "react";
 
 import { useBlanket } from "providers/blanket/hook";
+
 import { sample } from "utils/arrayUtils";
 
-import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
-import { useRef } from "react";
+import { CARD_STATUS, Card } from "components/standalone/scrape/ScrapePanelCardView";
 
 const BULK_ADD_OPTIONS = [10, 25, 50, 100];
 

@@ -1,8 +1,10 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
+
+import { createMegaFilter } from "providers/grid/filter";
+import { createMegaComparer } from "providers/grid/sort";
+import { Action, Page, State } from "providers/grid/types";
+
 import { upsert } from "utils/arrayUtils";
-import { createMegaFilter } from "./filter";
-import { createMegaComparer } from "./sort";
-import { Action, Page, State } from "./types";
 
 const getNewPage = (oldPage: Page, fileCount: number): Page => {
   const { itemsPerPage, index } = oldPage;

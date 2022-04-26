@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState } from "react";
 import { StarIcon } from "@chakra-ui/icons";
+import { useEffect, useRef, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
+import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
-import { useBlanket } from "providers/blanket/hook";
+import ToastPortal from "providers/toast/portal";
 
 import { madFocus } from "utils/elementUtils";
 
-import ToastPortal from "providers/toast/portal";
 import VideoView from "components/standalone/fileview/VideoView";
-import GalleryView from "./gallery/GalleryView";
+import GalleryView from "components/standalone/fileview/gallery/GalleryView";
 
 import "./FileView.scss";
 

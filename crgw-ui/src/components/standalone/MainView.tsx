@@ -1,14 +1,17 @@
 import cls from "classnames";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { useBlanket } from "providers/blanket/hook";
-import GridProvider from "providers/grid/grid";
-import GridView from "./grid/GridView";
-import { useEffect, useState } from "react";
 import { SessionInfo } from "typedefs/Session";
-import { retrieveFiles } from "clients/adapter";
+
+import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
-import SessionConfigurer from "./SessionConfigurer";
+import GridProvider from "providers/grid/grid";
+
+import { retrieveFiles } from "clients/adapter";
+
+import SessionConfigurer from "components/standalone/SessionConfigurer";
+import GridView from "components/standalone/grid/GridView";
 
 const SelfClosingBurgerMenu = () => <div />;
 
