@@ -1,14 +1,16 @@
 import cls from "classnames";
 import { InfoIcon, SearchIcon } from "@chakra-ui/icons";
 import { Box, Divider, HStack, useColorModeValue, VStack } from "@chakra-ui/react";
-import { useBlanket } from "providers/blanket/hook";
+
 import { CorganizeFile } from "typedefs/CorganizeFile";
+import { useBlanket } from "providers/blanket/hook";
+
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";
-
-import "./Card.scss";
 import FileMetadataTags from "components/reusable/FileMetadataTag";
 import ScrapePanel from "../scrape/ScrapePanel";
+
+import "./Card.scss";
 
 const IndexLabel = ({ index }: { index: number }) => {
   if (index >= 10) {
@@ -55,7 +57,7 @@ const Card = ({
       rounded="lg"
     >
       <VStack textAlign="center" p={6}>
-        <label className={cls({ clickable: openable })} onClick={openFile}>
+        <label className={cls("filename", { clickable: openable })} onClick={openFile}>
           <IndexLabel index={index} />
           {filename}
         </label>

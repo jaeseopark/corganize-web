@@ -110,3 +110,5 @@ venv/
 docker-pip-freeze.txt
 docker-venv/
 docker-compose-local.yml
+docker-compose.yml
+
