@@ -1,54 +1,54 @@
 .toast-portal {
-    position: fixed;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    bottom: 1em;
-    left: 1em;
+  position: fixed;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  bottom: 1em;
+  left: 1em;
 }
 
 .toast {
-    background-color: white;
-    width: 200px;
-    font-size: 0.875rem;
-    background-clip: padding-box;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-    border-radius: 0.25rem;
-    display: inline-block;
-    margin: 0 0 1em 1em;
+  background-color: white;
+  width: 200px;
+  font-size: 0.875rem;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  display: inline-block;
+  margin: 0 0 1em 1em;
 }
 
 .toast-header {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    background-clip: padding-box;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    border-top-left-radius: calc(0.25rem - 1px);
-    border-top-right-radius: calc(0.25rem - 1px);
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background-clip: padding-box;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-top-left-radius: calc(0.25rem - 1px);
+  border-top-right-radius: calc(0.25rem - 1px);
 }
 
 .toast-header-label {
-    font-weight: bold;
+  font-weight: bold;
 
-    &.info {
-        color: var(--chakra-colors-gray-800)
-    }
+  &.info {
+    color: var(--chakra-colors-gray-800);
+  }
 
-    &.success {
-        color: var(--chakra-colors-green-500)
-    }
+  &.success {
+    color: var(--chakra-colors-green-500);
+  }
 
-    &.warning {
-        color: var(--chakra-colors-yellow-500)
-    }
+  &.warning {
+    color: var(--chakra-colors-yellow-500);
+  }
 
-    &.error {
-        color: var(--chakra-colors-red-500)
-    }
+  &.error {
+    color: var(--chakra-colors-red-500);
+  }
 }
 
 .toast-body {
-    padding: 0.75rem;
+  padding: 0.75rem;
 }

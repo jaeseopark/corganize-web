@@ -28,4 +28,4 @@ export type CorganizeFile = {
   thumbnailurl?: string;
 };
 
-export const getActivationEmoji = (f: CorganizeFile) => !!f.dateactivated ? "👍" : "👎";
+export const getActivationEmoji = (f: CorganizeFile) => (!!f.dateactivated ? "👍" : "👎");
