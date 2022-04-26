@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-export function shuffle(array: any[]) {
+export function shuffle<T>(array: T[]) {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -9,12 +9,13 @@ export function shuffle(array: any[]) {
   return copy;
 }
 
-export const sample = (array: any[], size: number) => {
+export const sample = <T>(array: T[], size: number, shouldShuffle = true) => {
   if (array.length <= size) return [...array];
-  return shuffle(array).slice(0, size);
+  let maybeShuffled = shouldShuffle ? shuffle(array) : array;
+  return maybeShuffled.slice(0, size);
 };
 
-export const sampleOne = (array: any[]) => {
+export const sampleOne = <T>(array: T[]) => {
   const [s] = sample(array, 1);
   return s;
 };

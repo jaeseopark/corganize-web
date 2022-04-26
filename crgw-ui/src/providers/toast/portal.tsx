@@ -1,21 +1,14 @@
 import { useEffect } from "react";
-
+import cls from "classnames";
 import { useUpdate } from "react-use";
-import styled from "styled-components";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Flex,
-  Spacer,
-} from "@chakra-ui/react";
+import { Flex, Spacer } from "@chakra-ui/react";
+
+import { Toast } from "./toast";
+import { useToast } from "./hook";
 
 import { toRelativeHumanTime } from "utils/numberUtils";
 
-import { useToast } from "./hook";
-import { Toast } from "./toast";
+import "./toast.scss";
 
 const TimeCounter = ({ created }: { created: number }) => {
   const rerender = useUpdate();
@@ -28,46 +21,25 @@ const TimeCounter = ({ created }: { created: number }) => {
 };
 
 const ToastComponent = ({ header, type, message, onClick, createdAt }: Toast) => (
-  <StyledAlert status={type} onClick={onClick}>
-    <AlertIcon />
-    <Box>
-      <AlertTitle>
-        <Flex>
-          <Box>{header}</Box>
-          <Spacer />
-          <TimeCounter created={createdAt} />
-        </Flex>
-      </AlertTitle>
-      <AlertDescription>{message}</AlertDescription>
-    </Box>
-  </StyledAlert>
+  <div className="clickable toast" onClick={onClick}>
+    <Flex className="toast-header">
+      <label className={cls(type, "toast-header-label")}>{header}</label>
+      <Spacer />
+      <TimeCounter created={createdAt} />
+    </Flex>
+    <div className="toast-body">{message}</div>
+  </div>
 );
 
 const ToastPortal = () => {
   const { toasts } = useToast();
   return (
-    <StyledToastPortal>
+    <div className="toast-portal">
       {toasts.map((t) => (
         <ToastComponent key={t.id} {...t} />
       ))}
-    </StyledToastPortal>
+    </div>
   );
 };
 
 export default ToastPortal;
-
-const StyledAlert = styled(Alert)`
-  border-radius: 10px;
-  bottom: 1em;
-  left: 1em;
-`;
-
-const StyledToastPortal = styled.div`
-  position: fixed;
-  z-index: 5500;
-  pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  bottom: 0;
-  left: 0;
-`;

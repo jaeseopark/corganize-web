@@ -30,9 +30,9 @@ const InnerGrid = () => {
   const openFile = (f: CorganizeFile) => {
     if (!f) return;
 
-    const { fileid, filename } = f;
+    const { fileid } = f;
     setBlanket({
-      title: filename,
+      fileid,
       body: <FileView fileid={fileid} />,
       onClose: refocus,
     });
@@ -47,7 +47,7 @@ const InnerGrid = () => {
     } else if (key === "s") {
       if (!mostRecentFile) return;
       setBlanket({
-        title: mostRecentFile.filename,
+        title: "Scrape",
         body: <ScrapePanel defaultUrls={[mostRecentFile.sourceurl]} />,
         onClose: refocus,
       });
@@ -74,7 +74,7 @@ const InnerGrid = () => {
       return <label>No files available</label>;
     }
 
-    return files.map((f, i) => <Card key={f.fileid} file={f} index={i} />);
+    return files.map((f, i) => <Card key={f.fileid} file={f} index={i} focusGrid={focus} />);
   };
 
   return (
@@ -86,6 +86,7 @@ const InnerGrid = () => {
       minChildWidth={`${MIN_WIDTH}px`}
       spacing={6}
       outline="none"
+      marginY="1em"
     >
       {renderCards()}
     </SimpleGrid>

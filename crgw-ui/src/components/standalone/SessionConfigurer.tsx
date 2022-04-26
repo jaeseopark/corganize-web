@@ -38,7 +38,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
     />
   );
 
-  const maybeRenderDateRangerPicker = () => {
+  const DateRangerPicker = () => {
     if (endpoint !== "active") {
       return null;
     }
@@ -76,7 +76,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
             <td>Endpoint</td>
             <td>{renderEndpointPicker()}</td>
           </tr>
-          {maybeRenderDateRangerPicker()}
+          <DateRangerPicker />
           <tr>
             <td>File Limit</td>
             <td>{renderFilecountLimiter()}</td>

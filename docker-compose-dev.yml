@@ -11,8 +11,6 @@ services:
       - "ui"
       - "app"
     environment:
-      CRG_REMOTE_HOST: PLACEHOLDER
-      CRG_REOMTE_APIKEY: PLACEHOLDER
       SCRAPE_HOST: PLACEHOLDER
   ui:
     image: node:16.13.1
@@ -35,3 +33,6 @@ services:
     volumes:
       - ./crgw-app:/app
       - ./data/crg:/data:ro
+    environment:
+      CRG_REMOTE_HOST: PLACEHOLDER
+      CRG_REMOTE_APIKEY: PLACEHOLDER

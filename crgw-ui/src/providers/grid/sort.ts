@@ -7,6 +7,10 @@ const DEFAULT_COMPARER = (a: CorganizeFile, b: CorganizeFile): number =>
 const getFieldValue = (file: CorganizeFile, fld: Field) => {
   if (fld.sortType === "number") {
     return Number(file[fld.key]) || 0;
+  } else if (fld.sortType === "boolean") {
+    return Boolean(file[fld.key]) || false;
+  } else if (fld.sortType === "string") {
+    return String(file[fld.key]) || "";
   }
 
   throw new Error("Unsupported");

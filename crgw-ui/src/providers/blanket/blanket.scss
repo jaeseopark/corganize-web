@@ -5,18 +5,23 @@
   flex-grow: 1;
   overflow: auto;
 
-  .blanket-view {
-    .blanket-header {
-      padding: 10px 10px 10px 20px;
+  .blanket-header {
+    padding: 1em;
 
-      .close {
-        padding: 0;
-        margin: 0 10px 0 0;
-      }
-
-      .blanket-title {
-        width: 100%;
-      }
+    .blanket-title {
+      font-size: larger;
     }
+  }
+
+  .blanket-body {
+    display: flex;
+    overflow-y: scroll;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 0 1em;
+  }
+
+  .blanket-footer {
+    padding: 1em;
   }
 }

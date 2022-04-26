@@ -1,4 +1,4 @@
-import { Tag } from "@chakra-ui/react";
+import { Box, Tag } from "@chakra-ui/react";
 
 import { TriangleUpIcon, TriangleDownIcon, MinusIcon } from "@chakra-ui/icons";
 
@@ -6,6 +6,7 @@ import { useGrid } from "providers/grid/hook";
 import { Field, SortDirection } from "providers/grid/types";
 
 import BooleanControl from "./BooleanControl";
+import styled from "styled-components";
 
 const rotate = (direction: SortDirection): SortDirection | undefined => {
   if (direction === "desc") return "asc";
@@ -49,7 +50,7 @@ const FieldComponent = ({ field }: { field: Field }) => {
     upsertSort(newSort);
   };
 
-  const renderSortIcon = () => {
+  const SortIcon = () => {
     if (!sort) {
       return <MinusIcon className="semi-hidden" />;
     }
@@ -63,10 +64,10 @@ const FieldComponent = ({ field }: { field: Field }) => {
   };
 
   return (
-    <Tag size="lg">
+    <Tag size="lg" float="left" marginRight=".5em" marginBottom=".5em">
       <div className="clickable" onClick={updateSortOrder}>
-        {renderSortIcon()}
-        <label>{displayName}</label>
+        <SortIcon />
+        <StyledFieldLabel>{displayName}</StyledFieldLabel>
       </div>
       {renderFilterControl()}
     </Tag>
@@ -74,3 +75,7 @@ const FieldComponent = ({ field }: { field: Field }) => {
 };
 
 export default FieldComponent;
+
+const StyledFieldLabel = styled.label`
+  margin: 0 0.3em;
+`;

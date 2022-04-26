@@ -1,18 +1,23 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getObjectUrls } from "utils/zipUtils";
+import { useUpdate } from "react-use";
+import { Progress, Box, SimpleGrid } from "@chakra-ui/react";
+import { ViewIcon } from "@chakra-ui/icons";
 import cls from "classnames";
 
+import { FileViewComponentProps } from "../types";
 import { Multimedia } from "typedefs/CorganizeFile";
+
+import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
-import { createRange } from "utils/arrayUtils";
+import { createRange, sample } from "utils/arrayUtils";
 import HighlightManager from "bizlog/HighlightManager";
+
 import Butt from "components/reusable/Button";
 
 import "./GalleryView.scss";
-import { FileViewComponentProps } from "../types";
-import { Box, SimpleGrid } from "@chakra-ui/react";
-import { useUpdate } from "react-use";
 
+const SUMMARY_MODE_LIMIT = 20;
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   "[": -10000,
   z: -10,
@@ -44,19 +49,20 @@ const GalleryView = ({
   file: { multimedia, streamingurl },
   updateFile,
 }: FileViewComponentProps) => {
-  const { enqueue, enqueueError } = useToast();
+  const { enqueue, enqueueSuccess, enqueueError } = useToast();
   const [srcs, setSrcs] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isLightboxEnabled, setLightboxEnabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isBulkHighlightMode, setBulkHighlightMode] = useState(false);
+  const [summarySrcs, setSummarySrcs] = useState<string[]>([]);
   const highlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
   );
+  const { upsertUserAction } = useBlanket();
   const mainref = useRef();
   const selectedImgRef = useRef();
-
   const rerender = () => useUpdate();
 
   const updateMultimedia = useCallback(
@@ -80,7 +86,14 @@ const GalleryView = ({
           setErrorMessage("No images");
           return [];
         }
-        updateMultimedia({ filecount: sourcePaths.length });
+
+        if (sourcePaths.length !== multimedia?.filecount) {
+          return updateMultimedia({ filecount: sourcePaths.length })
+            .then(() => enqueueSuccess({ message: "Filecount updated" }))
+            .then(() => sourcePaths);
+        }
+
+        enqueue({ message: "Filecount already up to date" });
         return sourcePaths;
       })
       .then(setSrcs)
@@ -106,6 +119,27 @@ const GalleryView = ({
       (element as HTMLElement).scrollIntoView();
     }
   }, [currentIndex, isLightboxEnabled]);
+
+  const isSummaryMode = summarySrcs.length > 0;
+  const toggleSummaryMode = () => {
+    if (isSummaryMode) {
+      return setSummarySrcs([]);
+    }
+
+    let indices: number[] = createRange(0, srcs.length, 1, false);
+    if (!highlightManager.isEmpty()) {
+      indices = highlightManager.highlights;
+    }
+    setSummarySrcs(sample(indices, SUMMARY_MODE_LIMIT, false).map((i) => srcs[i]));
+  };
+
+  useEffect(() => {
+    upsertUserAction({
+      name: "Toggle Summary",
+      icon: <ViewIcon />,
+      onClick: toggleSummaryMode,
+    });
+  }, [srcs, isSummaryMode]);
 
   const toggleHighlight = (index: number) => {
     // The first line isn't going to cause a rerender because the pointers stay unchanged.
@@ -163,10 +197,12 @@ const GalleryView = ({
       }
       toggleLightbox();
     } else if (key === "e") {
-      // jump by 10%
       enterLightbox();
-      const i = currentIndex + Math.floor(srcs.length / 10);
-      safeJump(i % srcs.length);
+      let i = (currentIndex + Math.floor(srcs.length / 10)) % srcs.length;
+      if (!highlightManager.isEmpty()) {
+        i = highlightManager.next(currentIndex)!;
+      }
+      safeJump(i);
     } else if (key === "b") {
       toggleHighlight(currentIndex);
       if (!isBulkHighlightMode) {
@@ -177,9 +213,6 @@ const GalleryView = ({
       if (!isBulkHighlightMode) {
         saveHighlights();
       }
-    } else if (key === "`") {
-      const nextIndex = highlightManager.next(currentIndex);
-      if (nextIndex !== null) setCurrentIndex(nextIndex);
     } else if (!isBulkHighlightMode && !isLightboxEnabled && key === " ") {
       toggleLightbox();
     } else if (key === "enter") {
@@ -192,13 +225,14 @@ const GalleryView = ({
     }
   };
 
-  const maybeRenderLightbox = () => {
+  const Lightbox = () => {
     if (!isLightboxEnabled) {
       return null;
     }
 
     return (
       <div className="lightbox-with-progress">
+        <Progress value={(currentIndex * 100) / srcs.length} />
         <div className="lightbox">
           <Img src={srcs[currentIndex]} />
         </div>
@@ -206,7 +240,7 @@ const GalleryView = ({
     );
   };
 
-  const maybeRenderBulkModeControls = () => {
+  const BulkModeControls = () => {
     if (!isBulkHighlightMode) return null;
 
     return (
@@ -218,11 +252,19 @@ const GalleryView = ({
     );
   };
 
-  const maybeRenderGrid = () => {
+  const Grid = () => {
     if (isLightboxEnabled) return null;
+
+    const srcsToRender = isSummaryMode ? summarySrcs : srcs;
+
     return (
-      <SimpleGrid minChildWidth="400px" spacing={6} tabIndex={1}>
-        {srcs.map((src, i) => (
+      <SimpleGrid
+        minChildWidth={isSummaryMode ? "150px" : "400px"}
+        spacing={isSummaryMode ? 2 : 6}
+        tabIndex={1}
+        className={cls({ "summary-mode": isSummaryMode })}
+      >
+        {srcsToRender.map((src, i) => (
           <Box key={src} bg="white">
             <Img
               src={src}
@@ -257,9 +299,9 @@ const GalleryView = ({
   return (
     // @ts-ignore
     <div className="zip-view" tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
-      {maybeRenderLightbox()}
-      {maybeRenderBulkModeControls()}
-      {maybeRenderGrid()}
+      <Lightbox />
+      <BulkModeControls />
+      <Grid />
     </div>
   );
 };

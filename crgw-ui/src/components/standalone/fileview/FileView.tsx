@@ -25,22 +25,23 @@ COMPONENT_BY_MIMETYPE.set("application/zip", GalleryView);
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
-  const { findById, markAsOpened, updateFile, toggleFavourite } = useFileRepository();
+  const { findById, markAsOpened, updateFile, toggleActivation } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
-  const { enqueue, enqueueError } = useToast();
+  const { enqueueSuccess, enqueueError } = useToast();
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
 
-  const toggleFavouriteWithToast = () =>
-    toggleFavourite(fileid).then(({ emoji }) =>
-      enqueue({
-        header: file.filename,
-        message: emoji,
-      })
-    );
+  const toggleActivationWithToast = () =>
+    toggleActivation(fileid)
+      .then(({ message, emoji }) =>
+        enqueueSuccess({
+          message: `${message} ${emoji}`,
+        })
+      )
+      .catch((error: Error) => enqueueError({ message: error.message }));
 
   useEffect(() => {
     if (!mimetype || !streamingurl) {
@@ -65,7 +66,9 @@ const FileView = ({ fileid }: { fileid: string }) => {
     };
 
     setContent(getContent());
-    markAsOpened(fileid);
+    markAsOpened(fileid)
+      .then(() => enqueueSuccess({ message: "File marked as open" }))
+      .catch((error: Error) => enqueueError({ message: error.message }));
   }, []);
 
   useEffect(() => {
@@ -76,16 +79,16 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
   useEffect(() => {
     upsertUserAction({
-      name: "Toggle Fav",
+      name: "Toggle Activation",
       icon: <StarIcon />,
-      onClick: toggleFavouriteWithToast,
+      onClick: toggleActivationWithToast,
     });
   });
 
   const onKeyDown = (e: any) => {
     const key = e.key.toLowerCase();
     if (key === "w") {
-      toggleFavouriteWithToast();
+      toggleActivationWithToast();
     } else if (key === "f") {
       if (handle.active) {
         handle.exit();
