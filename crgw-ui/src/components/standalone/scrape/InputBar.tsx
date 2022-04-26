@@ -1,11 +1,11 @@
+import { Badge, Button, Flex, HStack, Spacer, VStack, Select, ButtonGroup } from "@chakra-ui/react";
 import cls from "classnames";
 
 import { useBlanket } from "providers/blanket/hook";
 import { sample } from "utils/arrayUtils";
 
 import { Card, CARD_STATUS } from "components/standalone/scrape/ScrapePanelCardView";
-import Butt, { SplitButt } from "components/reusable/Button";
-import { Badge } from "@chakra-ui/react";
+import { useRef } from "react";
 
 const BULK_ADD_OPTIONS = [10, 50, 100, 200];
 
@@ -40,23 +40,52 @@ const ScrapeInputBar = ({
     createFilesFromCards(cards);
   };
 
-  const getSplitButtOptions = () => {
-    const fromStartOptions = BULK_ADD_OPTIONS.map((cnt) => ({
-      label: `Add ${cnt} from start`,
-      onClick: () => addCards(getAvailableCards().slice(0, cnt)),
-    }));
+  const AddButtonGroup = () => {
+    const selectRef = useRef<HTMLSelectElement | null>(null);
 
-    const randomOptions = BULK_ADD_OPTIONS.map((cnt) => ({
-      label: `Add ${cnt} at random`,
-      onClick: () => addCards(getAvailableCards(), cnt),
-    }));
+    const getOptions = () => {
+      const fromStartOptions = BULK_ADD_OPTIONS.map((cnt) => ({
+        label: `First ${cnt}`,
+        onClick: () => addCards(getAvailableCards().slice(0, cnt)),
+      }));
 
-    const fromEndOptions = BULK_ADD_OPTIONS.map((cnt) => ({
-      label: `Add ${cnt} from end`,
-      onClick: () => addCards(getAvailableCards().slice(-cnt)),
-    }));
+      const randomOptions = BULK_ADD_OPTIONS.map((cnt) => ({
+        label: `${cnt} random`,
+        onClick: () => addCards(getAvailableCards(), cnt),
+      }));
 
-    return [...fromStartOptions, ...randomOptions, ...fromEndOptions];
+      const fromEndOptions = BULK_ADD_OPTIONS.map((cnt) => ({
+        label: `Last ${cnt}`,
+        onClick: () => addCards(getAvailableCards().slice(-cnt)),
+      }));
+
+      return [...fromStartOptions, ...randomOptions, ...fromEndOptions];
+    };
+
+    const isZeroCards = filterCards(CARD_STATUS.AVAILABLE).length === 0;
+    const options = getOptions();
+
+    return (
+      <ButtonGroup className="add-group">
+        <Select variant="filled" disabled={disabled || isZeroCards} ref={selectRef}>
+          {options.map(({ label }) => (
+            <option key={label}>{label}</option>
+          ))}
+        </Select>
+        <Button
+          className="add-button"
+          onClick={() => {
+            if (selectRef?.current) {
+              const { onClick } = options[selectRef?.current.selectedIndex];
+              onClick();
+            }
+          }}
+          disabled={disabled || isZeroCards}
+        >
+          Add
+        </Button>
+      </ButtonGroup>
+    );
   };
 
   const countByStatus = Array.from(new Set(cards.map((c) => c.status)))
@@ -73,40 +102,34 @@ const ScrapeInputBar = ({
   return (
     <div className="control-bar">
       <form onSubmit={scrape}>
-        <div className="form-row">
-          <input
-            required
-            type="text"
-            disabled={disabled}
-            placeholder="Use <p1-p2> to scrape multiple pages"
-            onChange={(e) => setUrl(e.target.value)}
-            value={url as string}
-            onFocus={() => disableHotkey()}
-            onBlur={() => enableHotkey()}
-          />
-          {
-            // @ts-ignore
-            <SplitButt
-              id="addall"
-              title="Add All"
-              onClick={() => addCards(filterCards(CARD_STATUS.AVAILABLE))}
-              options={getSplitButtOptions()}
-              disabled={disabled || filterCards(CARD_STATUS.AVAILABLE).length === 0}
+        <VStack>
+          <Flex direction="row" className="form-row">
+            <input
+              required
+              type="text"
+              disabled={disabled}
+              placeholder="Use <p1-p2> to scrape multiple pages"
+              onChange={(e) => setUrl(e.target.value)}
+              value={url as string}
+              onFocus={() => disableHotkey()}
+              onBlur={() => enableHotkey()}
             />
-          }
-          <Butt type="submit" disabled={disabled || !url}>
-            Scrape
-          </Butt>
-        </div>
-        <div className="form-row metadata">
-          <div className="tag-container">
-            {countByStatus.map(({ status, length }) => (
-              <Badge className={cls("tag", status)} key={status}>
-                {status}: {length}
-              </Badge>
-            ))}
-          </div>
-        </div>
+            <Button className="scrape-button" type="submit" disabled={disabled || !url}>
+              Scrape
+            </Button>
+            <AddButtonGroup />
+          </Flex>
+          <HStack className="form-row metadata">
+            <Spacer flexGrow={1} />
+            <Flex className="tag-container">
+              {countByStatus.map(({ status, length }) => (
+                <Badge className={cls("tag", status)} key={status}>
+                  {status}: {length}
+                </Badge>
+              ))}
+            </Flex>
+          </HStack>
+        </VStack>
       </form>
     </div>
   );

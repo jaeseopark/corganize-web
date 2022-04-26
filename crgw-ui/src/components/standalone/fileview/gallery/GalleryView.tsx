@@ -225,7 +225,7 @@ const GalleryView = ({
     }
   };
 
-  const maybeRenderLightbox = () => {
+  const Lightbox = () => {
     if (!isLightboxEnabled) {
       return null;
     }
@@ -240,7 +240,7 @@ const GalleryView = ({
     );
   };
 
-  const maybeRenderBulkModeControls = () => {
+  const BulkModeControls = () => {
     if (!isBulkHighlightMode) return null;
 
     return (
@@ -252,7 +252,7 @@ const GalleryView = ({
     );
   };
 
-  const maybeRenderGrid = () => {
+  const Grid = () => {
     if (isLightboxEnabled) return null;
 
     const srcsToRender = isSummaryMode ? summarySrcs : srcs;
@@ -299,9 +299,9 @@ const GalleryView = ({
   return (
     // @ts-ignore
     <div className="zip-view" tabIndex={1} onKeyDown={onKeyDown} ref={mainref}>
-      {maybeRenderLightbox()}
-      {maybeRenderBulkModeControls()}
-      {maybeRenderGrid()}
+      <Lightbox />
+      <BulkModeControls />
+      <Grid />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import cls from "classnames";
+import { Button } from "@chakra-ui/react";
 import { CorganizeFile } from "typedefs/CorganizeFile";
-import Butt from "components/reusable/Button";
 
 import "./ScrapePanelCardView.scss";
 
@@ -46,9 +46,9 @@ const CardView = ({ card, onSend, onScrape, disableScrapeButton }: CardViewProps
           alt={title}
         />
       </div>
-      <Butt className="scrape" onClick={() => onScrape(sourceurl)} disabled={disableScrapeButton}>
+      <Button className="scrape" onClick={() => onScrape(sourceurl)} disabled={disableScrapeButton}>
         Scrape
-      </Butt>
+      </Button>
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import { Button, Center } from "@chakra-ui/react";
-import styled from "styled-components";
+import { Button, Center, HStack } from "@chakra-ui/react";
 
 import { isHotkeyEnabled, useBlanket } from "./hook";
 
@@ -16,18 +15,26 @@ const Header = () => {
 
 const Body = () => {
   const { body } = useBlanket();
-  return <StyledBlanketBody>{body}</StyledBlanketBody>;
+  return <div className="blanket-body">{body}</div>;
 };
 
 const Footer = () => {
   const { userActions } = useBlanket();
   return (
     <Center className="blanket-footer">
-      {userActions.map(({ name, icon, onClick }) => (
-        <Button key={name} rightIcon={icon} colorScheme="blue" variant="outline" onClick={onClick}>
-          {name}
-        </Button>
-      ))}
+      <HStack spacing=".5em">
+        {userActions.map(({ name, icon, onClick }) => (
+          <Button
+            key={name}
+            rightIcon={icon}
+            colorScheme="blue"
+            variant="outline"
+            onClick={onClick}
+          >
+            {name}
+          </Button>
+        ))}
+      </HStack>
     </Center>
   );
 };
@@ -60,10 +67,3 @@ const BlanketPortal = () => {
 };
 
 export default BlanketPortal;
-
-const StyledBlanketBody = styled.div`
-  display: flex;
-  overflow-y: scroll;
-  flex-direction: column;
-  flex-grow: 1;
-`;

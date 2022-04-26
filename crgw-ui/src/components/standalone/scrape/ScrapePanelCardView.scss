@@ -14,19 +14,16 @@
   }
 
   .scrape {
-    padding: 0;
-    width: 60px;
-    height: 30px;
     position: absolute;
     left: 10px;
-    top: 160px;
+    bottom: 10px;
+    width: 60px;
+    height: 30px;
   }
 
   .img-wrapper {
     img.thumbnail {
       min-width: 80px;
-      width: unset;
-      height: 200px;
 
       &.clickable {
         cursor: pointer;
