@@ -48,8 +48,8 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
   const updateMultimedia = useCallback(
     (newProps: Partial<Multimedia>) => {
       const m = {
-        filecount: newProps.filecount || multimedia?.filecount,
-        highlights: newProps.highlights || multimedia?.highlights,
+        ...(multimedia || {}),
+        ...newProps,
       };
       return updateFile({
         fileid,

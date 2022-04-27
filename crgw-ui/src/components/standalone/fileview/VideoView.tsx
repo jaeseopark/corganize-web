@@ -1,4 +1,6 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+
+import { Multimedia } from "typedefs/CorganizeFile";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
@@ -32,20 +34,37 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   const quarterRotation = () => setRotationDegrees(rotationDegrees + 90);
   const resetRotation = () => setRotationDegrees(0);
 
+  const updateMultimedia = useCallback(
+    (newProps: Partial<Multimedia>) => {
+      const m = {
+        ...(multimedia || {}),
+        ...newProps,
+      };
+      return updateFile({
+        fileid,
+        multimedia: m,
+      });
+    },
+    [multimedia, updateFile]
+  );
+
   const onMetadata = (e: any) => {
     const { videoWidth, videoHeight, duration } = e.target;
-    if (!videoWidth || !videoHeight || !duration) return;
-    updateFile({
-      fileid,
-      multimedia: {
-        ...(multimedia || {}),
-        ...{
-          width: videoWidth,
-          height: videoHeight,
-          duration: Math.ceil(duration),
-        },
-      },
-    });
+
+    const isUpToDate =
+      videoWidth === multimedia?.width &&
+      videoHeight === multimedia?.height &&
+      duration === multimedia?.duration;
+
+    if (isUpToDate) {
+      return enqueue({ message: "Multimedia metadata already up to date" });
+    }
+
+    return updateMultimedia({
+      width: videoWidth,
+      height: videoHeight,
+      duration: Math.ceil(duration),
+    }).then(() => enqueue({ message: "Multimedia metadata updated" }));
   };
 
   const onKeyDown = (e: any) => {
@@ -54,16 +73,9 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
     const addHighlight = () => {
       highlightManager.add(Math.floor(vid.currentTime));
-      updateFile({
-        fileid,
-        multimedia: {
-          ...(multimedia || {}),
-          ...{ highlights: highlightManager.toString() },
-        },
-      }).then(() =>
+      updateMultimedia({ highlights: highlightManager.toString() }).then(() =>
         enqueue({
-          header: "Highlight",
-          message: `Added: ${toHumanDuration(vid.currentTime)}`,
+          message: `Highlight added: ${toHumanDuration(vid.currentTime)}`,
         })
       );
     };

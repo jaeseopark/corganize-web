@@ -16,12 +16,13 @@ import "./FileView.scss";
 
 type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;
 
-const COMPONENT_BY_MIMETYPE: Map<string, ContentRenderer> = new Map(); // TODO how to type JSX.Element?
-COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
-COMPONENT_BY_MIMETYPE.set("video/x-matroska", VideoView);
-COMPONENT_BY_MIMETYPE.set("video/x-m4v", VideoView);
-COMPONENT_BY_MIMETYPE.set("video/quicktime", VideoView);
-COMPONENT_BY_MIMETYPE.set("application/zip", GalleryView);
+const COMPONENT_BY_MIMETYPE: Map<string, ContentRenderer> = new Map([
+  ["video/mp4", VideoView],
+  ["video/x-matroska", VideoView],
+  ["video/x-m4v", VideoView],
+  ["video/quicktime", VideoView],
+  ["application/zip", GalleryView],
+]);
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
