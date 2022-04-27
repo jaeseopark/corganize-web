@@ -9,7 +9,7 @@ import { GalleryProps } from "./hook";
 
 const Thumbnails = ({
   basicProps: { imageUrls, currentIndex },
-  modeProps: { mode },
+  modeProps: { mode, enterLightboxMode },
   highlightProps: { isHighlighted },
 }: GalleryProps) => {
   const mainRef = useRef<HTMLDivElement | null>(null);
@@ -22,11 +22,18 @@ const Thumbnails = ({
 
   useEffect(() => madFocus(mainRef?.current), [mainRef, mode]);
 
+  const handleKey = (key: string) => {
+    if (key === " ") {
+      enterLightboxMode();
+    }
+  };
+
   return (
     <SimpleGrid
       className={cls("thumbnails-view", { "summary-mode": isSummaryMode })}
       minChildWidth={isSummaryMode ? "150px" : "400px"}
       spacing={isSummaryMode ? 2 : 6}
+      onKeyDown={(e) => handleKey(e.key.toLowerCase())}
       tabIndex={1}
       ref={mainRef}
     >

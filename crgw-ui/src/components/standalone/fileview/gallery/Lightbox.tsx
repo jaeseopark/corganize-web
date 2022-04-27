@@ -6,7 +6,7 @@ import { madFocus } from "utils/elementUtils";
 import { GalleryProps } from "./hook";
 
 const Lightbox = ({
-  basicProps: { imageUrls, currentIndex, incrementIndex },
+  basicProps: { imageUrls, currentIndex, incrementIndexWithWraparound },
   highlightProps: { setNextHighlightIndex },
   modeProps: { mode },
 }: GalleryProps) => {
@@ -18,7 +18,7 @@ const Lightbox = ({
     if (key === "e") {
       setNextHighlightIndex();
     } else if (key === " ") {
-      incrementIndex(1);
+      incrementIndexWithWraparound(1);
     }
   };
 

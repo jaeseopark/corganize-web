@@ -137,6 +137,7 @@ export const useGallery = (
       currentIndex,
       incrementIndex,
       setIndex,
+      incrementIndexWithWraparound,
     },
     modeProps: {
       mode,
