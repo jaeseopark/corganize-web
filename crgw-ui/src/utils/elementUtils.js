@@ -27,3 +27,10 @@ export const madFocus = (el, shouldTargetChild = false, interval = 100, initialD
 
   setTimeout(focus, initialDelay);
 };
+
+export const scrollToElement = (el) => {
+  if (!el) {
+    return;
+  }
+  el.scrollIntoView();
+};

@@ -27,7 +27,7 @@ export const removeAll = (array: any[], elements: any[]) => {
   for (let i = indicesToRemove.length - 1; i >= 0; i--) array.splice(indicesToRemove[i], 1);
 };
 
-export const createRange = (start: number, stop: number, step = 1, inclusive = true) =>
+export const createRange = (start: number, stop: number, step = 1, inclusive = true): number[] =>
   Array(Math.ceil((stop + (inclusive ? 1 : 0) - start) / step))
     .fill(start)
     .map((x, y) => x + y * step);

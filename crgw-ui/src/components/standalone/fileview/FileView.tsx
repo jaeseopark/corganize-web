@@ -2,8 +2,6 @@ import { StarIcon } from "@chakra-ui/icons";
 import { useEffect, useRef, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
-import { CorganizeFile } from "typedefs/CorganizeFile";
-
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
@@ -16,7 +14,9 @@ import GalleryView from "components/standalone/fileview/gallery/GalleryView";
 
 import "./FileView.scss";
 
-const COMPONENT_BY_MIMETYPE: Map<string, any> = new Map(); // TODO how to type JSX.Element?
+type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;
+
+const COMPONENT_BY_MIMETYPE: Map<string, ContentRenderer> = new Map(); // TODO how to type JSX.Element?
 COMPONENT_BY_MIMETYPE.set("video/mp4", VideoView);
 COMPONENT_BY_MIMETYPE.set("video/x-matroska", VideoView);
 COMPONENT_BY_MIMETYPE.set("video/x-m4v", VideoView);
@@ -25,7 +25,7 @@ COMPONENT_BY_MIMETYPE.set("application/zip", GalleryView);
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
-  const { findById, markAsOpened, updateFile, toggleActivation } = useFileRepository();
+  const { findById, markAsOpened, toggleActivation } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
@@ -56,13 +56,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
         return <span>{`Unsupported: ${mimetype}`}</span>;
       }
 
-      const updateWithFileid = (partialProps: Partial<CorganizeFile>) =>
-        updateFile({
-          fileid,
-          ...partialProps,
-        });
-
-      return <InnerComponent file={file} updateFile={updateWithFileid} />;
+      return <InnerComponent fileid={fileid} />;
     };
 
     setContent(getContent());
@@ -79,7 +73,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
   useEffect(() => {
     upsertUserAction({
-      name: "Toggle Activation",
+      name: "Actv",
       icon: <StarIcon />,
       onClick: toggleActivationWithToast,
     });

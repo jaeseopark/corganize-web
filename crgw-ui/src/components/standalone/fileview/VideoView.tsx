@@ -1,14 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 
-import { Multimedia } from "typedefs/CorganizeFile";
-
+import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
 import HighlightManager from "bizlog/HighlightManager";
 
 import { toHumanDuration } from "utils/numberUtils";
-
-import { FileViewComponentProps } from "components/standalone/fileview/types";
 
 import "./VideoView.scss";
 
@@ -20,40 +17,34 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   b: 300,
 };
 
-const VideoView = ({
-  file: { multimedia: multimediaSeed, streamingurl },
-  updateFile,
-}: FileViewComponentProps) => {
+const VideoView = ({ fileid }: { fileid: string }) => {
+  const { findById, updateFile } = useFileRepository();
+  const { multimedia, streamingurl } = findById(fileid);
+
   const mainref = useRef<HTMLDivElement | null>(null);
   const { enqueue } = useToast();
   const [rotationDegrees, setRotationDegrees] = useState(0);
-  const [multimedia, setMultimedia] = useState<Multimedia>(multimediaSeed || {});
   const highlightManager: HighlightManager = useMemo(
-    () => new HighlightManager(multimediaSeed?.highlights),
-    [multimediaSeed]
+    () => new HighlightManager(multimedia?.highlights),
+    [multimedia]
   );
 
   const quarterRotation = () => setRotationDegrees(rotationDegrees + 90);
   const resetRotation = () => setRotationDegrees(0);
 
-  const getNewMultimedia = (newProps: Multimedia) => {
-    const newMultimedia = {
-      ...multimedia,
-      ...newProps,
-    };
-    setMultimedia(newMultimedia);
-    return newMultimedia;
-  };
-
   const onMetadata = (e: any) => {
     const { videoWidth, videoHeight, duration } = e.target;
     if (!videoWidth || !videoHeight || !duration) return;
     updateFile({
-      multimedia: getNewMultimedia({
-        width: videoWidth,
-        height: videoHeight,
-        duration: Math.ceil(duration),
-      }),
+      fileid,
+      multimedia: {
+        ...(multimedia || {}),
+        ...{
+          width: videoWidth,
+          height: videoHeight,
+          duration: Math.ceil(duration),
+        },
+      },
     });
   };
 
@@ -64,9 +55,11 @@ const VideoView = ({
     const addHighlight = () => {
       highlightManager.add(Math.floor(vid.currentTime));
       updateFile({
-        multimedia: getNewMultimedia({
-          highlights: highlightManager.toString(),
-        }),
+        fileid,
+        multimedia: {
+          ...(multimedia || {}),
+          ...{ highlights: highlightManager.toString() },
+        },
       }).then(() =>
         enqueue({
           header: "Highlight",
