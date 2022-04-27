@@ -1,7 +1,6 @@
 import { Flex, Spacer } from "@chakra-ui/react";
 import cls from "classnames";
-import { useEffect } from "react";
-import { useUpdate } from "react-use";
+import { useEffect, useState } from "react";
 
 import { useToast } from "providers/toast/hook";
 import { Toast } from "providers/toast/toast";
@@ -10,14 +9,22 @@ import { toRelativeHumanTime } from "utils/numberUtils";
 
 import "./toast.scss";
 
+const TIMER_REFRESH_INTERVAL = 500;
+
 const TimeCounter = ({ created }: { created: number }) => {
-  const rerender = useUpdate();
+  const [timeString, setTimeString] = useState<string>();
 
   useEffect(() => {
-    const iid = setInterval(() => rerender(), 100);
+    const iid = setInterval(() => {
+      const newTimeString = toRelativeHumanTime(created) + " ago";
+      setTimeString(newTimeString);
+    }, TIMER_REFRESH_INTERVAL);
     return () => clearInterval(iid);
   }, []);
-  return <small>{toRelativeHumanTime(created)} ago</small>;
+
+  if (!timeString) return null;
+
+  return <small>{timeString}</small>;
 };
 
 const ToastComponent = ({ header, type, message, onClick, createdAt }: Toast) => (
