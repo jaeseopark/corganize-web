@@ -1,6 +1,7 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { SessionInfo } from "typedefs/Session";
 
+import { chunk } from "utils/arrayUtils";
 import { getPosixSeconds } from "utils/dateUtils";
 
 type FileResponse = {
@@ -9,6 +10,8 @@ type FileResponse = {
   };
   files: CorganizeFile[];
 };
+
+const CHUNK_SIZE = 10;
 
 export type CreateResponse = {
   created: CorganizeFile[];
@@ -102,30 +105,41 @@ class CorganizeClient {
   }
 
   createFiles(files: CorganizeFile[]): Promise<CreateResponse> {
-    return proxyFetch("/api/remote/files", "POST", files)
-      .then(async (res) => {
-        if (res.status === 200) {
-          // @ts-ignore
-          return res.json() as RawCreateResponse;
-        }
-        throw new Error(`status ${res.status}`);
-      })
-      .then(({ created, skipped }: RawCreateResponse) => {
-        const findFileById = (fileid: string) => {
-          const found = {
-            ...files.find((f) => f.fileid === fileid),
-            lastupdated: getPosixSeconds(),
-            dateactivated: getPosixSeconds(),
-          } as CorganizeFile;
+    const findFileById = (fileid: string) =>
+      ({
+        ...files.find((f) => f.fileid === fileid),
+        lastupdated: getPosixSeconds(),
+        dateactivated: getPosixSeconds(),
+      } as CorganizeFile);
 
-          return found;
-        };
+    const promises = chunk(files, CHUNK_SIZE).map((thisChunk) =>
+      proxyFetch("/api/remote/files", "POST", thisChunk)
+        .then(async (res) => {
+          if (res.status === 200) {
+            // @ts-ignore
+            return res.json() as RawCreateResponse;
+          }
+          throw new Error(`status ${res.status}`);
+        })
+        .then(({ created, skipped }: RawCreateResponse) => {
+          return {
+            created: created.map(findFileById),
+            skipped: skipped.map(findFileById),
+          };
+        })
+    );
 
-        return {
-          created: created.map(findFileById),
-          skipped: skipped.map(findFileById),
-        };
-      });
+    return Promise.all(promises).then((responses) =>
+      responses.reduce(
+        (acc, next) => {
+          return {
+            created: [...acc.created, ...next.created],
+            skipped: [...acc.skipped, ...next.skipped],
+          };
+        },
+        { created: [], skipped: [] } as CreateResponse
+      )
+    );
   }
 
   updateFile(partialProps: Partial<CorganizeFile>): Promise<Partial<CorganizeFile>> {

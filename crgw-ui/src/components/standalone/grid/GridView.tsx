@@ -78,7 +78,7 @@ const InnerGrid = () => {
       return <label>No files available</label>;
     }
 
-    return files.map((f, i) => <Card key={f.fileid} file={f} index={i} focusGrid={focus} />);
+    return files.map((f, i) => <Card key={f.fileid} file={f} index={i} focusGrid={refocus} />);
   };
 
   return (

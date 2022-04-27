@@ -26,6 +26,12 @@ class HighlightManager {
     this.highlights = range ? expand(range) : [];
   }
 
+  static fromHighlights = (highlights: number[]) => {
+    const hm = new HighlightManager();
+    hm.highlights = highlights;
+    return hm;
+  };
+
   isHighlighted = (value: number): boolean => this.highlights.includes(value);
   isEmpty = () => this.highlights.length === 0;
 

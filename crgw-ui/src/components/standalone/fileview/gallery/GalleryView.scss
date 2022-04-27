@@ -28,34 +28,19 @@
     }
   }
 
-  .bulk-mode {
+  .edit-mode {
     position: absolute;
     z-index: 1;
-    color: white;
     background: black;
     padding: 5px;
 
-    span {
-      float: left;
-      padding-top: 5px;
-    }
-
-    .btn {
-      margin-left: 5px;
-      padding: 5px;
+    .counter {
+      color: white;
     }
   }
 
-  .zip-grid {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-
+  .thumbnails-view {
     img {
-      height: 350px;
-      margin-right: 5px;
-      margin-bottom: 5px;
       opacity: 0.6;
       transform: scale(0.9);
     }
