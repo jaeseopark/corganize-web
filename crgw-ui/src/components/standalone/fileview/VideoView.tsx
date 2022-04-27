@@ -24,7 +24,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   const { multimedia, streamingurl } = findById(fileid);
 
   const mainref = useRef<HTMLDivElement | null>(null);
-  const { enqueue } = useToast();
+  const { enqueue, enqueueSuccess } = useToast();
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
@@ -64,7 +64,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       width: videoWidth,
       height: videoHeight,
       duration: Math.ceil(duration),
-    }).then(() => enqueue({ message: "Multimedia metadata updated" }));
+    }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
   const onKeyDown = (e: any) => {
@@ -74,7 +74,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     const addHighlight = () => {
       highlightManager.add(Math.floor(vid.currentTime));
       updateMultimedia({ highlights: highlightManager.toString() }).then(() =>
-        enqueue({
+        enqueueSuccess({
           message: `Highlight added: ${toHumanDuration(vid.currentTime)}`,
         })
       );
