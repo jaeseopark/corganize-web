@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, HStack } from "@chakra-ui/react";
 
 import { GalleryProps, GalleryRenderer } from "./hook";
 
@@ -12,7 +12,7 @@ const EditControls = ({
   }
 
   return (
-    <div className="edit-mode">
+    <HStack className="edit-mode" spacing=".5em">
       <span className="counter">
         Highlighted: {highlights.length}/{imageUrls.length}
       </span>
@@ -22,7 +22,7 @@ const EditControls = ({
       <Button tabIndex={-1} onClick={enterThumbnailMode}>
         OK (⏎)
       </Button>
-    </div>
+    </HStack>
   );
 };
 

@@ -127,7 +127,7 @@ export const useGallery = (
   const finalizeHighlights = () => {
     const newMultimedia = { highlights: hm.toString() };
     return updateMultimedia(newMultimedia)
-      .then(() => enqueue({ header: "Highlight", message: "Saved" }))
+      .then(() => enqueue({ message: "Highlights saved" }))
       .then(() => setMode("thumbnail"));
   };
 
