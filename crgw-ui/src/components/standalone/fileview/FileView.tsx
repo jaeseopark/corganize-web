@@ -9,20 +9,9 @@ import ToastPortal from "providers/toast/portal";
 
 import { madFocus } from "utils/elementUtils";
 
-import VideoView from "components/standalone/fileview/VideoView";
-import GalleryView from "components/standalone/fileview/gallery/GalleryView";
+import RendererSelection, { getRenderer } from "components/standalone/fileview/RendererSelection";
 
 import "./FileView.scss";
-
-type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;
-
-const COMPONENT_BY_MIMETYPE: Map<string, ContentRenderer> = new Map([
-  ["video/mp4", VideoView],
-  ["video/x-matroska", VideoView],
-  ["video/x-m4v", VideoView],
-  ["video/quicktime", VideoView],
-  ["application/zip", GalleryView],
-]);
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
@@ -45,19 +34,19 @@ const FileView = ({ fileid }: { fileid: string }) => {
       .catch((error: Error) => enqueueError({ message: error.message }));
 
   useEffect(() => {
-    if (!mimetype || !streamingurl) {
-      const body = "mimetype or streamingurl is missing";
+    if (!streamingurl) {
+      const body = "streamingurl is missing";
       enqueueError({ message: body });
       return;
     }
 
     const getContent = () => {
-      const InnerComponent = COMPONENT_BY_MIMETYPE.get(mimetype!);
-      if (!InnerComponent) {
-        return <span>{`Unsupported: ${mimetype}`}</span>;
+      const Renderer = getRenderer(mimetype);
+      if (!Renderer) {
+        return <RendererSelection setContent={setContent} fileid={fileid} />;
       }
 
-      return <InnerComponent fileid={fileid} />;
+      return <Renderer fileid={fileid} />;
     };
 
     setContent(getContent());
@@ -93,17 +82,13 @@ const FileView = ({ fileid }: { fileid: string }) => {
     }
   };
 
-  const renderInnerContent = () => (
-    <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
-      {handle.active && <ToastPortal />}
-      {content}
-    </div>
-  );
-
   return (
     // @ts-ignore
     <FullScreen className="fullscreen-portal" handle={handle}>
-      {renderInnerContent()}
+      <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
+        {handle.active && <ToastPortal />}
+        {content}
+      </div>
     </FullScreen>
   );
 };
