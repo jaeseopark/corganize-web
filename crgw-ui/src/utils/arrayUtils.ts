@@ -49,3 +49,12 @@ export const upsert = <T>(elements: T[], key: keyof T): T[] =>
     acc.splice(i, 1, next);
     return acc;
   }, new Array<T>());
+
+export const chunk = <T>(array: T[], chunkSize: number): T[][] => {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+  return chunks;
+};

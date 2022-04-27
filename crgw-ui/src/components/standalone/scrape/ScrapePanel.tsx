@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useUpdate } from "react-use";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -32,8 +31,6 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const [rawScrapeCount, setRawScrapeCount] = useState(0);
 
   const [url, setUrl] = useState<string>(defaultUrls ? defaultUrls.join(",") : "");
-
-  const rerender = useUpdate();
 
   const scrape = useCallback(
     (event?: Event) => {
@@ -74,6 +71,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const createFilesFromCards = (cards: Card[]) => {
     const files = cards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
 
+    setProcessing(true);
     createThenAddFiles(files)
       .then(({ created, skipped }) => {
         const updateCardStatus = (f: CorganizeFile, status: string, errorString?: string) => {
@@ -86,7 +84,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         skipped.forEach((f) => updateCardStatus(f, CARD_STATUS.ERROR, "already exists"));
       })
       .catch(({ message }: Error) => enqueueError({ message }))
-      .finally(rerender);
+      .finally(() => setProcessing(false));
   };
 
   if (error) {
