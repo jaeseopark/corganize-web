@@ -27,7 +27,9 @@
 }
 
 .dateactivated {
-  &.activated {
+
+  &.active,
+  &.inactive {
     background-color: transparent;
   }
 }

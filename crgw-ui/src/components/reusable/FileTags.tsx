@@ -34,7 +34,12 @@ export default FileTags;
 const TAG_GENERATION_MAP: Map<TagKey, (f: CorganizeFile) => Tag[]> = new Map([
   [
     "dateactivated",
-    (f) => [{ value: getActivationEmoji(f), styleClasses: [{ activated: !!f.dateactivated }] }],
+    (f) => [
+      {
+        value: getActivationEmoji(f),
+        styleClasses: [{ active: !!f.dateactivated, inactive: !f.dateactivated }],
+      },
+    ],
   ],
   [
     "highlights",
