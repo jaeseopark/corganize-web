@@ -11,7 +11,7 @@ export const getVideoMetadata = (file: CorganizeFile) => {
   const isVertical = height! > width!;
 
   // Expressed in Megabits per second.
-  const bitrate = Math.ceil((file.size! / 1024 ** 2 / duration) * 8);
+  const bitrate = Math.ceil((file.size! / 1000 ** 2 / duration) * 8);
 
   if (isVertical) dimensions.reverse();
 

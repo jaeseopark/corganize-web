@@ -9,7 +9,7 @@ export const shorten = (n: number, log = 1000, units = METRIC) => {
 };
 
 export const toHumanFileSize = (sizeInBytes: number): string =>
-  shorten(sizeInBytes, 1024, FILESIZE_UNITS);
+  shorten(sizeInBytes, 1000, FILESIZE_UNITS);
 
 // min and max included
 export const randomIntFromInterval = (min: number, max: number) =>

@@ -1,35 +1,39 @@
-.mimetype {
-    .video {
-        background-color: var(--chakra-colors-cyan-500);
-        color: var(--chakra-colors-whiteAlpha-900);
-    }
-
-    .application-zip {
-        background-color: var(--chakra-colors-orange-200);
-        color: var(--chakra-colors-blackAlpha-900);
-    }
+.orientation {
+  &.vertical {
+    background-image: url("/assets/phone.svg");
+    padding-left: 1.5em;
+    background-size: 1em 1em;
+    background-position: 0.3em 0.225em;
+    background-repeat: no-repeat;
+  }
 }
 
-.width {
-    .Vertical {
-        background-image: url("/assets/phone.svg");
-        padding-left: 1.5em;
-        background-size: 1em 1em;
-        background-position: 0.3em 0.225em;
-        background-repeat: no-repeat;
-    }
+.size,
+.bitrate {
+  &.adequate {
+    background-color: var(--chakra-colors-green-500);
+    color: white;
+  }
+}
+
+.duration,
+.size,
+.bitrate,
+.filecount {
+  &.inadequate {
+    background-color: var(--chakra-colors-red-400);
+    color: white;
+  }
 }
 
 .dateactivated {
-
-    .👍,
-    .👎 {
-        background-color: transparent;
-    }
+  &.activated {
+    background-color: transparent;
+  }
 }
 
 .highlights {
-    .⭐ {
-        background-color: transparent;
-    }
+  &.exists {
+    background-color: transparent;
+  }
 }

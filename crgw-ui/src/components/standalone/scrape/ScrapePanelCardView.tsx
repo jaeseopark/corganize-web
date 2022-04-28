@@ -39,15 +39,17 @@ const CardView = ({ card, onSend, onScrape, disableScrapeButton }: CardViewProps
 
   return (
     <div className={cls("scrape-card", { error, complete })}>
-      <div className="img-wrapper">
-        <img
-          className={cls("thumbnail", { clickable, error, complete })}
-          src={thumbnailurl || "not.found.jpg"}
-          onClick={onSendCard}
-          alt={title}
-        />
-      </div>
-      <Button className="scrape" onClick={() => onScrape(sourceurl)} disabled={disableScrapeButton}>
+      <img
+        className={cls("thumbnail", { clickable, error, complete })}
+        src={thumbnailurl || "not.found.jpg"}
+        onClick={onSendCard}
+        alt={title}
+      />
+      <Button
+        className="scrape-button"
+        onClick={() => onScrape(sourceurl)}
+        disabled={disableScrapeButton}
+      >
         Scrape
       </Button>
     </div>

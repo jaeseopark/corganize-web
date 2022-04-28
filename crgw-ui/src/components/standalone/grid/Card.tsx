@@ -6,6 +6,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { useBlanket } from "providers/blanket/hook";
 
+import FileIcon from "components/reusable/FileIcon";
 import FileTags from "components/reusable/FileTags";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";
@@ -69,6 +70,8 @@ const Card = ({
           <IndexLabel index={index} />
           {filename}
         </label>
+        <Divider />
+        <FileIcon f={file} />
         <Divider />
         <FileTags f={file} />
         <HStack>
