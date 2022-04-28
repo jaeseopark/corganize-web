@@ -1,7 +1,8 @@
 import { Center, SimpleGrid, Spinner } from "@chakra-ui/react";
 
-import CardView, { Card } from "components/standalone/scrape/ScrapePanelCardView";
 import { createRange } from "utils/arrayUtils";
+
+import CardView, { Card } from "components/standalone/scrape/ScrapePanelCardView";
 
 type ScrapeGridProps = {
   disabled: boolean;
