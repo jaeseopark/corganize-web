@@ -25,6 +25,7 @@ export const retrieveFiles = (
       ...f,
       isnewfile: isnewfile(f.lastopened),
     };
+    decorated.filename = decorated.filename || decorated.fileid;
 
     const localFilename = getLocalFilename(f.fileid);
     if (localFilename) {

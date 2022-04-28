@@ -1,0 +1,35 @@
+.mimetype {
+    .video {
+        background-color: var(--chakra-colors-cyan-500);
+        color: var(--chakra-colors-whiteAlpha-900);
+    }
+
+    .application-zip {
+        background-color: var(--chakra-colors-orange-200);
+        color: var(--chakra-colors-blackAlpha-900);
+    }
+}
+
+.width {
+    .Vertical {
+        background-image: url("/assets/phone.svg");
+        padding-left: 1.5em;
+        background-size: 1em 1em;
+        background-position: 0.3em 0.225em;
+        background-repeat: no-repeat;
+    }
+}
+
+.dateactivated {
+
+    .👍,
+    .👎 {
+        background-color: transparent;
+    }
+}
+
+.highlights {
+    .⭐ {
+        background-color: transparent;
+    }
+}

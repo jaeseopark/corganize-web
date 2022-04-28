@@ -6,7 +6,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { useBlanket } from "providers/blanket/hook";
 
-import FileMetadataTags from "components/reusable/FileMetadataTag";
+import FileTags from "components/reusable/FileTags";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
@@ -61,7 +61,6 @@ const Card = ({
     <Box
       className={cls("card", mimetype)}
       bg={useColorModeValue("white", "gray.900")}
-      maxW="400px"
       boxShadow="xl"
       rounded="lg"
     >
@@ -71,7 +70,7 @@ const Card = ({
           {filename}
         </label>
         <Divider />
-        <FileMetadataTags f={file} />
+        <FileTags f={file} />
         <HStack>
           <InfoIcon className="clickable" onClick={openJsonEditor} />
           <SearchIcon className="clickable" onClick={openScrapePanel} />

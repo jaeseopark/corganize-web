@@ -1,8 +1,11 @@
 import { Badge, Wrap, WrapItem } from "@chakra-ui/react";
+import cls from "classnames";
 
 import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
 
 import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
+
+import "./FileTags.scss";
 
 const getHighlightEmoji = (f: CorganizeFile) => {
   if (f.multimedia?.highlights) {
@@ -58,17 +61,20 @@ const TAG_GENERATION_MAP: Map<TagType, (f: CorganizeFile) => string[]> = new Map
   ["duration", getDurationTags],
 ]);
 
-const FileMetadataTags = ({ f }: { f: CorganizeFile }) => {
-  const tags = Array.from(TAG_GENERATION_MAP.values()).flatMap((func) => func(f));
+const FileTags = ({ f }: { f: CorganizeFile }) => {
+  const badgeCls = cls(f.mimetype && [f.mimetype.split("/")[0], f.mimetype.replace("/", "-")]);
+
   return (
-    <Wrap spacing="3px" justify="center">
-      {tags.map((t) => (
-        <WrapItem key={t}>
-          <Badge>{t}</Badge>
-        </WrapItem>
-      ))}
+    <Wrap className="file-tags" spacing="3px" justify="center">
+      {Array.from(TAG_GENERATION_MAP.entries()).map(([fieldName, func]) =>
+        func(f).map((t) => (
+          <WrapItem className={fieldName} key={t}>
+            <Badge className={cls(badgeCls, t)}>{t}</Badge>
+          </WrapItem>
+        ))
+      )}
     </Wrap>
   );
 };
 
-export default FileMetadataTags;
+export default FileTags;

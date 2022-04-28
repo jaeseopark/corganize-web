@@ -4,6 +4,7 @@
   padding: 0;
   margin-right: 5px;
   margin-bottom: 5px;
+  max-width: 10em;
 
   &.error {
     background-color: rgba(255, 0, 0, 0.3);
@@ -24,6 +25,7 @@
   .img-wrapper {
     img.thumbnail {
       min-width: 80px;
+      width: 100%;
 
       &.clickable {
         cursor: pointer;
