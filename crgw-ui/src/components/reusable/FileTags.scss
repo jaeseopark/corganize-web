@@ -1,0 +1,39 @@
+.orientation {
+  &.vertical {
+    background-image: url("/assets/phone.svg");
+    padding-left: 1.5em;
+    background-size: 1em 1em;
+    background-position: 0.3em 0.225em;
+    background-repeat: no-repeat;
+  }
+}
+
+.size,
+.bitrate {
+  &.adequate {
+    background-color: var(--chakra-colors-green-500);
+    color: white;
+  }
+}
+
+.duration,
+.size,
+.bitrate,
+.filecount {
+  &.inadequate {
+    background-color: var(--chakra-colors-red-400);
+    color: white;
+  }
+}
+
+.dateactivated {
+  &.activated {
+    background-color: transparent;
+  }
+}
+
+.highlights {
+  &.exists {
+    background-color: transparent;
+  }
+}

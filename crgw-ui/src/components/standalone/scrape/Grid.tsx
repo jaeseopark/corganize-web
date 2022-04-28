@@ -1,5 +1,7 @@
 import { Center, SimpleGrid, Spinner } from "@chakra-ui/react";
 
+import { createRange } from "utils/arrayUtils";
+
 import CardView, { Card } from "components/standalone/scrape/ScrapePanelCardView";
 
 type ScrapeGridProps = {
@@ -25,7 +27,13 @@ const GridSpinner = ({ isGridDisabled }: { isGridDisabled: boolean }) => {
 const ScrapeGrid = ({ disabled, cards, createFilesFromCards, setUrl, scrape }: ScrapeGridProps) => (
   <div className="scrape-grid-with-spinner">
     <GridSpinner isGridDisabled={disabled} />
-    <SimpleGrid tabIndex={1} className="scrape-grid" spacing={6} outline="none">
+    <SimpleGrid
+      tabIndex={1}
+      className="scrape-grid"
+      spacing={3}
+      columns={createRange(1, 7)}
+      outline="none"
+    >
       {cards.map((card) => (
         <CardView
           key={card.file.fileid}

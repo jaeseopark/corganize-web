@@ -1,0 +1,134 @@
+import { Badge, Wrap, WrapItem } from "@chakra-ui/react";
+import cls, { Argument as ClsArg } from "classnames";
+
+import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
+
+import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
+
+import "./FileTags.scss";
+
+type TagKey = keyof CorganizeFile | keyof Multimedia;
+type Tag = {
+  value: string;
+  styleClasses?: ClsArg[];
+};
+
+const FileTags = ({ f }: { f: CorganizeFile }) => {
+  return (
+    <Wrap className="file-tags" spacing="3px" justify="center">
+      {Array.from(TAG_GENERATION_MAP.entries()).map(([fieldName, func]) =>
+        func(f).map(({ value, styleClasses }) => (
+          <WrapItem key={value}>
+            <Badge className={cls(fieldName, value, styleClasses)}>{value}</Badge>
+          </WrapItem>
+        ))
+      )}
+    </Wrap>
+  );
+};
+
+export default FileTags;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const TAG_GENERATION_MAP: Map<TagKey, (f: CorganizeFile) => Tag[]> = new Map([
+  [
+    "dateactivated",
+    (f) => [{ value: getActivationEmoji(f), styleClasses: [{ activated: !!f.dateactivated }] }],
+  ],
+  [
+    "highlights",
+    (f) => {
+      if (!f.multimedia?.highlights?.length) return [];
+      return [
+        {
+          value: "⭐",
+          styleClasses: ["highlighted"],
+        },
+      ];
+    },
+  ],
+  [
+    "size",
+    (f) => {
+      const TOO_BIG = 2500000000; // 2.5GB
+
+      if (!f.size) return [];
+      return [
+        {
+          value: toHumanFileSize(f.size),
+          styleClasses: [{ inadequate: TOO_BIG < f.size }],
+        },
+      ];
+    },
+  ],
+  [
+    "filecount",
+    (f) => {
+      const TOO_LOW = 15;
+      if (!f.multimedia?.filecount) return [];
+      return [
+        {
+          value: `${f.multimedia?.filecount}pcs`,
+          styleClasses: [{ inadequate: f.multimedia.filecount < TOO_LOW }],
+        },
+      ];
+    },
+  ],
+  [
+    "width",
+    (f) => {
+      const tags: Tag[] = [];
+      if (f.multimedia?.width) {
+        const { width, height } = f.multimedia;
+        const dimensions = [height!, width!];
+        const isVertical = height! > width!;
+
+        if (isVertical) {
+          dimensions.reverse();
+          tags.push({ value: "Vertical", styleClasses: ["orientation", "vertical"] });
+        }
+
+        const [short, long] = dimensions;
+        const isCommonAspectRatio = closeEnough(long / short, 16 / 9, 0.15);
+
+        if (isCommonAspectRatio) {
+          tags.push({ value: `${short}p` });
+        }
+      }
+      return tags;
+    },
+  ],
+  [
+    "duration",
+    (f) => {
+      const tags: Tag[] = [];
+      if (f.multimedia?.duration) {
+        const TOO_SHORT = 60;
+        const TOO_LONG = 3600;
+
+        tags.push({
+          value: toHumanDuration(f.multimedia.duration),
+          styleClasses: [
+            {
+              inadequate: TOO_SHORT > f.multimedia.duration || f.multimedia.duration > TOO_LONG,
+            },
+          ],
+        });
+        if (f.size) {
+          const ADEQUATE_RANGE = [2500000, 5000000]; // 2.5-5Mbps
+          const TOO_HIGH = 7000000; // 7Mbps
+
+          const bitrate = (f.size / f.multimedia.duration) * 8;
+          const adequate = ADEQUATE_RANGE[0] <= bitrate && bitrate <= ADEQUATE_RANGE[1];
+
+          tags.push({
+            value: `${Math.ceil(bitrate / 1000 ** 2)}Mbps`,
+            styleClasses: ["bitrate", { adequate, inadequate: bitrate > TOO_HIGH }],
+          });
+        }
+      }
+      return tags;
+    },
+  ],
+]);

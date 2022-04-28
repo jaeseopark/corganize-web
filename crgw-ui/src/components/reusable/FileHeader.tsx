@@ -1,6 +1,6 @@
 import { useFileRepository } from "providers/fileRepository/hook";
 
-import FileMetadataTags from "components/reusable/FileMetadataTag";
+import FileTags from "components/reusable/FileTags";
 
 const FileHeader = ({ fileid }: { fileid: string }) => {
   const { findById } = useFileRepository();
@@ -9,7 +9,7 @@ const FileHeader = ({ fileid }: { fileid: string }) => {
 
   return (
     <label>
-      <FileMetadataTags f={file} />
+      <FileTags f={file} />
       {filename}
     </label>
   );

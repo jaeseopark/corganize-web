@@ -17,8 +17,6 @@ import FieldBar from "components/standalone/grid/field/FieldBar";
 import GlobalSearch from "components/standalone/grid/field/GlobalSearch";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
-const MIN_WIDTH = 200;
-
 const InnerGrid = () => {
   const {
     fileProps: { files },
@@ -87,7 +85,7 @@ const InnerGrid = () => {
       className="inner-grid"
       onKeyDown={onKeyDown}
       ref={gridRef}
-      minChildWidth={`${MIN_WIDTH}px`}
+      columns={[1, 2, 3, 4, 5]}
       spacing={6}
       outline="none"
       marginY="1em"
