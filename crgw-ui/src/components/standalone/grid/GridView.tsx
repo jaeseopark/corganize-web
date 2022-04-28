@@ -6,6 +6,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
+import { useToast } from "providers/toast/hook";
 
 import { madFocus } from "utils/elementUtils";
 
@@ -21,21 +22,40 @@ const InnerGrid = () => {
   const {
     fileProps: { files },
   } = useGrid();
-  const { mostRecentFile } = useFileRepository();
+  const { mostRecentFile, toggleActivation } = useFileRepository();
   const { setBlanket } = useBlanket();
+  const { enqueueSuccess } = useToast();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
 
   const refocus = () => madFocus(gridRef.current);
 
   const [firstLocalFile] = files.filter((f) => f.streamingurl);
 
-  const openFile = (f: CorganizeFile) => {
-    if (!f) return;
+  const openFile = (file?: CorganizeFile) => {
+    if (!file) return;
 
-    const { fileid } = f;
+    const { fileid } = file;
     setBlanket({
       fileid,
       body: <FileView fileid={fileid} />,
+      onClose: refocus,
+    });
+  };
+
+  const openJsonEditor = (file?: CorganizeFile) => {
+    if (!file) return;
+    setBlanket({
+      fileid: file.fileid,
+      body: <FileMetadataView file={file} />,
+      onClose: refocus,
+    });
+  };
+
+  const openScrapePanel = (file?: CorganizeFile) => {
+    if (!file) return;
+    setBlanket({
+      title: "Scrape",
+      body: <ScrapePanel defaultUrls={[file.sourceurl]} />,
       onClose: refocus,
     });
   };
@@ -47,22 +67,14 @@ const InnerGrid = () => {
     } else if (key === "o") {
       openFile(mostRecentFile);
     } else if (key === "s") {
-      if (!mostRecentFile) return;
-      setBlanket({
-        title: "Scrape",
-        body: <ScrapePanel defaultUrls={[mostRecentFile.sourceurl]} />,
-        onClose: refocus,
-      });
+      openScrapePanel(mostRecentFile);
     } else if (key === "i") {
-      if (!mostRecentFile) return;
-      setBlanket({
-        title: mostRecentFile.filename,
-        body: <FileMetadataView file={mostRecentFile} />,
-        onClose: refocus,
-      });
+      openJsonEditor(mostRecentFile);
     } else if (key === "w") {
       if (!mostRecentFile) return;
-      // TODO
+      toggleActivation(mostRecentFile.fileid).then(({ message, emoji }) =>
+        enqueueSuccess({ message: `${message} ${emoji}` })
+      );
     } else if ("0" <= key && key <= "9") {
       const fileAtIndex = files.at(parseInt(key));
       if (fileAtIndex) {
@@ -76,7 +88,16 @@ const InnerGrid = () => {
       return <label>No files available</label>;
     }
 
-    return files.map((f, i) => <Card key={f.fileid} file={f} index={i} focusGrid={refocus} />);
+    return files.map((f, i) => (
+      <Card
+        key={f.fileid}
+        fileid={f.fileid}
+        index={i}
+        openFile={openFile}
+        openScrapePanel={openScrapePanel}
+        openJsonEditor={openJsonEditor}
+      />
+    ));
   };
 
   return (

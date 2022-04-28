@@ -4,13 +4,10 @@ import cls from "classnames";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
-import { useBlanket } from "providers/blanket/hook";
+import { useFileRepository } from "providers/fileRepository/hook";
 
 import FileIcon from "components/reusable/FileIcon";
 import FileTags from "components/reusable/FileTags";
-import FileMetadataView from "components/standalone/fileview/FileMetadataView";
-import FileView from "components/standalone/fileview/FileView";
-import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 import "./Card.scss";
 
@@ -22,41 +19,30 @@ const IndexLabel = ({ index }: { index: number }) => {
   return <label className="index">{index}</label>;
 };
 
+type FileAction = (f?: CorganizeFile) => void;
+
 const Card = ({
-  file,
+  fileid,
   index,
-  focusGrid,
+  openFile,
+  openScrapePanel,
+  openJsonEditor,
 }: {
-  file: CorganizeFile;
+  fileid: string;
   index: number;
-  focusGrid: () => void;
+  openFile: FileAction;
+  openScrapePanel: FileAction;
+  openJsonEditor: FileAction;
 }) => {
-  const { setBlanket } = useBlanket();
-  const { streamingurl, mimetype, filename, fileid } = file;
+  const { findById } = useFileRepository();
+  const file = findById(fileid);
+  const { streamingurl, mimetype, filename } = file;
+
   const openable = !!streamingurl;
 
-  const openFile = () => {
-    if (openable)
-      setBlanket({
-        title: filename,
-        body: <FileView fileid={fileid} />,
-        onClose: focusGrid,
-      });
-  };
-
-  const openJsonEditor = () =>
-    setBlanket({
-      title: filename,
-      body: <FileMetadataView file={file} />,
-      onClose: focusGrid,
-    });
-
-  const openScrapePanel = () =>
-    setBlanket({
-      title: "Scrape",
-      body: <ScrapePanel defaultUrls={[file.sourceurl]} />,
-      onClose: focusGrid,
-    });
+  const openFilee = () => openFile(file);
+  const openScrapePanell = () => openScrapePanel(file);
+  const openJsonEditorr = () => openJsonEditor(file);
 
   return (
     <Box
@@ -66,7 +52,7 @@ const Card = ({
       rounded="lg"
     >
       <VStack textAlign="center" p={6}>
-        <label className={cls("filename", { clickable: openable })} onClick={openFile}>
+        <label className={cls("filename", { clickable: openable })} onClick={openFilee}>
           <IndexLabel index={index} />
           {filename}
         </label>
@@ -75,8 +61,8 @@ const Card = ({
         <Divider />
         <FileTags f={file} />
         <HStack>
-          <InfoIcon className="clickable" onClick={openJsonEditor} />
-          <SearchIcon className="clickable" onClick={openScrapePanel} />
+          <InfoIcon className="clickable" onClick={openJsonEditorr} />
+          <SearchIcon className="clickable" onClick={openScrapePanell} />
         </HStack>
       </VStack>
     </Box>
