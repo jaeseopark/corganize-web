@@ -7,9 +7,23 @@ from commmons import merge
 _OVERRIDE_PATH = "/mnt/config.yml"
 
 _DEFAULT = """
-local:
+log:
+  path: /mnt/watcher.log
+data:
   path: /data
-  sleep_seconds: 1800
+watch:
+  path: /watch
+  type: polling
+  polling:
+    interval: 60  # Seconds
+  watchdog:
+    recursive: false
+    handler:
+      case_sensitive: true
+      ignore_directories: false
+server:
+  host: ""
+  apikey: ""
 """
 
 _INSTANCE = dict()
@@ -35,5 +49,7 @@ def get_config() -> dict:
             _get_default_config(),
             _get_override()
         ))
+        if not _INSTANCE["server"]["host"] or not _INSTANCE["server"]["apikey"]:
+            raise RuntimeError("Server information must be provided")
 
     return _INSTANCE

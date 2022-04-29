@@ -9,7 +9,6 @@ from typing import List
 import requests
 from pydash import url as pydash_url
 
-from crgw.config import get_config
 
 ALLOWED_FWD_HEADERS = ("rangeend", "rangestart", "content-type", "order", "nexttoken", "crg-method", "crg-body")
 
@@ -50,10 +49,10 @@ def teardown():
 
 
 def _startup():
-    def cache_loop():
-        path = get_config()["local"]["path"]
-        sleep_seconds = get_config()["local"]["sleep_seconds"]
+    path = "/data"
+    sleep_seconds = 1800
 
+    def cache_loop():
         if not os.path.isdir(path):
             LOGGER.warning(f"invalid local path {path=}")
             return

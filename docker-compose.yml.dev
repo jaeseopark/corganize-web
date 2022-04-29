@@ -3,13 +3,15 @@ services:
   nginx:
     image: nginx
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ./data/crg:/data/crg:ro
+      - ./data:/data:ro
     ports:
       - "5823:80"
     depends_on:
       - "ui"
-      - "app"
+      - "api"
     environment:
       SCRAPE_HOST: PLACEHOLDER
   ui:
@@ -19,9 +21,11 @@ services:
       sh -c "yarn install &&
              yarn start-port80"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - ./crgw-ui:/app
-  app:
-    image: python:3.8-slim-bullseye
+  api:
+    image: python:3.10-slim-bullseye
     working_dir: /app
     stop_signal: SIGINT # https://github.com/docker/compose/issues/4199#issuecomment-426109482
     command: >
@@ -31,8 +35,23 @@ services:
                pip freeze > docker-pip-freeze.txt &&
                python main.py"
     volumes:
-      - ./crgw-app:/app
-      - ./data/crg:/data:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./crgw-api:/app
+      - ./data:/data:ro
     environment:
       CRG_REMOTE_HOST: PLACEHOLDER
       CRG_REMOTE_APIKEY: PLACEHOLDER
+  daemon:
+    container_name: daemon
+    build:
+      context: ./crgw-daemon
+      dockerfile: Dockerfile
+    command: python -m daemon
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./mnt:/mnt
+      - ./data:/data
+      - ./watch:/watch
