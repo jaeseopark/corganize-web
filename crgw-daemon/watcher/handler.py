@@ -60,7 +60,6 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
     logger = with_prefix(original_logger, f"{basename=}")
 
     if src_path.endswith(PROCESSED_SUFFIX):
-        logger.info("already processed")
         return
 
     if os.path.isdir(src_path):
