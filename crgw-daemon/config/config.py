@@ -49,7 +49,7 @@ def get_config() -> dict:
             _get_default_config(),
             _get_override()
         ))
-        if not _INSTANCE["server"]["host"] or _INSTANCE["server"]["apikey"]:
+        if not _INSTANCE["server"]["host"] or not _INSTANCE["server"]["apikey"]:
             raise RuntimeError("Server information must be provided")
 
     return _INSTANCE
