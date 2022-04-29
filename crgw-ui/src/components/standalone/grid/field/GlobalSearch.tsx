@@ -11,8 +11,8 @@ const GlobalSearch = () => {
     fileProps: { fileCount },
   } = useGrid();
 
-  const onKeyDown = (e: any) => {
-    if (e.key === "Escape") {
+  const handleKey = (key: string) => {
+    if (key === "escape") {
       setPrefilter("");
     }
   };
@@ -28,7 +28,10 @@ const GlobalSearch = () => {
         placeholder="Filter by keyword"
         value={prefilter}
         onChange={onChange}
-        onKeyDown={onKeyDown}
+        onKeyDown={(e) => {
+          if (e.shiftKey || e.ctrlKey) return;
+          handleKey(e.key.toLowerCase());
+        }}
       />
       <CounterLabel>{fileCount}</CounterLabel>
     </InputGroup>

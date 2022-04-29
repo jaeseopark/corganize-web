@@ -46,19 +46,20 @@ const BlanketPortal = () => {
     return null;
   }
 
-  const onKeyDown = (e: any) => {
-    if (!isHotkeyEnabled) {
-      return;
-    }
-
-    const key = e.key.toLowerCase();
+  const handleKey = (key: string) => {
     if (key === "q") {
       exitBlanket();
     }
   };
 
   return (
-    <div className="blanket-portal" onKeyDown={onKeyDown}>
+    <div
+      className="blanket-portal"
+      onKeyDown={(e) => {
+        if (!isHotkeyEnabled || e.shiftKey || e.ctrlKey) return;
+        handleKey(e.key.toLowerCase());
+      }}
+    >
       <Header />
       <Body />
       <Footer />

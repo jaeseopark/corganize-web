@@ -130,7 +130,10 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
     <div
       className="zip-view"
       tabIndex={1}
-      onKeyDown={(e) => handleKey(e.key.toLowerCase())}
+      onKeyDown={(e) => {
+        if (e.shiftKey || e.ctrlKey) return;
+        handleKey(e.key.toLowerCase());
+      }}
       ref={mainref}
     >
       <ChildComponent {...galleryProps} />
