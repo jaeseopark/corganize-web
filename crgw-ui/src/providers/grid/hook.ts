@@ -30,6 +30,8 @@ const getPageProps = (state: State, dispatch: Dispatch<Action>) => {
     canDecrement: index > 0,
     incrementPage: () => setPage(index + 1),
     decrementPage: () => setPage(index - 1),
+    goToStart: () => setPage(0),
+    goToEnd: () => setPage(maxIndex),
   };
 };
 

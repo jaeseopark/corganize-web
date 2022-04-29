@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -9,6 +9,8 @@ import { useToast } from "providers/toast/hook";
 import { getInstance } from "clients/corganize";
 
 import { isDiscovered } from "shared/globalstore";
+
+import { madFocus } from "utils/elementUtils";
 
 import ScrapeGrid from "components/standalone/scrape/Grid";
 import ScrapeInputBar from "components/standalone/scrape/InputBar";
@@ -29,6 +31,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const [cards, setCards] = useState(new Array<Card>());
   const [error, setError] = useState<Error>();
   const [rawScrapeCount, setRawScrapeCount] = useState(0);
+  const mainDivRef = useRef<HTMLDivElement | null>(null);
 
   const [url, setUrl] = useState<string>(defaultUrls ? defaultUrls.join(",") : "");
 
@@ -68,6 +71,12 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (!isProcessing) {
+      madFocus(mainDivRef?.current);
+    }
+  }, [isProcessing]);
+
   const createFilesFromCards = (cards: Card[]) => {
     const files = cards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
 
@@ -92,7 +101,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   }
 
   return (
-    <div className="scrape-panel">
+    <div className="scrape-panel" tabIndex={1} ref={mainDivRef}>
       <ScrapeInputBar
         disabled={isProcessing}
         cards={cards}
