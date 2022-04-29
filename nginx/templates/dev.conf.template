@@ -2,8 +2,8 @@ upstream ui {
     server ui;
 }
 
-upstream app {
-    server app;
+upstream api {
+    server api;
 }
 
 server {
@@ -15,7 +15,7 @@ server {
 
     location /api/ {
         rewrite /api/(.*) /$1 break;
-        proxy_pass http://app;
+        proxy_pass http://api;
     }
 
     location ~* \.(dec|zdec)$ {
