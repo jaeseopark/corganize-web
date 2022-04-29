@@ -11,7 +11,7 @@ services:
       - "5823:80"
     depends_on:
       - "ui"
-      - "app"
+      - "api"
     environment:
       SCRAPE_HOST: PLACEHOLDER
   ui:
