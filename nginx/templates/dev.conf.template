@@ -19,7 +19,7 @@ server {
     }
 
     location ~* \.(dec|zdec)$ {
-        root /data/crg;
+        root /data;
     }
 
     location /scrape {
