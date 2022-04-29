@@ -1,4 +1,6 @@
 .scrape-panel {
+  outline: none;
+
   .control-bar {
     margin-bottom: 10px;
 
@@ -38,18 +40,19 @@
       margin: 0 0 0 4px;
       border-radius: 3px;
       color: white;
-      background-color: gainsboro;
+      background-color: var(--chakra-colors-gray-700);
+      padding: 0.1em 1em;
 
       &.Available {
-        background-color: rgba(0, 123, 255, 0.3);
+        background-color: var(--chakra-colors-blue-300);
       }
 
       &.Complete {
-        background-color: rgba(50, 205, 50, 0.3);
+        background-color: var(--chakra-colors-green-500);
       }
 
       &.Error {
-        background-color: rgba(255, 0, 0, 0.3);
+        background-color: var(--chakra-colors-red-400);
       }
     }
   }
