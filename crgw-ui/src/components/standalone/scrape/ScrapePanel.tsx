@@ -2,11 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
-import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import { getInstance } from "clients/corganize";
+import { CreateResponse, getInstance } from "clients/corganize";
 
 import { isDiscovered } from "shared/globalstore";
 
@@ -23,9 +22,8 @@ type ScrapePanelProps = {
 };
 
 const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
-  const { enableHotkey: enableFullscreenHotkey } = useBlanket();
   const { createThenAddFiles } = useFileRepository();
-  const { enqueueError } = useToast();
+  const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
 
   const [isProcessing, setProcessing] = useState(false);
   const [cards, setCards] = useState(new Array<Card>());
@@ -41,8 +39,6 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
 
       if (isProcessing) return;
 
-      enableFullscreenHotkey();
-
       setProcessing(true);
 
       const urls = (url as string).split(",");
@@ -51,6 +47,13 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         .scrapeAsync(...urls)
         .then((scrapedFiles) => {
           setRawScrapeCount(scrapedFiles.length);
+
+          if (scrapedFiles.length > 0) {
+            enqueue({ message: `Scraped ${scrapedFiles.length} files` });
+          } else {
+            enqueueWarning({ message: "No files scraped" });
+          }
+
           return scrapedFiles
             .filter((file) => !isDiscovered(file.fileid))
             .map((file: CorganizeFile) => ({
@@ -62,7 +65,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         .catch(setError)
         .finally(() => setProcessing(false));
     },
-    [enableFullscreenHotkey, isProcessing, url]
+    [isProcessing, url]
   );
 
   useEffect(() => {
@@ -80,8 +83,24 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const createFilesFromCards = (cards: Card[]) => {
     const files = cards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
 
+    const displayToasts = (res: CreateResponse) => {
+      if (files.length === 1) return res;
+
+      const { created, skipped } = res;
+      if (created.length > 0) {
+        enqueueSuccess({ message: `${created.length} files added` });
+      }
+
+      if (skipped.length > 0) {
+        enqueueWarning({ message: `${skipped.length} files skipped` });
+      }
+
+      return res;
+    };
+
     setProcessing(true);
     createThenAddFiles(files)
+      .then(displayToasts)
       .then(({ created, skipped }) => {
         const updateCardStatus = (f: CorganizeFile, status: string, errorString?: string) => {
           const card = cards.find((c) => c.file.fileid === f.fileid) as Card;
