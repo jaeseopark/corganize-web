@@ -54,12 +54,11 @@ def replace_then_get_new_path(src_path: str, logger: logging.Logger):
 
 
 def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, original_logger: logging.Logger):
+    if os.path.isdir(src_path):
+        src_path = replace_then_get_new_path(src_path, original_logger)
+
     basename = os.path.basename(src_path)
     logger = with_prefix(original_logger, f"{basename=}")
-
-    if os.path.isdir(src_path):
-        src_path = replace_then_get_new_path(src_path, logger)
-
     filename, _ = os.path.splitext(basename)
     fileid = "local" + hashlib.sha256(filename.encode()).hexdigest()
     size = os.stat(src_path).st_size
