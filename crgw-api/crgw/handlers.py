@@ -25,9 +25,9 @@ def get_local_files() -> List[str]:
     return _LOCAL_FILE_CACHE.files
 
 
-def add_local_files(new_filepaths: List[str]):
-    filenames = [basename(f) for f in new_filepaths]  # strip the directory part
-    _LOCAL_FILE_CACHE.files = list(set(_LOCAL_FILE_CACHE.files + filenames))
+def add_local_files(paths: List[str]):
+    basenames = [basename(f) for f in paths]  # strip the directory part
+    _LOCAL_FILE_CACHE.files = list(set(_LOCAL_FILE_CACHE.files + basenames))
 
 
 def forward_request(data, headers: dict, method: str, subpath: str):
