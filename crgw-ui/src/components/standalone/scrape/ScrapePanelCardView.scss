@@ -4,6 +4,9 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  max-height: 15em;
+  border-radius: var(--chakra-radii-md);
+  border: 0.1em solid var(--chakra-colors-blackAlpha-300);
 
   &.error {
     background-color: rgba(255, 0, 0, 0.3);
@@ -11,6 +14,10 @@
 
   &.complete {
     background-color: rgba(50, 205, 50, 0.3);
+
+    .thumbnail {
+      transform: scale(.9);
+    }
   }
 
   .scrape-button {
@@ -25,6 +32,7 @@
     flex-shrink: 0;
     min-width: 100%;
     min-height: 100%;
+    object-fit: contain;
 
     &.clickable {
       cursor: pointer;
@@ -33,6 +41,7 @@
     &.error,
     &.complete {
       opacity: 0.5;
+      transform: scale(.9);
     }
   }
 }
