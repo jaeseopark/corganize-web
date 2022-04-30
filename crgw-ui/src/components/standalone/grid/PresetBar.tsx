@@ -1,6 +1,5 @@
 import { Button, Center, SimpleGrid } from "@chakra-ui/react";
 import { useEffect } from "react";
-import styled from "styled-components";
 
 import {
   fieldDateActivated,
@@ -78,7 +77,7 @@ const PresetBar = () => {
   }, []);
 
   return (
-    <StyledPresetBar className="preset-bar">
+    <Center className="preset-bar">
       <SimpleGrid spacing=".5em" display="flex">
         {ALL_PRESETS.map((p) => (
           <Button key={p.name} onClick={() => setPreset(p)}>
@@ -86,12 +85,8 @@ const PresetBar = () => {
           </Button>
         ))}
       </SimpleGrid>
-    </StyledPresetBar>
+    </Center>
   );
 };
 
 export default PresetBar;
-
-const StyledPresetBar = styled(Center)`
-  margin-bottom: 0.5em;
-`;
