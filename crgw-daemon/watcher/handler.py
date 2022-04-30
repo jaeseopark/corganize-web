@@ -73,6 +73,8 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         sourceurl="local",
         storageservice="local",
         size=size,
+        lastopened=0,
+        mimetype=guess or ""
     )])
 
     if len(result["created"]) > 0:
@@ -80,13 +82,6 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         dst_path = os.path.join(data_dir, f"{fileid}.dec")
         shutil.copyfile(src_path, dst_path)
         logger.info("file copied")
-
-        # Update the server
-        cc.update_file(dict(
-            fileid=fileid,
-            lastopened=0,
-            mimetype=guess or ""
-        ))
     else:
         logger.warning("fileid already exists")
 
