@@ -7,8 +7,6 @@ import shutil
 from commmons import get_file_handler, with_prefix
 from corganizeclient.client import CorganizeClient
 
-PROCESSED_SUFFIX = ".processed"
-
 
 def get_biggest_child(src_path: str, logger: logging.Logger):
     if len(os.listdir(src_path)) == 0:
@@ -59,9 +57,6 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
     basename = os.path.basename(src_path)
     logger = with_prefix(original_logger, f"{basename=}")
 
-    if src_path.endswith(PROCESSED_SUFFIX):
-        return
-
     if os.path.isdir(src_path):
         src_path = replace_then_get_new_path(src_path, logger)
 
@@ -80,23 +75,21 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         size=size,
     )])
 
-    if len(result["skipped"]) > 0:
+    if len(result["created"]) > 0:
+        # Copy the file to the new location
+        dst_path = os.path.join(data_dir, f"{fileid}.dec")
+        shutil.copyfile(src_path, dst_path)
+
+        # Update the server
+        cc.update_file(dict(
+            fileid=fileid,
+            lastopened=0,
+            mimetype=guess
+        ))
+    else:
         logger.warning("fileid already exists")
-        return
 
-    # Copy the file to the new location
-    dst_path = os.path.join(data_dir, f"{fileid}.dec")
-    shutil.copyfile(src_path, dst_path)
-
-    # Update the server
-    cc.update_file(dict(
-        fileid=fileid,
-        lastopened=0,
-        mimetype=guess
-    ))
-
-    # At last, rename the file so it does not get processed twice
-    os.rename(src_path, src_path + PROCESSED_SUFFIX)
+    os.remove(src_path)
 
 
 def handle(src_path: str, config: dict):
