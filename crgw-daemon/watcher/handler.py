@@ -62,7 +62,7 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
     filename, _ = os.path.splitext(basename)
     fileid = "local" + hashlib.sha256(filename.encode()).hexdigest()
     size = os.stat(src_path).st_size
-    guess = mimetypes.guess_type(src_path)[0]
+    guess = mimetypes.guess_type(src_path)[0]  # TODO: use python-magic
 
     logger = with_prefix(logger, f"{fileid=}")
     logger.info(f"{size=} {guess=}")
