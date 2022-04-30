@@ -7,6 +7,16 @@
   left: 1em;
 }
 
+@media (hover: none) {
+  .toast-portal {
+    flex-direction: column-reverse;
+    bottom: unset;
+    left: unset;
+    top: 1em;
+    right: 1em;
+  }
+}
+
 .toast {
   background-color: white;
   width: 200px;
