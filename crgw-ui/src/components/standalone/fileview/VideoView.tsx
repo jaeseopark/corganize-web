@@ -7,10 +7,12 @@ import { useToast } from "providers/toast/hook";
 
 import HighlightManager from "bizlog/HighlightManager";
 
+import { madFocus } from "utils/elementUtils";
 import { toHumanDuration } from "utils/numberUtils";
 
 import "./VideoView.scss";
 
+const DEFAULT_MIMETYPE = "video/mp4";
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   z: -15,
   x: -3,
@@ -21,9 +23,8 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 
 const VideoView = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile } = useFileRepository();
-  const { multimedia, streamingurl } = findById(fileid);
+  const { multimedia, streamingurl, mimetype } = findById(fileid);
 
-  const mainref = useRef<HTMLDivElement | null>(null);
   const { enqueue, enqueueSuccess } = useToast();
   const [rotationDegrees, setRotationDegrees] = useState(0);
   const highlightManager: HighlightManager = useMemo(
@@ -50,6 +51,8 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
   const onMetadata = (e: any) => {
     const { videoWidth, videoHeight, duration } = e.target;
+
+    madFocus(e.target);
 
     const isUpToDate =
       videoWidth === multimedia?.width &&
@@ -132,16 +135,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   };
 
   return (
-    <div className="video-view" ref={mainref}>
-      <video
-        onKeyDown={onKeyDown}
-        onLoadedMetadata={onMetadata}
-        src={streamingurl}
-        muted
-        autoPlay
-        loop
-        controls
-      />
+    <div className="video-view">
+      <video onKeyDown={onKeyDown} onLoadedMetadata={onMetadata} muted autoPlay loop controls>
+        <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
+      </video>
     </div>
   );
 };

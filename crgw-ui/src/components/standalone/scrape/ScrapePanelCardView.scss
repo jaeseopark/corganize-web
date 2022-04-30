@@ -14,10 +14,6 @@
 
   &.complete {
     background-color: rgba(50, 205, 50, 0.3);
-
-    .thumbnail {
-      transform: scale(.9);
-    }
   }
 
   .scrape-button {
@@ -34,14 +30,10 @@
     min-height: 100%;
     object-fit: contain;
 
-    &.clickable {
-      cursor: pointer;
-    }
-
     &.error,
     &.complete {
       opacity: 0.5;
-      transform: scale(.9);
+      transform: scale(0.9);
     }
   }
 }
