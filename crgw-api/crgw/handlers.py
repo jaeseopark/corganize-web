@@ -26,8 +26,11 @@ def get_local_files() -> List[str]:
 
 
 def add_local_files(paths: List[str]):
+    LOGGER.info(f"{len(paths)=}")
+    LOGGER.info(f"BEFORE {len(_LOCAL_FILE_CACHE.files)=}")
     basenames = [basename(f) for f in paths]  # strip the directory part
     _LOCAL_FILE_CACHE.files = list(set(_LOCAL_FILE_CACHE.files + basenames))
+    LOGGER.info(f"AFTER {len(_LOCAL_FILE_CACHE.files)=}")
 
 
 def forward_request(data, headers: dict, method: str, subpath: str):
