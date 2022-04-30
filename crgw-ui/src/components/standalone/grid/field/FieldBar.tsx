@@ -1,3 +1,5 @@
+import { Wrap, WrapItem } from "@chakra-ui/react";
+
 import { useGrid } from "providers/grid/hook";
 
 import FieldComponent from "components/standalone/grid/field/FieldComponent";
@@ -8,11 +10,13 @@ const FieldBar = () => {
   } = useGrid();
 
   return (
-    <div className="filter-bar">
+    <Wrap className="field-bar" spacing=".5em" justify="center">
       {fields.map((f) => (
-        <FieldComponent key={f.displayName} field={f} />
+        <WrapItem key={f.displayName}>
+          <FieldComponent field={f} />
+        </WrapItem>
       ))}
-    </div>
+    </Wrap>
   );
 };
 

@@ -1,4 +1,4 @@
-import { SimpleGrid } from "@chakra-ui/react";
+import { Divider, SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
@@ -13,9 +13,10 @@ import { madFocus } from "utils/elementUtils";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";
 import Card from "components/standalone/grid/Card";
+import GlobalSearch from "components/standalone/grid/GlobalSearch";
 import PageControl from "components/standalone/grid/PageControl";
+import PresetBar from "components/standalone/grid/PresetBar";
 import FieldBar from "components/standalone/grid/field/FieldBar";
-import GlobalSearch from "components/standalone/grid/field/GlobalSearch";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 const InnerGrid = () => {
@@ -133,6 +134,8 @@ const GridView = () => {
 
   return (
     <div className="grid-view">
+      <PresetBar />
+      <Divider marginY=".5em" />
       <FieldBar />
       <GlobalSearch />
       <PageControl />

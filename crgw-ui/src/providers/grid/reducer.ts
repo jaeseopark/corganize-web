@@ -98,6 +98,13 @@ export const gridReducer = (state: State, action: Action): State => {
         filteredSortedAndPaginated: paginate(filteredAndSorted, newPage),
         page: newPage,
       };
+    case "SET_PRESET": {
+      return recompute({
+        ...state,
+        filters: action.payload.filters,
+        sorts: action.payload.sorts,
+      });
+    }
     default:
       return state;
   }

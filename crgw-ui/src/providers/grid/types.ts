@@ -1,5 +1,7 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
+import { RequireOnlyOne } from "utils/typeUtils";
+
 /**
  * Field-related items
  */
@@ -34,11 +36,13 @@ export type NumberFilter = {
   value2: number;
 };
 
-export interface Filter extends FieldReferer {
-  number?: NumberFilter;
-  boolean?: BooleanFilter;
-  dropdown?: DropdownFilter;
+interface InnerFilter extends FieldReferer {
+  number: NumberFilter;
+  boolean: BooleanFilter;
+  dropdown: DropdownFilter;
 }
+
+export type Filter = RequireOnlyOne<InnerFilter, "number" | "boolean" | "dropdown">;
 
 /**
  * Sort-related items
@@ -47,6 +51,12 @@ export type SortDirection = "asc" | "desc";
 export interface Sort extends FieldReferer {
   direction: SortDirection;
 }
+
+export type Preset = {
+  name: string;
+  filters: Filter[];
+  sorts: Sort[];
+};
 
 /**
  * Page-related items
@@ -81,4 +91,5 @@ export type Action =
   | { type: "UPSERT_SORTS"; payload: Sort[] }
   | { type: "REMOVE_SORTS"; payload: Sort[] }
   | { type: "SET_PREFILTER"; payload: string }
-  | { type: "SET_PAGE"; payload: Page };
+  | { type: "SET_PAGE"; payload: Page }
+  | { type: "SET_PRESET"; payload: Preset };

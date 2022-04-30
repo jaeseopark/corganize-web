@@ -3,7 +3,7 @@ import { Dispatch, useContext } from "react";
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { GridContext } from "providers/grid/grid";
-import { Action, Field, Filter, Sort, State } from "providers/grid/types";
+import { Action, Field, Filter, Preset, Sort, State } from "providers/grid/types";
 
 const getPageProps = (state: State, dispatch: Dispatch<Action>) => {
   const { page } = state;
@@ -57,8 +57,11 @@ const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
 
   const setPrefilter = (value: string) => dispatch({ type: "SET_PREFILTER", payload: value });
 
+  const setPreset = (value: Preset) => dispatch({ type: "SET_PRESET", payload: value });
+
   const upsertFilter = (filter: Filter) => dispatch({ type: "UPSERT_FILTERS", payload: [filter] });
   const removeFilter = (filter: Filter) => dispatch({ type: "REMOVE_FILTERS", payload: [filter] });
+  const setSort = (sort: Sort) => setPreset({ name: "", filters, sorts: [sort] });
   const upsertSort = (sort: Sort) => dispatch({ type: "UPSERT_SORTS", payload: [sort] });
   const removeSort = (sort: Sort) => dispatch({ type: "REMOVE_SORTS", payload: [sort] });
 
@@ -70,8 +73,10 @@ const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
     setPrefilter,
     upsertFilter,
     removeFilter,
+    setSort,
     upsertSort,
     removeSort,
+    setPreset,
   };
 };
 
