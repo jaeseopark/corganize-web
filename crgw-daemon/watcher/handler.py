@@ -84,7 +84,7 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         shutil.copyfile(src_path, dst_path)
         logger.info("file copied")
 
-        requests.post("http://api", json=[dst_path])
+        requests.post("http://api/files", json=[dst_path])
         logger.info("api local cache updated")
     else:
         logger.warning("fileid already exists")
