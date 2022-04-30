@@ -65,6 +65,7 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
     guess = mimetypes.guess_type(src_path)[0]
 
     logger = with_prefix(logger, f"{fileid=}")
+    logger.info(f"{size=} {guess=}")
 
     result = cc.create_files([dict(
         fileid=fileid,
@@ -83,7 +84,7 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         cc.update_file(dict(
             fileid=fileid,
             lastopened=0,
-            mimetype=guess
+            mimetype=guess or ""
         ))
     else:
         logger.warning("fileid already exists")
