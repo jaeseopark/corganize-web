@@ -79,6 +79,7 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         # Copy the file to the new location
         dst_path = os.path.join(data_dir, f"{fileid}.dec")
         shutil.copyfile(src_path, dst_path)
+        logger.info("file copied")
 
         # Update the server
         cc.update_file(dict(
@@ -89,6 +90,7 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
     else:
         logger.warning("fileid already exists")
 
+    logger.info("file removed")
     os.remove(src_path)
 
 
