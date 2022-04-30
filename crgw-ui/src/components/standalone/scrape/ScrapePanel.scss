@@ -58,13 +58,13 @@
   }
 
   .spinner {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    left: 50%;
+    top: 50%;
     z-index: 1;
   }
 
   .scrape-grid {
-    width: 100%;    
+    width: 100%;
   }
 }
