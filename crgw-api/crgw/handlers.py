@@ -25,8 +25,8 @@ def get_local_files() -> List[str]:
     return _LOCAL_FILE_CACHE.files
 
 
-def add_local_files(files: List[str]):
-    filenames = [basename(f) for f in files]
+def add_local_files(new_filepaths: List[str]):
+    filenames = [basename(f) for f in new_filepaths]  # just get the file names
     _LOCAL_FILE_CACHE.files = list(set(_LOCAL_FILE_CACHE.files + filenames))
 
 
