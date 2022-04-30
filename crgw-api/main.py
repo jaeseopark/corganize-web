@@ -21,7 +21,7 @@ def get_files():
 
 @app.post("/files")
 def add_files():
-    add_local_files(freq.body)
+    add_local_files(freq.get_json())
 
 
 @app.route("/remote/<path:subpath>")
