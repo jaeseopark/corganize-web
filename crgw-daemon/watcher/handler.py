@@ -4,6 +4,7 @@ import mimetypes
 import os
 import shutil
 
+import requests
 from commmons import get_file_handler, with_prefix
 from corganizeclient.client import CorganizeClient
 
@@ -86,6 +87,8 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
             lastopened=0,
             mimetype=guess
         ))
+
+        requests.post("http://api", json=[dst_path])
     else:
         logger.warning("fileid already exists")
 

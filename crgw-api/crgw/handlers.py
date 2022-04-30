@@ -1,6 +1,7 @@
 import base64
 import logging
 import os
+from os.path import basename
 from threading import Thread
 from time import sleep
 from types import SimpleNamespace
@@ -8,7 +9,6 @@ from typing import List
 
 import requests
 from pydash import url as pydash_url
-
 
 ALLOWED_FWD_HEADERS = ("rangeend", "rangestart", "content-type", "order", "nexttoken", "crg-method", "crg-body")
 
@@ -23,6 +23,11 @@ _LOCAL_FILE_CACHE = SimpleNamespace(
 
 def get_local_files() -> List[str]:
     return _LOCAL_FILE_CACHE.files
+
+
+def add_local_files(files: List[str]):
+    filenames = [basename(f) for f in files]
+    _LOCAL_FILE_CACHE.files = list(set(_LOCAL_FILE_CACHE.files + filenames))
 
 
 def forward_request(data, headers: dict, method: str, subpath: str):
