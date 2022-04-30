@@ -1,67 +1,17 @@
 import React, { Dispatch, useReducer } from "react";
 
 import { gridReducer } from "providers/grid/reducer";
-import { Action, Field, State } from "providers/grid/types";
+import { Action, State } from "providers/grid/types";
 
-const fieldNew: Field = {
-  displayName: "New",
-  key: "isnewfile",
-  filterType: "boolean",
-  sortType: "boolean",
-};
-
-const fieldLocal: Field = {
-  displayName: "Local",
-  key: "streamingurl",
-  filterType: "boolean",
-  sortType: "boolean",
-};
-
-const fieldMimetype: Field = {
-  displayName: "Mimetype",
-  key: "mimetype",
-  filterType: "boolean", // TODO: change to dropdown later
-  sortType: "string",
-};
-
-const fieldSize: Field = {
-  displayName: "Size",
-  key: "size",
-  sortType: "number",
-  filterType: "number",
-};
+import { fieldDateActivated, fieldLastOpened, fieldMimetype, fieldNew, fieldSize } from "./fields";
 
 const initialState: State = {
   files: [],
   filteredAndSorted: [],
   filteredSortedAndPaginated: [],
-  fields: [fieldNew, fieldLocal, fieldMimetype, fieldSize],
-  filters: [
-    {
-      field: fieldNew,
-      boolean: {
-        value: "checked",
-      },
-    },
-    {
-      field: fieldLocal,
-      boolean: {
-        value: "checked",
-      },
-    },
-    {
-      field: fieldMimetype,
-      boolean: {
-        value: "checked",
-      },
-    },
-  ],
-  sorts: [
-    {
-      field: fieldSize,
-      direction: "desc",
-    },
-  ],
+  fields: [fieldNew, fieldDateActivated, fieldLastOpened, fieldMimetype, fieldSize],
+  filters: [],
+  sorts: [],
   prefilter: "",
   page: {
     index: 0,

@@ -19,7 +19,7 @@ const BooleanControl = ({ filter }: { filter: Filter }) => {
       isIndeterminate={boolean!.value === "maybe"}
       onChange={() => {
         const value = getNextValue(boolean!.value as MaybeBoolean);
-        upsertFilter({ ...filter, boolean: { value } });
+        upsertFilter({ ...filter, boolean: { value } } as Filter);
       }}
     />
   );
