@@ -55,18 +55,18 @@ def replace_then_get_new_path(src_path: str, logger: logging.Logger):
 
 
 def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, original_logger: logging.Logger):
+    if os.path.isdir(src_path):
+        src_path = replace_then_get_new_path(src_path, original_logger)
+
     basename = os.path.basename(src_path)
     logger = with_prefix(original_logger, f"{basename=}")
-
-    if os.path.isdir(src_path):
-        src_path = replace_then_get_new_path(src_path, logger)
-
     filename, _ = os.path.splitext(basename)
     fileid = "local" + hashlib.sha256(filename.encode()).hexdigest()
     size = os.stat(src_path).st_size
-    guess = mimetypes.guess_type(src_path)[0]
+    guess = mimetypes.guess_type(src_path)[0]  # TODO: use python-magic
 
     logger = with_prefix(logger, f"{fileid=}")
+    logger.info(f"{size=} {guess=}")
 
     result = cc.create_files([dict(
         fileid=fileid,
@@ -74,24 +74,22 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         sourceurl="local",
         storageservice="local",
         size=size,
+        lastopened=0,
+        mimetype=guess or ""
     )])
 
     if len(result["created"]) > 0:
         # Copy the file to the new location
         dst_path = os.path.join(data_dir, f"{fileid}.dec")
         shutil.copyfile(src_path, dst_path)
-
-        # Update the server
-        cc.update_file(dict(
-            fileid=fileid,
-            lastopened=0,
-            mimetype=guess
-        ))
+        logger.info("file copied")
 
         requests.post("http://api", json=[dst_path])
+        logger.info("api local cache updated")
     else:
         logger.warning("fileid already exists")
 
+    logger.info("file removed")
     os.remove(src_path)
 
 
