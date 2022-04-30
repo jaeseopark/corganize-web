@@ -61,6 +61,8 @@ const InnerGrid = () => {
   };
 
   const onKeyDown = (e: any) => {
+    if (e.shiftKey || e.ctrlKey) return;
+
     const key = e.key.toLowerCase();
     if (key === "e") {
       openFile(firstLocalFile);

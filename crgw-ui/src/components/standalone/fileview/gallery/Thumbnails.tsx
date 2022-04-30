@@ -33,9 +33,12 @@ const Thumbnails = ({
       className={cls("thumbnails-view", { "summary-mode": isSummaryMode })}
       minChildWidth={isSummaryMode ? "150px" : "400px"}
       spacing={isSummaryMode ? 2 : 6}
-      onKeyDown={(e) => handleKey(e.key.toLowerCase())}
       tabIndex={1}
       ref={mainRef}
+      onKeyDown={(e) => {
+        if (e.shiftKey || e.ctrlKey) return;
+        handleKey(e.key.toLowerCase());
+      }}
     >
       {imageUrls.map((src, i) => {
         const isCurrent = i === currentIndex;

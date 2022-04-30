@@ -70,6 +70,10 @@ const FileView = ({ fileid }: { fileid: string }) => {
   });
 
   const onKeyDown = (e: any) => {
+    if (e.shiftKey || e.ctrlKey) {
+      return;
+    }
+
     const key = e.key.toLowerCase();
     if (key === "w") {
       toggleActivationWithToast();

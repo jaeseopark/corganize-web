@@ -68,8 +68,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   };
 
   const onKeyDown = (e: any) => {
-    const { target: vid, shiftKey } = e;
+    const { target: vid, shiftKey, ctrlKey } = e;
     const key = e.key.toLowerCase();
+
+    if (ctrlKey) return;
 
     const addHighlight = () => {
       highlightManager.add(Math.floor(vid.currentTime));
@@ -100,6 +102,14 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       if (nextHighlight !== null) vid.currentTime = nextHighlight;
     };
 
+    if (shiftKey) {
+      if (SEEK_HOTKEY_MAP[key]) {
+        jumpTimeByDelta(SEEK_HOTKEY_MAP[key] * 2);
+      } else {
+        return;
+      }
+    }
+
     if (key === "e") {
       if (highlightManager.isEmpty()) {
         jumpTimeByDelta(vid.duration / 10); // jump by 10%
@@ -109,17 +119,13 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "m") {
       vid.muted = !vid.muted;
     } else if (key === "r") {
-      if (shiftKey) {
-        resetRotation();
-      } else {
-        quarterRotation();
-      }
+      quarterRotation();
     } else if (key === "b") {
       addHighlight();
     } else if (key >= "0" && key <= "9") {
       jumpTimeByPercentage(parseInt(key, 10) / 10);
     } else if (SEEK_HOTKEY_MAP[key]) {
-      jumpTimeByDelta(SEEK_HOTKEY_MAP[key] * (shiftKey ? 2 : 1));
+      jumpTimeByDelta(SEEK_HOTKEY_MAP[key]);
     } else if (key === "[") {
       vid.currentTime = 0;
     }

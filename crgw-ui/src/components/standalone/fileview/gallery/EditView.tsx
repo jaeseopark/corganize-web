@@ -40,7 +40,10 @@ const EditViewHOC = (Inner: GalleryRenderer) => (props: GalleryProps) => {
   };
 
   return (
-    <div onKeyDown={(e) => handleKey(e.key.toLowerCase())}>
+    <div onKeyDown={(e) => {
+      if (e.shiftKey || e.ctrlKey) return;
+      handleKey(e.key.toLowerCase());
+    }}>
       <EditControls {...props} />
       <Inner {...props} />
     </div>

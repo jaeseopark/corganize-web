@@ -26,7 +26,10 @@ const Lightbox = ({
     <div
       className="lightbox-with-progress"
       tabIndex={1}
-      onKeyDown={(e) => handleKey(e.key.toLowerCase())}
+      onKeyDown={(e) => {
+        if (e.shiftKey || e.ctrlKey) return;
+        handleKey(e.key.toLowerCase());
+      }}
       ref={ref}
     >
       <Progress value={(currentIndex * 100) / imageUrls.length} />
