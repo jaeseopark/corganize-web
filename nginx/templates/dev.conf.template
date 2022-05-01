@@ -22,10 +22,9 @@ server {
         root /data;
     }
 
-    location /scrape {
-        if ($request_method = POST ) {
-            proxy_pass ${SCRAPE_HOST};
-            proxy_set_header Host ${SCRAPE_HOST};
-        }
+    location /redir/scrape {
+        rewrite /redir/(.*) /$1 break;
+        proxy_pass ${SCRAPE_HOST};
+        proxy_set_header Host ${SCRAPE_HOST};
     }
 }

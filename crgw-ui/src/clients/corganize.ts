@@ -166,7 +166,7 @@ class CorganizeClient {
       files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
 
     const scrapeSingleUrl = (url: string) =>
-      fetch("/scrape", {
+      fetch("/redir/scrape", {
         method: "POST",
         body: JSON.stringify({ url }),
         headers: {
