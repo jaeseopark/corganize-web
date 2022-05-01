@@ -27,11 +27,11 @@ export const useFileRepository = () => {
     dispatch!({ type: "ADD", payload: fs });
   };
 
-  const createThenAddFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
+  const createScrapedFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
     return getInstance()
       .createFiles(fs)
       .then(({ created, skipped }) => {
-        addFiles!([...created, ...skipped]);
+        addAll([...created, ...skipped]);
         return { created, skipped };
       });
   };
@@ -89,7 +89,7 @@ export const useFileRepository = () => {
     isMostRecentFile,
     mostRecentFile,
     addFiles,
-    createThenAddFiles,
+    createScrapedFiles,
     updateFile,
     markAsOpened,
     findById,
