@@ -4,6 +4,7 @@ import mimetypes
 import os
 import shutil
 
+import requests
 from commmons import get_file_handler, with_prefix
 from corganizeclient.client import CorganizeClient
 
@@ -82,6 +83,9 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
         dst_path = os.path.join(data_dir, f"{fileid}.dec")
         shutil.copyfile(src_path, dst_path)
         logger.info("file copied")
+
+        requests.post("http://api/files", json=[dst_path])
+        logger.info("api local cache updated")
     else:
         logger.warning("fileid already exists")
 

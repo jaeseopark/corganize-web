@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, request as freq, Response
 
-from crgw.handlers import get_local_files, teardown, forward_request
+from crgw.handlers import get_local_files, teardown, forward_request, add_local_files
 
 logging.basicConfig(format="%(asctime)s %(levelname)s thread=%(thread)d %(module)s.%(funcName)s %(message)s")
 logging.root.setLevel(logging.INFO)
@@ -17,6 +17,12 @@ app = Flask(__name__)
 def get_files():
     files = get_local_files()
     return dict(files=files), 200
+
+
+@app.post("/files")
+def add_files():
+    add_local_files(freq.get_json())
+    return "", 200
 
 
 @app.route("/remote/<path:subpath>")
