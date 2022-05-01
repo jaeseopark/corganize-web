@@ -1,4 +1,5 @@
 import { Button, Center, HStack } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 import { isHotkeyEnabled, useBlanket } from "providers/blanket/hook";
 
@@ -40,7 +41,8 @@ const Footer = () => {
 };
 
 const BlanketPortal = () => {
-  const { isBlanketEnabled, exitBlanket } = useBlanket();
+  const { isBlanketEnabled } = useBlanket();
+  const navigate = useNavigate();
 
   if (!isBlanketEnabled) {
     return null;
@@ -48,7 +50,7 @@ const BlanketPortal = () => {
 
   const handleKey = (key: string) => {
     if (key === "q") {
-      exitBlanket();
+      navigate("/");
     }
   };
 

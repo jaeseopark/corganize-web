@@ -1,6 +1,6 @@
 import { SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -11,19 +11,16 @@ import { useToast } from "providers/toast/hook";
 
 import { madFocus } from "utils/elementUtils";
 
-import FileMetadataView from "components/standalone/fileview/FileMetadataView";
-import FileView from "components/standalone/fileview/FileView";
 import Card from "components/standalone/grid/Card";
-import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 const GridView = () => {
   const {
     fileProps: { files },
   } = useGrid();
   const { mostRecentFile, toggleActivation } = useFileRepository();
-  const { setBlanket, isBlanketEnabled } = useBlanket();
+  const { isBlanketEnabled } = useBlanket();
   const { enqueueSuccess } = useToast();
-  const history = useHistory();
+  const navigate = useNavigate();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
 
   const refocus = () => madFocus(gridRef.current);
@@ -38,33 +35,18 @@ const GridView = () => {
 
   const openFile = (file?: CorganizeFile) => {
     if (!file) return;
-
-    const { fileid } = file;
-    setBlanket({
-      fileid,
-      body: <FileView fileid={fileid} />,
-      onClose: refocus,
-    });
+    navigate(`/file/${file.fileid}/content`);
   };
 
   const openJsonEditor = (file?: CorganizeFile) => {
     if (!file) return;
-    setBlanket({
-      fileid: file.fileid,
-      body: <FileMetadataView file={file} />,
-      onClose: refocus,
-    });
+    navigate(`/file/${file.fileid}/info`);
   };
 
   const openScrapePanel = (file?: CorganizeFile) => {
     if (!file) return;
-
-    // setBlanket({
-    //   title: "Scrape",
-    //   body: <ScrapePanel />,
-    //   onClose: refocus,
-    // });
-  }; //defaultUrls={[file.sourceurl]}
+    navigate(`/scrape?urls=${file.sourceurl}`);
+  };
 
   const onKeyDown = (e: any) => {
     if (e.shiftKey || e.ctrlKey) return;

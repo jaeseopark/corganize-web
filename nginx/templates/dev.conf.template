@@ -23,7 +23,9 @@ server {
     }
 
     location /scrape {
-        proxy_pass ${SCRAPE_HOST};
-        proxy_set_header Host ${SCRAPE_HOST};
+        if ($request_method = POST ) {
+            proxy_pass ${SCRAPE_HOST};
+            proxy_set_header Host ${SCRAPE_HOST};
+        }
     }
 }

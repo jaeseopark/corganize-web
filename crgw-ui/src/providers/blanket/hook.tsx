@@ -1,5 +1,6 @@
 import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { BlanketContext, UserAction } from "providers/blanket/blanket";
 
@@ -12,7 +13,6 @@ type SetBlanketProps = RequireOnlyOne<
     title: string;
     fileid: string;
     body: JSX.Element;
-    onClose?: () => void;
     userActions?: UserAction[];
   },
   "title" | "fileid"
@@ -22,23 +22,27 @@ export let isHotkeyEnabled = true;
 
 export const useBlanket = () => {
   const {
-    state: { title, body, onClose, userActions },
+    state: { title, body, userActions },
     dispatch,
   } = useContext(BlanketContext);
-  const isBlanketEnabled = !!title && !!body;
+  const nagivate = useNavigate();
 
-  const setBlanket = ({ title, fileid, body, onClose, userActions }: SetBlanketProps) => {
+  const isBlanketEnabled = !!title && !!body;
+  const exitBlanket = () => dispatch!({ type: "UNSET" });
+
+  const setBlanket = ({ title, fileid, body, userActions }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
-      onClick: () => dispatch!({ type: "UNSET" }),
+      onClick: () => {
+        nagivate("/");
+      },
     };
 
     const payload = {
       title: title || <FileHeader fileid={fileid!} />,
       body,
       userActions: userActions || [defaultUserAction],
-      onClose,
     };
 
     dispatch!({ type: "SET", payload });
@@ -54,8 +58,6 @@ export const useBlanket = () => {
       },
     });
 
-  const exitBlanket = () => dispatch!({ type: "UNSET" });
-
   const enableHotkey = () => {
     isHotkeyEnabled = true;
   };
@@ -68,7 +70,6 @@ export const useBlanket = () => {
     title,
     body,
     userActions,
-    onClose,
     isBlanketEnabled,
     isHotkeyEnabled,
     setBlanket,
