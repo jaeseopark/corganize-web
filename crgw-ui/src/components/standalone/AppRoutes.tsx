@@ -25,9 +25,14 @@ const ScrapeRouteHandler = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    let urls;
+    if (searchParams.has("urls")) {
+      urls = window.atob(searchParams.get("urls")!).split(",");
+    }
+
     setBlanket({
       title: "Scrape",
-      body: <ScrapePanel defaultUrls={searchParams.get("urls")?.split(",")} />,
+      body: <ScrapePanel defaultUrls={urls} />,
     });
   }, []);
   return <Fragment />;
