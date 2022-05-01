@@ -1,5 +1,6 @@
 import { Divider, SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
+import { StringParam, useQueryParam } from "use-query-params";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -23,10 +24,11 @@ const InnerGrid = () => {
   const {
     fileProps: { files },
   } = useGrid();
-  const { mostRecentFile, toggleActivation } = useFileRepository();
+  const { mostRecentFile, toggleActivation, findById } = useFileRepository();
   const { setBlanket } = useBlanket();
-  const { enqueueSuccess } = useToast();
+  const { enqueueSuccess, enqueueWarning } = useToast();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
+  const [targetedFileid] = useQueryParam("id", StringParam);
 
   const refocus = () => madFocus(gridRef.current);
 
@@ -86,22 +88,16 @@ const InnerGrid = () => {
     }
   };
 
-  const renderCards = () => {
-    if (files.length === 0) {
-      return <label>No files available</label>;
+  useEffect(() => {
+    if (targetedFileid) {
+      const file = findById(targetedFileid);
+      if (file) {
+        openFile(file);
+      } else {
+        enqueueWarning({ header: "Not found", message: `File w/ ID ${targetedFileid}` });
+      }
     }
-
-    return files.map((f, i) => (
-      <Card
-        key={f.fileid}
-        fileid={f.fileid}
-        index={i}
-        openFile={openFile}
-        openScrapePanel={openScrapePanel}
-        openJsonEditor={openJsonEditor}
-      />
-    ));
-  };
+  }, [targetedFileid]);
 
   return (
     <SimpleGrid
@@ -114,7 +110,16 @@ const InnerGrid = () => {
       outline="none"
       marginY="1em"
     >
-      {renderCards()}
+      {files.map((f, i) => (
+        <Card
+          key={f.fileid}
+          fileid={f.fileid}
+          index={i}
+          openFile={openFile}
+          openScrapePanel={openScrapePanel}
+          openJsonEditor={openJsonEditor}
+        />
+      ))}
     </SimpleGrid>
   );
 };
