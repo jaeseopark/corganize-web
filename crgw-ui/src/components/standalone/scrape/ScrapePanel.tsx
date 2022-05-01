@@ -22,7 +22,7 @@ type ScrapePanelProps = {
 };
 
 const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
-  const { createThenAddFiles } = useFileRepository();
+  const { createScrapedFiles } = useFileRepository();
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
 
   const [isProcessing, setProcessing] = useState(false);
@@ -98,19 +98,21 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
       return res;
     };
 
-    setProcessing(true);
-    createThenAddFiles(files)
-      .then(displayToasts)
-      .then(({ created, skipped }) => {
-        const updateCardStatus = (f: CorganizeFile, status: string, errorString?: string) => {
-          const card = cards.find((c) => c.file.fileid === f.fileid) as Card;
-          card.status = status;
-          card.error = errorString;
-        };
+    const updateCardStatus = ({ created, skipped }: CreateResponse) => {
+      const updateCardStatus = (f: CorganizeFile, status: string, errorString?: string) => {
+        const card = cards.find((c) => c.file.fileid === f.fileid) as Card;
+        card.status = status;
+        card.error = errorString;
+      };
 
-        created.forEach((f) => updateCardStatus(f, CARD_STATUS.COMPLETE));
-        skipped.forEach((f) => updateCardStatus(f, CARD_STATUS.ERROR, "already exists"));
-      })
+      created.forEach((f) => updateCardStatus(f, CARD_STATUS.COMPLETE));
+      skipped.forEach((f) => updateCardStatus(f, CARD_STATUS.ERROR, "already exists"));
+    };
+
+    setProcessing(true);
+    createScrapedFiles(files)
+      .then(displayToasts)
+      .then(updateCardStatus)
       .catch(({ message }: Error) => enqueueError({ message }))
       .finally(() => setProcessing(false));
   };
