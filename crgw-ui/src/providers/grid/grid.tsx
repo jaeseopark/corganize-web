@@ -4,14 +4,17 @@ import { gridReducer } from "providers/grid/reducer";
 import { Action, State } from "providers/grid/types";
 
 import { fieldDateActivated, fieldLastOpened, fieldMimetype, fieldNew, fieldSize } from "./fields";
+import { ALL_PRESETS } from "./presets";
+
+const [defaultPreset] = ALL_PRESETS;
 
 const initialState: State = {
   files: [],
   filteredAndSorted: [],
   filteredSortedAndPaginated: [],
   fields: [fieldNew, fieldDateActivated, fieldLastOpened, fieldMimetype, fieldSize],
-  filters: [],
-  sorts: [],
+  filters: defaultPreset.filters,
+  sorts: defaultPreset.sorts,
   prefilter: "",
   page: {
     index: 0,
