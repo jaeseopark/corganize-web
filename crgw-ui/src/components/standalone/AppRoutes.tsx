@@ -1,5 +1,5 @@
 import { Fragment, useEffect } from "react";
-import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
@@ -22,11 +22,12 @@ const BlanketResetter = () => {
 
 const ScrapeRouteHandler = () => {
   const { setBlanket } = useBlanket();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     setBlanket({
       title: "Scrape",
-      body: <ScrapePanel />,
+      body: <ScrapePanel defaultUrls={searchParams.get("urls")?.split(",")} />,
     });
   }, []);
   return <Fragment />;

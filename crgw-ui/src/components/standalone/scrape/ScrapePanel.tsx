@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -18,10 +17,11 @@ import { CARD_STATUS, Card } from "components/standalone/scrape/ScrapePanelCardV
 
 import "./ScrapePanel.scss";
 
-const ScrapePanel = () => {
-  const [searchParams] = useSearchParams();
-  const defaultUrls = searchParams.get("urls")?.split(",");
+type ScrapePanelProps = {
+  defaultUrls?: string[];
+};
 
+const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const { createThenAddFiles } = useFileRepository();
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
 

@@ -26,7 +26,7 @@ const MainView = () => {
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const {
-    fileProps: { setFiles },
+    fileProps: { setFiles: setGridFiles },
   } = useGrid();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const MainView = () => {
 
   useEffect(() => {
     if (files && files.length > 0) {
-      setFiles(files);
+      setGridFiles(files);
     }
   }, [files]);
 
