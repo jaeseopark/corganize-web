@@ -1,80 +1,12 @@
 import { Button, Center, SimpleGrid } from "@chakra-ui/react";
-import { useEffect } from "react";
 
-import {
-  fieldDateActivated,
-  fieldLastOpened,
-  fieldMimetype,
-  fieldNew,
-  fieldSize,
-} from "providers/grid/fields";
 import { useGrid } from "providers/grid/hook";
-import { Preset } from "providers/grid/types";
-
-const PRESET_DEFAULT: Preset = {
-  name: "Default",
-  filters: [
-    {
-      field: fieldNew,
-      boolean: {
-        value: "checked",
-      },
-    },
-    {
-      field: fieldMimetype,
-      boolean: {
-        value: "checked",
-      },
-    },
-    {
-      field: fieldDateActivated,
-      boolean: {
-        value: "checked",
-      },
-    },
-  ],
-  sorts: [
-    {
-      field: fieldSize,
-      direction: "desc",
-    },
-  ],
-};
-
-const PRESET_REVIEW: Preset = {
-  name: "Review",
-  filters: [
-    {
-      field: fieldNew,
-      boolean: {
-        value: "unchecked",
-      },
-    },
-    {
-      field: fieldDateActivated,
-      boolean: {
-        value: "checked",
-      },
-    },
-  ],
-  sorts: [
-    {
-      field: fieldLastOpened,
-      direction: "desc",
-    },
-  ],
-};
-
-const ALL_PRESETS: Preset[] = [PRESET_DEFAULT, PRESET_REVIEW];
+import { ALL_PRESETS } from "providers/grid/presets";
 
 const PresetBar = () => {
   const {
     fieldProps: { setPreset },
   } = useGrid();
-
-  useEffect(() => {
-    setPreset(PRESET_DEFAULT);
-  }, []);
 
   return (
     <Center className="preset-bar">
