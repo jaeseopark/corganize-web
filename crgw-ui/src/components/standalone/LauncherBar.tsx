@@ -19,10 +19,7 @@ const LauncherBar = () => {
 
   const openScrape = () => {
     onClose();
-    setBlanket({
-      title: "Scrape",
-      body: <ScrapePanel />,
-    });
+    // TODO open scrape
   };
 
   return (

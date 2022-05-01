@@ -1,6 +1,6 @@
-import { Divider, SimpleGrid } from "@chakra-ui/react";
+import { SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
-import { StringParam, useQueryParam } from "use-query-params";
+import { useHistory } from "react-router-dom";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -14,23 +14,25 @@ import { madFocus } from "utils/elementUtils";
 import FileMetadataView from "components/standalone/fileview/FileMetadataView";
 import FileView from "components/standalone/fileview/FileView";
 import Card from "components/standalone/grid/Card";
-import GlobalSearch from "components/standalone/grid/GlobalSearch";
-import PageControl from "components/standalone/grid/PageControl";
-import PresetBar from "components/standalone/grid/PresetBar";
-import FieldBar from "components/standalone/grid/field/FieldBar";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
-const InnerGrid = () => {
+const GridView = () => {
   const {
     fileProps: { files },
   } = useGrid();
-  const { mostRecentFile, toggleActivation, findById } = useFileRepository();
-  const { setBlanket } = useBlanket();
-  const { enqueueSuccess, enqueueWarning } = useToast();
+  const { mostRecentFile, toggleActivation } = useFileRepository();
+  const { setBlanket, isBlanketEnabled } = useBlanket();
+  const { enqueueSuccess } = useToast();
+  const history = useHistory();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
-  const 
 
   const refocus = () => madFocus(gridRef.current);
+
+  useEffect(() => {
+    if (!isBlanketEnabled) {
+      refocus();
+    }
+  }, [isBlanketEnabled]);
 
   const [firstLocalFile] = files.filter((f) => f.streamingurl);
 
@@ -56,12 +58,13 @@ const InnerGrid = () => {
 
   const openScrapePanel = (file?: CorganizeFile) => {
     if (!file) return;
-    setBlanket({
-      title: "Scrape",
-      body: <ScrapePanel defaultUrls={[file.sourceurl]} />,
-      onClose: refocus,
-    });
-  };
+
+    // setBlanket({
+    //   title: "Scrape",
+    //   body: <ScrapePanel />,
+    //   onClose: refocus,
+    // });
+  }; //defaultUrls={[file.sourceurl]}
 
   const onKeyDown = (e: any) => {
     if (e.shiftKey || e.ctrlKey) return;
@@ -88,21 +91,10 @@ const InnerGrid = () => {
     }
   };
 
-  useEffect(() => {
-    if (targetedFileid) {
-      const file = findById(targetedFileid);
-      if (file) {
-        openFile(file);
-      } else {
-        enqueueWarning({ header: "Not found", message: `File w/ ID ${targetedFileid}` });
-      }
-    }
-  }, [targetedFileid]);
-
   return (
     <SimpleGrid
       tabIndex={1}
-      className="inner-grid"
+      className="grid-view"
       onKeyDown={onKeyDown}
       ref={gridRef}
       columns={[1, 2, 3, 4, 5]}
@@ -121,32 +113,6 @@ const InnerGrid = () => {
         />
       ))}
     </SimpleGrid>
-  );
-};
-
-const GridView = () => {
-  const { files } = useFileRepository();
-  const {
-    fileProps: { setFiles },
-  } = useGrid();
-
-  useEffect(() => {
-    if (files && files.length > 0) {
-      setFiles(files);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files]);
-
-  return (
-    <div className="grid-view">
-      <PresetBar />
-      <Divider marginY=".5em" />
-      <FieldBar />
-      <GlobalSearch />
-      <PageControl />
-      <InnerGrid />
-      <PageControl />
-    </div>
   );
 };
 
