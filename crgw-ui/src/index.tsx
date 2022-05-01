@@ -1,6 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { Route, BrowserRouter as Router } from "react-router-dom";
-import { QueryParamProvider } from "use-query-params";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import App from "./App";
 import "./index.css";
@@ -9,11 +8,13 @@ import reportWebVitals from "./reportWebVitals";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
-  <Router>
-    <QueryParamProvider ReactRouterRoute={Route}>
-      <App />
-    </QueryParamProvider>
-  </Router>
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<App />} />
+      {/* <Route path="files/:fileid" element={<App />} />
+      <Route path="scrape" element={<App />} /> */}
+    </Routes>
+  </BrowserRouter>
 );
 
 // root.render(

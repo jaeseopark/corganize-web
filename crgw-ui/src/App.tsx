@@ -1,4 +1,9 @@
 import { ChakraProvider } from "@chakra-ui/react";
+import {
+  ExtendedStringifyOptions,
+  QueryParamProvider,
+  transformSearchStringJsonSafe,
+} from "use-query-params";
 
 import BlanketProvider from "providers/blanket/blanket";
 import BlanketPortal from "providers/blanket/portal";
@@ -10,6 +15,10 @@ import MainView from "components/standalone/MainView";
 
 import "./App.scss";
 
+const queryStringifyOptions: ExtendedStringifyOptions = {
+  transformSearchString: transformSearchStringJsonSafe,
+};
+
 const App = () => (
   <div>
     <ToastPortal />
@@ -19,15 +28,17 @@ const App = () => (
 );
 
 const AppWithProviders = () => (
-  <FileRepositoryProvider>
-    <ChakraProvider>
-      <ToastProvider>
-        <BlanketProvider>
-          <App />
-        </BlanketProvider>
-      </ToastProvider>
-    </ChakraProvider>
-  </FileRepositoryProvider>
+  <QueryParamProvider stringifyOptions={queryStringifyOptions}>
+    <FileRepositoryProvider>
+      <ChakraProvider>
+        <ToastProvider>
+          <BlanketProvider>
+            <App />
+          </BlanketProvider>
+        </ToastProvider>
+      </ChakraProvider>
+    </FileRepositoryProvider>
+  </QueryParamProvider>
 );
 
 export default AppWithProviders;

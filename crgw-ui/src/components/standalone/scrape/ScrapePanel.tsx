@@ -1,3 +1,4 @@
+import { useNav } from "hooks/nav";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
@@ -17,11 +18,8 @@ import { CARD_STATUS, Card } from "components/standalone/scrape/ScrapePanelCardV
 
 import "./ScrapePanel.scss";
 
-type ScrapePanelProps = {
-  defaultUrls?: string[];
-};
-
-const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
+const ScrapePanel = () => {
+  const { scrapeUrls } = useNav();
   const { createThenAddFiles } = useFileRepository();
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
 
@@ -31,7 +29,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const [rawScrapeCount, setRawScrapeCount] = useState(0);
   const mainDivRef = useRef<HTMLDivElement | null>(null);
 
-  const [url, setUrl] = useState<string>(defaultUrls ? defaultUrls.join(",") : "");
+  const [url, setUrl] = useState<string>(scrapeUrls ? scrapeUrls.join(",") : "");
 
   const scrape = useCallback(
     (event?: Event) => {
@@ -69,7 +67,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   );
 
   useEffect(() => {
-    if (defaultUrls) {
+    if (scrapeUrls) {
       scrape();
     }
   }, []);

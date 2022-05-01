@@ -28,7 +28,7 @@ const InnerGrid = () => {
   const { setBlanket } = useBlanket();
   const { enqueueSuccess, enqueueWarning } = useToast();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
-  const [targetedFileid] = useQueryParam("id", StringParam);
+  const 
 
   const refocus = () => madFocus(gridRef.current);
 
