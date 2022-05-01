@@ -3,6 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import BlanketProvider from "providers/blanket/blanket";
 import BlanketPortal from "providers/blanket/portal";
 import FileRepositoryProvider from "providers/fileRepository/fileRepository";
+import GridProvider from "providers/grid/grid";
 import ToastPortal from "providers/toast/portal";
 import ToastProvider from "providers/toast/toast";
 
@@ -23,7 +24,9 @@ const AppWithProviders = () => (
     <ChakraProvider>
       <ToastProvider>
         <BlanketProvider>
-          <App />
+          <GridProvider>
+            <App />
+          </GridProvider>
         </BlanketProvider>
       </ToastProvider>
     </ChakraProvider>

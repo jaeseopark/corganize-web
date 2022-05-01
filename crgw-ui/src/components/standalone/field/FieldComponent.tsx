@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { useGrid } from "providers/grid/hook";
 import { Field, Filter, SortDirection } from "providers/grid/types";
 
-import BooleanControl from "components/standalone/grid/field/BooleanControl";
+import BooleanControl from "components/standalone/field/BooleanControl";
 
 const rotate = (direction: SortDirection): SortDirection | undefined => {
   if (direction === "desc") return "asc";

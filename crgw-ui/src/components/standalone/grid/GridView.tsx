@@ -1,5 +1,6 @@
-import { Divider, SimpleGrid } from "@chakra-ui/react";
+import { SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -10,55 +11,41 @@ import { useToast } from "providers/toast/hook";
 
 import { madFocus } from "utils/elementUtils";
 
-import FileMetadataView from "components/standalone/fileview/FileMetadataView";
-import FileView from "components/standalone/fileview/FileView";
 import Card from "components/standalone/grid/Card";
-import GlobalSearch from "components/standalone/grid/GlobalSearch";
-import PageControl from "components/standalone/grid/PageControl";
-import PresetBar from "components/standalone/grid/PresetBar";
-import FieldBar from "components/standalone/grid/field/FieldBar";
-import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
-const InnerGrid = () => {
+const GridView = () => {
   const {
     fileProps: { files },
   } = useGrid();
   const { mostRecentFile, toggleActivation } = useFileRepository();
-  const { setBlanket } = useBlanket();
+  const { isBlanketEnabled } = useBlanket();
   const { enqueueSuccess } = useToast();
+  const navigate = useNavigate();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
 
   const refocus = () => madFocus(gridRef.current);
+
+  useEffect(() => {
+    if (!isBlanketEnabled) {
+      refocus();
+    }
+  }, [isBlanketEnabled]);
 
   const [firstLocalFile] = files.filter((f) => f.streamingurl);
 
   const openFile = (file?: CorganizeFile) => {
     if (!file) return;
-
-    const { fileid } = file;
-    setBlanket({
-      fileid,
-      body: <FileView fileid={fileid} />,
-      onClose: refocus,
-    });
+    navigate(`/file/${file.fileid}/content`);
   };
 
   const openJsonEditor = (file?: CorganizeFile) => {
     if (!file) return;
-    setBlanket({
-      fileid: file.fileid,
-      body: <FileMetadataView file={file} />,
-      onClose: refocus,
-    });
+    navigate(`/file/${file.fileid}/info`);
   };
 
   const openScrapePanel = (file?: CorganizeFile) => {
     if (!file) return;
-    setBlanket({
-      title: "Scrape",
-      body: <ScrapePanel defaultUrls={[file.sourceurl]} />,
-      onClose: refocus,
-    });
+    navigate(`/scrape?urls=${file.sourceurl}`);
   };
 
   const onKeyDown = (e: any) => {
@@ -86,27 +73,10 @@ const InnerGrid = () => {
     }
   };
 
-  const renderCards = () => {
-    if (files.length === 0) {
-      return <label>No files available</label>;
-    }
-
-    return files.map((f, i) => (
-      <Card
-        key={f.fileid}
-        fileid={f.fileid}
-        index={i}
-        openFile={openFile}
-        openScrapePanel={openScrapePanel}
-        openJsonEditor={openJsonEditor}
-      />
-    ));
-  };
-
   return (
     <SimpleGrid
       tabIndex={1}
-      className="inner-grid"
+      className="grid-view"
       onKeyDown={onKeyDown}
       ref={gridRef}
       columns={[1, 2, 3, 4, 5]}
@@ -114,34 +84,17 @@ const InnerGrid = () => {
       outline="none"
       marginY="1em"
     >
-      {renderCards()}
+      {files.map((f, i) => (
+        <Card
+          key={f.fileid}
+          fileid={f.fileid}
+          index={i}
+          openFile={openFile}
+          openScrapePanel={openScrapePanel}
+          openJsonEditor={openJsonEditor}
+        />
+      ))}
     </SimpleGrid>
-  );
-};
-
-const GridView = () => {
-  const { files } = useFileRepository();
-  const {
-    fileProps: { setFiles },
-  } = useGrid();
-
-  useEffect(() => {
-    if (files && files.length > 0) {
-      setFiles(files);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files]);
-
-  return (
-    <div className="grid-view">
-      <PresetBar />
-      <Divider marginY=".5em" />
-      <FieldBar />
-      <GlobalSearch />
-      <PageControl />
-      <InnerGrid />
-      <PageControl />
-    </div>
   );
 };
 

@@ -2,7 +2,7 @@ import { Wrap, WrapItem } from "@chakra-ui/react";
 
 import { useGrid } from "providers/grid/hook";
 
-import FieldComponent from "components/standalone/grid/field/FieldComponent";
+import FieldComponent from "components/standalone/field/FieldComponent";
 
 const FieldBar = () => {
   const {
