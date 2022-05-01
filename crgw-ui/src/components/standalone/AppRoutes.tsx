@@ -1,11 +1,14 @@
 import { Fragment, useEffect } from "react";
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import { useBlanket } from "providers/blanket/hook";
+import { useFileRepository } from "providers/fileRepository/hook";
 
 import FileMetadataView from "./fileview/FileMetadataView";
 import FileView from "./fileview/FileView";
 import ScrapePanel from "./scrape/ScrapePanel";
+
+type FileRenderer = ({ fileid }: { fileid: string }) => JSX.Element;
 
 const BlanketResetter = () => {
   const { exitBlanket } = useBlanket();
@@ -29,32 +32,21 @@ const ScrapeRouteHandler = () => {
   return <Fragment />;
 };
 
-const FileContentHandler = () => {
+const FileHandler = ({ renderer: Renderer }: { renderer: FileRenderer }) => {
   const { setBlanket } = useBlanket();
   const params = useParams();
+  const navigate = useNavigate();
+  const { findById } = useFileRepository();
 
   useEffect(() => {
-    if (params.fileid) {
+    const file = findById(params.fileid || "");
+    if (file) {
       setBlanket({
-        fileid: params.fileid,
-        body: <FileView fileid={params.fileid} />,
+        fileid: file.fileid,
+        body: <Renderer fileid={file.fileid} />,
       });
-    }
-  }, []);
-
-  return <Fragment />;
-};
-
-const FileInfoHandler = () => {
-  const { setBlanket } = useBlanket();
-  const params = useParams();
-
-  useEffect(() => {
-    if (params.fileid) {
-      setBlanket({
-        fileid: params.fileid,
-        body: <FileMetadataView fileid={params.fileid} />,
-      });
+    } else {
+      navigate("/");
     }
   }, []);
 
@@ -66,8 +58,8 @@ const AppRoutes = () => (
     <Route path="*" element={<Navigate to="/" replace />} />
     <Route path="/" element={<BlanketResetter />} />
     <Route path="/scrape" element={<ScrapeRouteHandler />} />
-    <Route path="/file/:fileid/content" element={<FileContentHandler />} />
-    <Route path="/file/:fileid/info" element={<FileInfoHandler />} />
+    <Route path="/file/:fileid/content" element={<FileHandler renderer={FileView} />} />
+    <Route path="/file/:fileid/info" element={<FileHandler renderer={FileMetadataView} />} />
   </Routes>
 );
 
