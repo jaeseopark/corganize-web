@@ -3,6 +3,12 @@
 
   .control-bar {
     margin-bottom: 10px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    background: white;
 
     input[type="text"] {
       flex: 1;

@@ -45,7 +45,7 @@ const GridView = () => {
 
   const openScrapePanel = (file?: CorganizeFile) => {
     if (!file) return;
-    navigate(`/scrape?urls=${file.sourceurl}`);
+    navigate(`/scrape?urls=${window.btoa(file.sourceurl)}`);
   };
 
   const onKeyDown = (e: any) => {
