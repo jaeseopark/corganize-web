@@ -26,14 +26,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   const { multimedia, streamingurl, mimetype } = findById(fileid);
 
   const { enqueue, enqueueSuccess } = useToast();
-  const [rotationDegrees, setRotationDegrees] = useState(0);
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
   );
-
-  const quarterRotation = () => setRotationDegrees(rotationDegrees + 90);
-  const resetRotation = () => setRotationDegrees(0);
 
   const updateMultimedia = useCallback(
     (newProps: Partial<Multimedia>) => {
@@ -121,8 +117,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       }
     } else if (key === "m") {
       vid.muted = !vid.muted;
-    } else if (key === "r") {
-      quarterRotation();
     } else if (key === "b") {
       addHighlight();
     } else if (key >= "0" && key <= "9") {
@@ -136,7 +130,16 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
   return (
     <div className="video-view">
-      <video onKeyDown={onKeyDown} onLoadedMetadata={onMetadata} muted autoPlay loop controls>
+      <video
+        onKeyDown={onKeyDown}
+        onLoadedMetadata={onMetadata}
+        muted
+        autoPlay
+        loop
+        controls
+        playsInline
+        webkit-playsinline
+      >
         <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
       </video>
     </div>
