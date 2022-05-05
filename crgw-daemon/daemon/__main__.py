@@ -23,7 +23,7 @@ def run_daemon():
     for init_fs, init_logger, run_module in FUNCS:
         init_fs(config)
         init_logger(config)
-        t = Thread(target=run_cleaner, args=config)
+        t = Thread(target=run_cleaner, args=(config,))
         threads.append(t)
         t.start()
 
