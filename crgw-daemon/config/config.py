@@ -8,7 +8,8 @@ _OVERRIDE_PATH = "/mnt/config.yml"
 
 _DEFAULT = """
 log:
-  path: /mnt/watcher.log
+  watcher: /mnt/watcher.log
+  cleaner: /mnt/cleaner.log
 data:
   path: /data
 watch:

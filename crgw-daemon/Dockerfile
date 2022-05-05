@@ -9,6 +9,7 @@ RUN pip install -r requirements.txt
 COPY config/ config/
 COPY daemon/ daemon/
 COPY watcher/ watcher/
+COPY cleaner/ cleaner/
 RUN python setup.py install
 
 # Cleanup
