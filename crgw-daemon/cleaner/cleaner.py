@@ -1,0 +1,53 @@
+import logging
+import os
+from time import sleep
+
+from commmons import touch, get_file_handler
+from corganizeclient.client import CorganizeClient
+
+QUERY_LIMIT = 10000
+
+logger = logging.getLogger("cleaner")
+
+
+class CorganizeClientWrapper(CorganizeClient):
+    def get_recently_deactivated_filenames(self, data_path: str):
+        recent_files = self.get_recently_modified_files(limit=QUERY_LIMIT)
+        inactive_fileids = set([f["fileid"] for f in recent_files if f.get("dateactivated") is None])
+
+        def is_inactive(filename: str) -> bool:
+            return filename.split(".")[0] in inactive_fileids
+
+        local_filenames = os.listdir(data_path)
+        return [filename for filename in local_filenames if is_inactive(filename)]
+
+
+def cleanup_local_files(data_path: str, cc: CorganizeClientWrapper):
+    filenames = cc.get_recently_deactivated_filenames(data_path)
+    logger.info(f"{len(filenames)=}")
+
+    for filename in filenames:
+        logger.info(f"Delete: {filename}")
+        os.remove(os.path.join(data_path, filename))
+
+    reclaimed = [os.stat(os.path.join(data_path, filename)).st_size for filename in filenames]
+    reclaimed_gb = sum(reclaimed) / pow(10, 9)
+    logger.info(f"{reclaimed_gb=}")
+
+
+def run_cleaner(config: dict):
+    cc = CorganizeClientWrapper(**config["server"])
+
+    while True:
+        cleanup_local_files(config["data"]["path"], cc)
+        sleep(1800)
+
+
+def init_cleaner_fs(config: dict):
+    touch(config["log"]["cleaner"])
+
+
+def init_cleaner_logger(config: dict):
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+    logger.addHandler(get_file_handler(os.path.abspath(config["log"]["cleaner"])))

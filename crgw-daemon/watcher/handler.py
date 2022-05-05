@@ -5,8 +5,10 @@ import os
 import shutil
 
 import requests
-from commmons import get_file_handler, with_prefix
+from commmons import with_prefix
 from corganizeclient.client import CorganizeClient
+
+logger = logging.getLogger("watcher")
 
 
 def get_biggest_child(src_path: str, logger: logging.Logger):
@@ -96,12 +98,6 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
 def handle(src_path: str, config: dict):
     cc = CorganizeClient(**config["server"])
     data_dir = os.path.abspath(config["data"]["path"])
-
-    logger = logging.getLogger(__name__)
-    if not logger.hasHandlers():
-        logger.setLevel(logging.DEBUG)
-        logger.addHandler(logging.StreamHandler())
-        logger.addHandler(get_file_handler(os.path.abspath(config["log"]["path"])))
 
     try:
         _handle_single_file(src_path, data_dir, cc, logger)
