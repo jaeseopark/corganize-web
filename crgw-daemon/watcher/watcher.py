@@ -1,12 +1,16 @@
+import logging
 import os
 import time
 
-from commmons import touch_directory, touch
+from commmons import touch_directory, touch, get_file_handler
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 from watcher.handler import handle
-from config.config import get_config
+
+logger = logging.getLogger("watcher")
+logger.setLevel(logging.DEBUG)
+
 
 def run_observer_based_watcher(config: dict):
     my_observer = create_observer(config)
@@ -49,17 +53,20 @@ def run_polling_based_watcher(config: dict):
         time.sleep(watch_config["polling"]["interval"])
 
 
-def run_watcher():
-    config = get_config()
-    watch_config = config["watch"]
-
-    touch(config["log"]["path"])
-    touch_directory(os.path.abspath(watch_config["path"]))
-    touch_directory(os.path.abspath(config["data"]["path"]))
-
+def run_watcher(config: dict):
     func = {
         "observer": run_observer_based_watcher,
         "polling": run_polling_based_watcher
-    }.get(watch_config["type"])
+    }.get(config["watch"]["type"])
 
     func(config)
+
+
+def init_watcher_fs(config: dict):
+    touch(config["log"]["watcher"])
+    touch_directory(os.path.abspath(config["watch"]["path"]))
+
+
+def init_watcher_logger(config: dict):
+    logger.addHandler(logging.StreamHandler())
+    logger.addHandler(get_file_handler(os.path.abspath(config["log"]["watcher"])))
