@@ -1,8 +1,10 @@
 import { Fragment, useEffect } from "react";
-import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
+
+import { useNavv } from "hooks/navv";
 
 import FileMetadataView from "./fileview/FileMetadataView";
 import FileView from "./fileview/FileView";
@@ -41,7 +43,7 @@ const ScrapeRouteHandler = () => {
 const FileHandler = ({ renderer: Renderer }: { renderer: FileRenderer }) => {
   const { setBlanket } = useBlanket();
   const params = useParams();
-  const navigate = useNavigate();
+  const { navRoot } = useNavv();
   const { findById } = useFileRepository();
 
   useEffect(() => {
@@ -52,7 +54,7 @@ const FileHandler = ({ renderer: Renderer }: { renderer: FileRenderer }) => {
         body: <Renderer fileid={file.fileid} />,
       });
     } else {
-      navigate("/");
+      navRoot();
     }
   }, []);
 

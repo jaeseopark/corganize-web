@@ -1,4 +1,4 @@
-import { StarIcon } from "@chakra-ui/icons";
+import { SearchIcon, StarIcon } from "@chakra-ui/icons";
 import { useEffect, useRef, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
@@ -6,6 +6,8 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 import ToastPortal from "providers/toast/portal";
+
+import { useNavv } from "hooks/navv";
 
 import { madFocus } from "utils/elementUtils";
 
@@ -20,6 +22,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const { navScrape } = useNavv();
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
@@ -67,6 +70,11 @@ const FileView = ({ fileid }: { fileid: string }) => {
       icon: <StarIcon />,
       onClick: toggleActivationWithToast,
     });
+    upsertUserAction({
+      name: "Scrape",
+      icon: <SearchIcon />,
+      onClick: () => navScrape(file),
+    });
   });
 
   const onKeyDown = (e: any) => {
@@ -77,6 +85,8 @@ const FileView = ({ fileid }: { fileid: string }) => {
     const key = e.key.toLowerCase();
     if (key === "w") {
       toggleActivationWithToast();
+    } else if (key === "s") {
+      navScrape(file);
     } else if (key === "f") {
       if (handle.active) {
         handle.exit();
