@@ -4,6 +4,7 @@ module.exports = {
   importOrder: [
     "^typedefs\\/.*",
     "^providers\\/.*",
+    "^hooks\\/.*",
     "^bizlog\\/.*",
     "^clients\\/.*",
     "^shared\\/.*",

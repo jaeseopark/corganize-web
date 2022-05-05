@@ -1,6 +1,5 @@
 import { SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -8,6 +7,8 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
 import { useToast } from "providers/toast/hook";
+
+import { useNavv } from "hooks/navv";
 
 import { madFocus } from "utils/elementUtils";
 
@@ -20,8 +21,8 @@ const GridView = () => {
   const { mostRecentFile, toggleActivation } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { enqueueSuccess } = useToast();
-  const navigate = useNavigate();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
+  const { navContent, navScrape, navInfo } = useNavv();
 
   const refocus = () => madFocus(gridRef.current);
 
@@ -35,17 +36,17 @@ const GridView = () => {
 
   const openFile = (file?: CorganizeFile) => {
     if (!file) return;
-    navigate(`/file/${file.fileid}/content`);
+    navContent(file);
   };
 
   const openJsonEditor = (file?: CorganizeFile) => {
     if (!file) return;
-    navigate(`/file/${file.fileid}/info`);
+    navInfo(file);
   };
 
   const openScrapePanel = (file?: CorganizeFile) => {
     if (!file) return;
-    navigate(`/scrape?urls=${window.btoa(file.sourceurl)}`);
+    navScrape(file);
   };
 
   const onKeyDown = (e: any) => {
