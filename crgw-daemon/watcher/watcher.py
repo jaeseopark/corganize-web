@@ -44,20 +44,26 @@ def create_observer(config: dict):
 def run_polling_based_watcher(config: dict):
     watch_config = config["watch"]
     watch_path = os.path.abspath(watch_config["path"])
+    interval = watch_config["polling"]["interval"]
 
     while True:
         names = os.listdir(watch_path)
         for name in names:
             src_path = os.path.join(watch_path, name)
             handle(src_path, config)
-        time.sleep(watch_config["polling"]["interval"])
+
+        logger.info(f"sleeping until the next turn {interval=}")
+        time.sleep(interval)
 
 
 def run_watcher(config: dict):
+    key = config["watch"]["type"]
     func = {
         "observer": run_observer_based_watcher,
         "polling": run_polling_based_watcher
-    }.get(config["watch"]["type"])
+    }.get(key)
+
+    logger.info(f"{key=} {func.__name__=}")
 
     func(config)
 
