@@ -50,7 +50,7 @@ const PRESET_REVIEW: Preset = {
   sorts: [
     {
       field: fieldLastOpened,
-      direction: "desc",
+      direction: "asc",
     },
   ],
 };
