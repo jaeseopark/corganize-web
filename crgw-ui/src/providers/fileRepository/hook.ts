@@ -60,6 +60,13 @@ export const useFileRepository = () => {
     );
   };
 
+  const renew = (fileid: string) =>
+    updateFile({
+      fileid,
+      lastopened: 0,
+      isnewfile: true,
+    });
+
   /**
    * De/activates a file by its fileid.
    *
@@ -92,6 +99,7 @@ export const useFileRepository = () => {
     createScrapedFiles,
     updateFile,
     markAsOpened,
+    renew,
     findById,
     toggleActivation,
   };

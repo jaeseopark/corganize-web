@@ -11,7 +11,7 @@ const FileMetadataView = ({ fileid }: { fileid: string }) => {
   const { enableHotkey, disableHotkey, upsertUserAction } = useBlanket();
   const { enqueueSuccess, enqueueError } = useToast();
 
-  const { updateFile, findById } = useFileRepository();
+  const { updateFile, findById, renew } = useFileRepository();
   const file = findById(fileid);
 
   const [edit, setEdit] = useState<string>(JSON.stringify(file, null, 2));
@@ -23,13 +23,19 @@ const FileMetadataView = ({ fileid }: { fileid: string }) => {
       .catch((err) => enqueueError({ message: err.message }));
   };
 
+  const renewwww = () => renew(fileid).then(() => enqueueSuccess({ message: "Renewed" }));
+
   useEffect(() => {
     upsertUserAction({
       name: "Save",
       icon: <CheckIcon />,
       onClick: save,
     });
-  });
+    upsertUserAction({
+      name: "Renew",
+      onClick: renewwww,
+    });
+  }, []);
 
   return (
     <textarea
