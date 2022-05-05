@@ -24,15 +24,15 @@ class CorganizeClientWrapper(CorganizeClient):
 
 def cleanup_local_files(data_path: str, cc: CorganizeClientWrapper):
     filenames = cc.get_recently_deactivated_filenames(data_path)
-
-    reclaimed = [os.stat(os.path.join(data_path, filename)).st_size for filename in filenames]
-    reclaimed_gb = sum(reclaimed) / pow(10, 9)
-
-    logger.info(f"Files to delete: {len(filenames)=} {reclaimed_gb=}")
+    logger.info(f"{len(filenames)=}")
 
     for filename in filenames:
         logger.info(f"Delete: {filename}")
         os.remove(os.path.join(data_path, filename))
+
+    reclaimed = [os.stat(os.path.join(data_path, filename)).st_size for filename in filenames]
+    reclaimed_gb = sum(reclaimed) / pow(10, 9)
+    logger.info(f"{reclaimed_gb=}")
 
 
 def run_cleaner(config: dict):
