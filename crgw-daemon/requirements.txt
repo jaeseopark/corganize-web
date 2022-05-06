@@ -1,4 +1,4 @@
 PyYAML==5.3
 commmons==0.0.16
-corganizeclient==0.0.10
+corganizeclient==0.0.12
 watchdog==2.1.7

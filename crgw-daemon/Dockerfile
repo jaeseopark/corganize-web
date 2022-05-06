@@ -10,6 +10,7 @@ COPY config/ config/
 COPY daemon/ daemon/
 COPY watcher/ watcher/
 COPY cleaner/ cleaner/
+COPY scraper/ scraper/
 RUN python setup.py install
 
 # Cleanup

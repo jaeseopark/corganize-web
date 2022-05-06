@@ -1,6 +1,5 @@
 import logging
 import os
-from time import sleep
 
 from commmons import touch, get_file_handler
 from corganizeclient.client import CorganizeClient
@@ -37,17 +36,11 @@ def cleanup_local_files(data_path: str, cc: CorganizeClientWrapper):
 
 def run_cleaner(config: dict):
     cc = CorganizeClientWrapper(**config["server"])
-
-    while True:
-        cleanup_local_files(config["data"]["path"], cc)
-        sleep(1800)
+    cleanup_local_files(config["data"]["path"], cc)
 
 
-def init_cleaner_fs(config: dict):
+def init_cleaner(config: dict):
     touch(config["log"]["cleaner"])
-
-
-def init_cleaner_logger(config: dict):
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
     logger.addHandler(get_file_handler(os.path.abspath(config["log"]["cleaner"])))
