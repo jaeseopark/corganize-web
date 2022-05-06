@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from dataclasses import dataclass, field
-from typing import List, Callable, Generator
+from typing import List, Callable, Generator, Collection
 
 import requests
 from commmons import touch, get_file_handler, sample_size
@@ -16,7 +16,7 @@ class ScrapableEntry:
     url: str
     max_items: int = field(default=sys.maxsize)
 
-    def scrape(self, external_scrape_func: Callable[[str], List[dict]]) -> Generator[dict]:
+    def scrape(self, external_scrape_func: Callable[[str], List[dict]]) -> Generator[dict, None, None]:
         files = external_scrape_func(self.url)
         yield from [i for i in sample_size(files, self.max_items)]
 
@@ -25,15 +25,15 @@ def run_scraper(config: dict):
     cc = CorganizeClient(**config["server"])
     recent_files = cc.get_active_files(limit=config["scrape"]["quick_dedup"]["query_limit"], interval=15)
     recent_fileids = [f["fileid"] for f in recent_files]
-    banned_keywords: List[str] = [n.lower() for n in config["scrape"]["blacklist"]]
+    banned_keywords = set([n.lower() for n in config["scrape"]["blacklist"]])
 
-    def filt(files: Generator[dict]) -> Generator[dict]:
+    def filt(files: Collection[dict]) -> Generator[dict, None, None]:
         for file in files:
             if file["fileid"] in recent_fileids:
                 continue
 
             # TODO: use regex instead
-            if any([bkw in file["filename"].lower() for bkw in banned_keywords]):
+            if any([s in file["filename"].lower() for s in banned_keywords]):
                 continue
 
             yield file
@@ -44,6 +44,7 @@ def run_scraper(config: dict):
 
         if not r.ok:
             logger.error(r.text)
+            return []
 
         return r.json()["files"]
 
