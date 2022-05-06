@@ -1,33 +1,21 @@
 import logging
 import os
-import sys
-from dataclasses import dataclass, field
-from typing import List, Callable, Generator, Collection
+from typing import Iterable
 
 import requests
-from commmons import touch, get_file_handler, sample_size
+from commmons import touch, get_file_handler
 from corganizeclient.client import CorganizeClient
 
 logger = logging.getLogger("scraper")
 
 
-@dataclass
-class ScrapableEntry:
-    url: str
-    max_items: int = field(default=sys.maxsize)
-
-    def scrape(self, external_scrape_func: Callable[[str], List[dict]]) -> Generator[dict, None, None]:
-        files = external_scrape_func(self.url)
-        yield from [i for i in sample_size(files, self.max_items)]
-
-
 def run_scraper(config: dict):
     cc = CorganizeClient(**config["server"])
     recent_files = cc.get_active_files(limit=config["scrape"]["quick_dedup"]["query_limit"], interval=15)
-    recent_fileids = [f["fileid"] for f in recent_files]
+    recent_fileids = set([f["fileid"] for f in recent_files])
     banned_keywords = set([n.lower() for n in config["scrape"]["blacklist"]])
 
-    def filt(files: Collection[dict]) -> Generator[dict, None, None]:
+    def filt(files: Iterable[dict]) -> Iterable[dict]:
         for file in files:
             if file["fileid"] in recent_fileids:
                 continue
@@ -38,20 +26,16 @@ def run_scraper(config: dict):
 
             yield file
 
-    def call_remote(url: str) -> List[dict]:
-        host_url = "http://localhost/redir/scrape"
-        r = requests.post(host_url, json=dict(url=url))
+    def scrape() -> Iterable[dict]:
+        for entry in config["scrape"]["entries"]:
+            host_url = "http://localhost/redir/scrape"
+            r = requests.post(host_url, json=entry)
 
-        if not r.ok:
-            logger.error(r.text)
-            return []
+            if not r.ok:
+                logger.error(r.text)
+                continue
 
-        return r.json()["files"]
-
-    def scrape():
-        for e in config["scrape"]["entries"]:
-            entry = ScrapableEntry(**e)
-            yield from entry.scrape(call_remote)
+            yield from [f for f in r.json()["files"]]
 
     unfiltered = scrape()
     filtered = filt(unfiltered)
