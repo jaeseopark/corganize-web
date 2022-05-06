@@ -28,7 +28,7 @@ def run_scraper(config: dict):
 
     def scrape() -> Iterable[dict]:
         for entry in config["scrape"]["entries"]:
-            host_url = "http://localhost/redir/scrape"
+            host_url = "http://nginx/redir/scrape"
             r = requests.post(host_url, json=entry)
 
             if not r.ok:
