@@ -1,10 +1,11 @@
 import logging
+import os
 from dataclasses import dataclass, field
 from threading import Thread
 from time import sleep
 from typing import Callable
 
-from commmons import touch_directory, touch, get_file_handler
+from commmons import init_logger_with_handlers
 
 from cleaner.cleaner import run_cleaner, init_cleaner
 from config.config import get_config
@@ -12,9 +13,6 @@ from scraper.scraper import init_scraper, run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)-5s %(funcName)-26s %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S")
 
 
 @dataclass
@@ -49,10 +47,8 @@ DAEMON_JOBS = [
 
 def run_daemon():
     config = get_config()
-    touch_directory(config["data"]["path"])
-    touch(config["log"]["all"])
-
-    LOGGER.addHandler(get_file_handler(config["log"]["all"]))
+    os.makedirs(config["data"]["path"], exist_ok=True)
+    init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["all"])
 
     threads = []
 

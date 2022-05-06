@@ -1,9 +1,8 @@
 import logging
-import os
 from typing import Iterable
 
 import requests
-from commmons import touch, get_file_handler
+from commmons import init_logger_with_handlers
 from corganizeclient.client import CorganizeClient
 
 logger = logging.getLogger("scraper")
@@ -45,7 +44,4 @@ def run_scraper(config: dict):
 
 
 def init_scraper(config: dict):
-    touch(config["log"]["scraper"])
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
-    logger.addHandler(get_file_handler(os.path.abspath(config["log"]["scraper"])))
+    init_logger_with_handlers("scraper", logging.DEBUG, config["log"]["scraper"])

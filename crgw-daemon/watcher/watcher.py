@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from commmons import touch_directory, touch, get_file_handler
+from commmons import init_logger_with_handlers
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
@@ -52,10 +52,9 @@ def run_polling_based_watcher(config: dict):
 
 
 def init_watcher(config: dict):
-    touch(config["log"]["watcher"])
-    touch_directory(os.path.abspath(config["watch"]["path"]))
-    logger.addHandler(logging.StreamHandler())
-    logger.addHandler(get_file_handler(os.path.abspath(config["log"]["watcher"])))
+    os.makedirs(config["data"]["path"], exist_ok=True)
+    os.makedirs(config["watch"]["path"], exist_ok=True)
+    init_logger_with_handlers("cleaner", logging.DEBUG, config["log"]["cleaner"])
 
 
 run_watcher = run_polling_based_watcher

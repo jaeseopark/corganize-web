@@ -1,7 +1,7 @@
 import logging
 import os
 
-from commmons import touch, get_file_handler
+from commmons import init_logger_with_handlers
 from corganizeclient.client import CorganizeClient
 
 QUERY_LIMIT = 10000
@@ -40,7 +40,5 @@ def run_cleaner(config: dict):
 
 
 def init_cleaner(config: dict):
-    touch(config["log"]["cleaner"])
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
-    logger.addHandler(get_file_handler(os.path.abspath(config["log"]["cleaner"])))
+    os.makedirs(config["data"]["path"], exist_ok=True)
+    init_logger_with_handlers("cleaner", logging.DEBUG, config["log"]["cleaner"])
