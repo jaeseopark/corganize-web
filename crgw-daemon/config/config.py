@@ -11,6 +11,7 @@ server:
   host: ""
   apikey: ""
 log:
+  all: /mnt/all.log
   watcher: /mnt/watcher.log
   cleaner: /mnt/cleaner.log
   scraper: /mnt/scraper.log
