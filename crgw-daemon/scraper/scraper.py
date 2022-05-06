@@ -44,7 +44,7 @@ def run_scraper(config: dict):
     filtered = filt(unfiltered)
 
     result = cc.create_files(list(filtered))
-    logger.info(f"{result['created']=} {result['skipped']=} {result['failed']=}")
+    logger.info(f"{len(result['created'])=} {(result['skipped'])=} {(result['failed'])=}")
 
 
 def init_scraper(config: dict):
