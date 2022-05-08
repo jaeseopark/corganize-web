@@ -11,14 +11,14 @@ server:
   host: ""
   apikey: ""
 log:
-  all: /mnt/all.log
-  watcher: /mnt/watcher.log
-  cleaner: /mnt/cleaner.log
-  scraper: /mnt/scraper.log
+  all: /mnt/logs/all.log
+  watcher: /mnt/logs/watcher.log
+  cleaner: /mnt/logs/cleaner.log
+  scraper: /mnt/logs/scraper.log
 data:
-  path: /data
+  path: /mnt/data
 watch:
-  path: /watch
+  path: /mnt/downloads/complete
   watchdog:
     recursive: false
     handler:

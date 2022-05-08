@@ -83,16 +83,14 @@ def _handle_single_file(src_path: str, data_dir: str, cc: CorganizeClient, origi
     if len(result["created"]) > 0:
         # Copy the file to the new location
         dst_path = os.path.join(data_dir, f"{fileid}.dec")
-        shutil.copyfile(src_path, dst_path)
-        logger.info("file copied")
+        os.rename(src_path, dst_path)
+        logger.info("file moved")
 
         requests.post("http://api/files", json=[dst_path])
         logger.info("api local cache updated")
     else:
         logger.warning("fileid already exists")
-
-    logger.info("file removed")
-    os.remove(src_path)
+        os.remove(src_path)
 
 
 def handle(src_path: str, config: dict):

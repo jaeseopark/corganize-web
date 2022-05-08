@@ -6,6 +6,7 @@ from time import sleep
 from typing import Callable
 
 import requests
+from requests import ConnectionError
 from commmons import init_logger_with_handlers
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
@@ -52,7 +53,7 @@ def wait_until_api_ready():
         try:
             r = requests.get("http://api/health/ready")
             status = r.status_code
-        except (MaxRetryError, ConnectionRefusedError, NewConnectionError):
+        except (MaxRetryError, ConnectionRefusedError, NewConnectionError, ConnectionError):
             status = 500
 
         if status == 200:
