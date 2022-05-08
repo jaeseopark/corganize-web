@@ -25,7 +25,7 @@ def add_files():
     return "", 200
 
 
-@app.get("health/ready")
+@app.get("/health/ready")
 def health_ready():
     files = get_local_files()
     status = 200 if len(files) > 0 else 204
