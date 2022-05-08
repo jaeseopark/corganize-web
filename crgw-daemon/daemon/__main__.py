@@ -5,6 +5,7 @@ from threading import Thread
 from time import sleep
 from typing import Callable
 
+import requests
 from commmons import init_logger_with_handlers
 
 from cleaner.cleaner import run_cleaner, init_cleaner
@@ -45,7 +46,20 @@ DAEMON_JOBS = [
 ]
 
 
+def wait_until_api_ready():
+    while True:
+        r = requests.get("http://api/health/ready")
+        if r.ok:
+            LOGGER.info("API ready. Now starting daemon jobs.")
+            break
+
+        LOGGER.info("API not ready. Sleeping for 5 seconds...")
+        sleep(5)
+
+
 def run_daemon():
+    wait_until_api_ready()
+
     config = get_config()
     os.makedirs(config["data"]["path"], exist_ok=True)
     init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["all"])
