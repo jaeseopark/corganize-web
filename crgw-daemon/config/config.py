@@ -7,24 +7,31 @@ from commmons import merge
 _OVERRIDE_PATH = "/mnt/config.yml"
 
 _DEFAULT = """
+server:
+  host: ""
+  apikey: ""
 log:
+  all: /mnt/all.log
   watcher: /mnt/watcher.log
   cleaner: /mnt/cleaner.log
+  scraper: /mnt/scraper.log
 data:
   path: /data
 watch:
   path: /watch
-  type: polling
-  polling:
-    interval: 60  # Seconds
   watchdog:
     recursive: false
     handler:
       case_sensitive: true
       ignore_directories: false
-server:
-  host: ""
-  apikey: ""
+scrape:
+  entries:
+    - url: PLACEHOLDER
+      max_items: 5
+  quick_dedup:
+    query_limit: 5000
+  blacklist:
+  - PLACEHOLDER
 """
 
 _INSTANCE = dict()
