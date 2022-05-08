@@ -7,6 +7,7 @@ from typing import Callable
 
 import requests
 from commmons import init_logger_with_handlers
+from urllib3.exceptions import MaxRetryError, NewConnectionError
 
 from cleaner.cleaner import run_cleaner, init_cleaner
 from config.config import get_config
@@ -48,8 +49,13 @@ DAEMON_JOBS = [
 
 def wait_until_api_ready():
     while True:
-        r = requests.get("http://api/health/ready")
-        if r.ok:
+        try:
+            r = requests.get("http://api/health/ready")
+            status = r.status_code
+        except (MaxRetryError, ConnectionRefusedError, NewConnectionError):
+            status = 500
+
+        if status == 200:
             LOGGER.info("API ready. Now starting daemon jobs.")
             break
 
