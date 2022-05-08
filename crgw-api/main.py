@@ -25,6 +25,13 @@ def add_files():
     return "", 200
 
 
+@app.get("health/ready")
+def health_ready():
+    files = get_local_files()
+    status = 200 if len(files) > 0 else 204
+    return "", status
+
+
 @app.route("/remote/<path:subpath>")
 def fwd_remote(subpath: str):
     """
