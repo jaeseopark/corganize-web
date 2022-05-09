@@ -31,7 +31,10 @@ class DaemonJob:
         def repeated_func(config: dict):
             # TODO: use a timer instead of a loop
             while True:
-                self.func(config)
+                try:
+                    self.func(config)
+                except:
+                    LOGGER.exception("")
                 sleep(self.interval)
                 LOGGER.info(f"{self.func.__name__} Sleeping for {self.interval=} seconds")
 
