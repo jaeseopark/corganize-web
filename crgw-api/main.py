@@ -29,8 +29,8 @@ def add_files():
 def split_file(fileid: str):
     start = freq.args.get("start")
     end = freq.args.get("end")
-    split(fileid, (start, end))
-    return "", 200
+    file = split(fileid, (start, end))
+    return file, 200
 
 
 @app.get("/health/ready")

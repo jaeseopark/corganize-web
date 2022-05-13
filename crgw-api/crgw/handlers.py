@@ -39,7 +39,7 @@ def add_local_files(paths: List[str]):
     LOGGER.info(f"AFTER {len(_LOCAL_FILE_CACHE.files)=}")
 
 
-def split(fileid: str, timerange: Tuple[int, int]):
+def split(fileid: str, timerange: Tuple[int, int]) -> dict:
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
         return

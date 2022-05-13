@@ -4,7 +4,7 @@ const STORE: { map: Map<string, string> | null } = {
   map: null,
 };
 
-const addOnePair = (fileid: string, filename: string) => {
+export const addOne = (fileid: string, filename: string) => {
   STORE.map!.set(fileid, filename);
 };
 
@@ -16,7 +16,7 @@ export const initWithLocalFilenames = (filenames: string[]) => {
   STORE.map = new Map<string, string>();
   filenames.forEach((filename) => {
     const [withoutExt] = filename.split(".");
-    addOnePair(withoutExt, filename);
+    addOne(withoutExt, filename);
   });
 };
 
@@ -28,7 +28,7 @@ export const addAll = (fs: CorganizeFile[]) =>
   fs.reduce((acc, f) => {
     if (!isDiscovered(f.fileid)) {
       acc.push(f);
-      addOnePair(f.fileid, "");
+      addOne(f.fileid, "");
     }
     return acc;
   }, new Array<CorganizeFile>());

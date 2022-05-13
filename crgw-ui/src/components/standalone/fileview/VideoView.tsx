@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 
@@ -8,7 +8,7 @@ import { useToast } from "providers/toast/hook";
 import HighlightManager from "bizlog/HighlightManager";
 
 import { madFocus } from "utils/elementUtils";
-import { toHumanDuration } from "utils/numberUtils";
+import { toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
 import "./VideoView.scss";
 
@@ -23,10 +23,10 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 
 const VideoView = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile, splitVideo } = useFileRepository();
-  const { multimedia, streamingurl, mimetype } = findById(fileid);
+  const { multimedia, streamingurl, mimetype, size } = findById(fileid);
   const [splitStart, setSplitStart] = useState<number>();
 
-  const { enqueue, enqueueSuccess } = useToast();
+  const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
@@ -67,19 +67,33 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
-  const split = (splitEnd: number) => {
+  const split = async (splitEnd: number) => {
     if (splitStart === undefined) {
+      enqueueWarning({ message: "Mark the start time first" });
       return;
     }
 
     if (splitEnd <= splitStart) {
+      enqueueWarning({ message: "Negative duration" });
       return;
     }
 
-    new Promise((resolve) => {
-      enqueue({ message: "Splitting..." });
-      resolve(null);
-    }).then(() => splitVideo(fileid, [splitStart, splitEnd]));
+    const newDuration = splitEnd - splitStart;
+    const newSize = (newDuration / multimedia?.duration!) * size!;
+
+    const newDurationStr = toHumanDuration(newDuration);
+    const newSizeStr = toHumanFileSize(newSize);
+
+    enqueue({ header: "Split in progress", message: `${newDurationStr}, ${newSizeStr}` });
+    try {
+      await splitVideo(fileid, [splitStart, splitEnd]);
+      enqueueSuccess({ message: "Split complete" });
+    } catch (e) {
+      const message = (e as Error).message || "Unknown reason";
+      enqueueError({ header: "Split failed", message });
+    } finally {
+      setSplitStart(undefined);
+    }
   };
 
   const onKeyDown = (e: any) => {
@@ -142,7 +156,9 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "[") {
       vid.currentTime = 0;
     } else if (key === "i") {
-      setSplitStart(Math.floor(vid.currentTime));
+      const t = Math.floor(vid.currentTime);
+      setSplitStart(t);
+      enqueue({ message: `Start timestamp: ${t}` });
     } else if (key === "o") {
       split(Math.floor(vid.currentTime));
     }
