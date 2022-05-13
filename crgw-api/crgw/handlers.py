@@ -42,7 +42,7 @@ def add_local_files(paths: List[str]):
 def split(fileid: str, timerange: Tuple[int, int]) -> dict:
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
-        return
+        raise FileNotFoundError
 
     if _LOCAL_FILE_CACHE.crg_client is None:
         host = os.environ["CRG_REMOTE_HOST"]
@@ -53,35 +53,33 @@ def split(fileid: str, timerange: Tuple[int, int]) -> dict:
     new_fileid = f"{fileid}-{starttime}-{endtime}"
     target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
 
-    source_file: dict = dict()  # TODO: get from server
+    source_file = _LOCAL_FILE_CACHE.crg_client.get_file(fileid)
 
-    print(f"{target_path=}")
+    multimedia = source_file.get("multimedia") or dict()
+    multimedia.update(dict(duration=endtime - starttime))
 
-    # mimetype = source_file.get("mimetype")
-    # multimedia = source_file.get("multimedia") or dict()
-    # new_filename = f"{source_file['filename']}-{starttime}-{endtime}"
+    new_file = dict(
+        fileid=new_fileid,
+        filename=f"{source_file['filename']}-{starttime}-{endtime}",
+        sourceurl=source_file["sourceurl"],
+        storageservice="local",
+        locationref="local",
+        mimetype=source_file.get("mimetype"),
+        multimedia=multimedia
+    )
 
-    # _LOCAL_FILE_CACHE.crg_client.create_files([dict(
-    #     fileid=new_fileid,
-    #     filename=new_filename,
-    #     sourceurl=source_file["sourceurl"],
-    #     storageservice="local",
-    #     locationref="local",
-    #     mimetype=mimetype,
-    #     multimedia=dict(
-    #         width=multimedia.get("width"),
-    #         height=multimedia.get("height"),
-    #         duration=endtime - starttime
-    #     )
-    # )])
+    _LOCAL_FILE_CACHE.crg_client.create_files([new_file])
 
-    # ffmpeg_extract_subclip(source_path, starttime, endtime, targetname=target_path)
+    ffmpeg_extract_subclip(source_path, starttime, endtime, targetname=target_path)
 
-    # _LOCAL_FILE_CACHE.crg_client.update_file(dict(
-    #     fileid=new_fileid,
-    #     size=os.stat(target_path).st_size,
-    #     lastopened=0,
-    # ))
+    new_file.update(dict(
+        size=os.stat(target_path).st_size,
+        lastopened=0,
+    ))
+
+    _LOCAL_FILE_CACHE.crg_client.update_file(new_file)
+
+    return new_file
 
 
 def forward_request(data, headers: dict, method: str, subpath: str):

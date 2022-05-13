@@ -27,9 +27,12 @@ def add_files():
 
 @app.post("/files/<path:fileid>/split")
 def split_file(fileid: str):
-    start = freq.args.get("start")
-    end = freq.args.get("end")
-    file = split(fileid, (start, end))
+    start = int(freq.args.get("start"))
+    end = int(freq.args.get("end"))
+    try:
+        file = split(fileid, (start, end))
+    except FileNotFoundError:
+        return "", 404
     return file, 200
 
 
