@@ -5,8 +5,10 @@ from os.path import basename
 from threading import Thread
 from time import sleep
 from types import SimpleNamespace
-from typing import List
+from typing import List, Tuple
 
+from corganizeclient.client import CorganizeClient
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 import requests
 from pydash import url as pydash_url
 
@@ -18,7 +20,11 @@ _LOCAL_FILE_CACHE = SimpleNamespace(
     files=list(),
     should_run=True,
     running=False,
+    crg_client=None
 )
+
+DATA_PATH = "/data"
+CACHE_UPDATE_INTERVAL = 1800
 
 
 def get_local_files() -> List[str]:
@@ -31,6 +37,49 @@ def add_local_files(paths: List[str]):
     basenames = [basename(f) for f in paths]  # strip the directory part
     _LOCAL_FILE_CACHE.files = list(set(_LOCAL_FILE_CACHE.files + basenames))
     LOGGER.info(f"AFTER {len(_LOCAL_FILE_CACHE.files)=}")
+
+
+def split(fileid: str, timerange: Tuple[int, int]):
+    source_path = os.path.join(DATA_PATH, fileid + ".dec")
+    if not os.path.exists(source_path):
+        return
+
+    if _LOCAL_FILE_CACHE.crg_client is None:
+        host = os.environ["CRG_REMOTE_HOST"]
+        apikey = os.environ["CRG_REMOTE_APIKEY"]
+        _LOCAL_FILE_CACHE.crg_client = CorganizeClient(host, apikey)
+
+    starttime, endtime = timerange
+    new_fileid = f"{fileid}-{starttime}-{endtime}"
+    target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
+
+    source_file: dict = dict()  # TODO: get from server
+
+    mimetype = source_file.get("mimetype")
+    multimedia = source_file.get("multimedia") or dict()
+    new_filename = f"{source_file['filename']}-{starttime}-{endtime}"
+
+    _LOCAL_FILE_CACHE.crg_client.create_files([dict(
+        fileid=new_fileid,
+        filename=new_filename,
+        sourceurl=source_file["sourceurl"],
+        storageservice="local",
+        locationref="local",
+        mimetype=mimetype,
+        multimedia=dict(
+            width=multimedia.get("width"),
+            height=multimedia.get("height"),
+            duration=endtime - starttime
+        )
+    )])
+
+    ffmpeg_extract_subclip(source_path, starttime, endtime, targetname=target_path)
+
+    _LOCAL_FILE_CACHE.crg_client.update_file(dict(
+        fileid=new_fileid,
+        size=os.stat(target_path).st_size,
+        lastopened=0,
+    ))
 
 
 def forward_request(data, headers: dict, method: str, subpath: str):
@@ -57,20 +106,17 @@ def teardown():
 
 
 def _startup():
-    path = "/data"
-    sleep_seconds = 1800
-
     def cache_loop():
-        if not os.path.isdir(path):
-            LOGGER.warning(f"invalid local path {path=}")
+        if not os.path.isdir(DATA_PATH):
+            LOGGER.warning(f"invalid local path {DATA_PATH=}")
             return
 
         _LOCAL_FILE_CACHE.running = True
         while _LOCAL_FILE_CACHE.should_run:
-            filenames = os.listdir(path)
+            filenames = os.listdir(DATA_PATH)
             _LOCAL_FILE_CACHE.files = filenames
             LOGGER.info(f"Updated cache {len(filenames)=}")
-            sleep(sleep_seconds)
+            sleep(CACHE_UPDATE_INTERVAL)
 
         _LOCAL_FILE_CACHE.running = False
         LOGGER.info("stopped")
