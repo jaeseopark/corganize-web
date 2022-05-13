@@ -22,8 +22,9 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 };
 
 const VideoView = ({ fileid }: { fileid: string }) => {
-  const { findById, updateFile } = useFileRepository();
+  const { findById, updateFile, splitVideo } = useFileRepository();
   const { multimedia, streamingurl, mimetype } = findById(fileid);
+  const [splitStart, setSplitStart] = useState<number>();
 
   const { enqueue, enqueueSuccess } = useToast();
   const highlightManager: HighlightManager = useMemo(
@@ -64,6 +65,21 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       height: videoHeight,
       duration: Math.ceil(duration),
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
+  };
+
+  const split = (splitEnd: number) => {
+    if (splitStart === undefined) {
+      return;
+    }
+
+    if (splitEnd <= splitStart) {
+      return;
+    }
+
+    new Promise((resolve) => {
+      enqueue({ message: "Splitting..." });
+      resolve(null);
+    }).then(() => splitVideo(fileid, [splitStart, splitEnd]));
   };
 
   const onKeyDown = (e: any) => {
@@ -125,6 +141,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       jumpTimeByDelta(SEEK_HOTKEY_MAP[key]);
     } else if (key === "[") {
       vid.currentTime = 0;
+    } else if (key === "i") {
+      setSplitStart(Math.floor(vid.currentTime));
+    } else if (key === "o") {
+      split(Math.floor(vid.currentTime));
     }
   };
 

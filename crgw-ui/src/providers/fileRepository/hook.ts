@@ -91,6 +91,10 @@ export const useFileRepository = () => {
     }));
   };
 
+  const splitVideo = (fileid: string, timerange: number[]) => {
+    
+  }
+
   return {
     files,
     isMostRecentFile,
@@ -102,5 +106,6 @@ export const useFileRepository = () => {
     renew,
     findById,
     toggleActivation,
+    splitVideo
   };
 };

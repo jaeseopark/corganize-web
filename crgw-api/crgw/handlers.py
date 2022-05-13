@@ -55,31 +55,33 @@ def split(fileid: str, timerange: Tuple[int, int]):
 
     source_file: dict = dict()  # TODO: get from server
 
-    mimetype = source_file.get("mimetype")
-    multimedia = source_file.get("multimedia") or dict()
-    new_filename = f"{source_file['filename']}-{starttime}-{endtime}"
+    print(f"{target_path=}")
 
-    _LOCAL_FILE_CACHE.crg_client.create_files([dict(
-        fileid=new_fileid,
-        filename=new_filename,
-        sourceurl=source_file["sourceurl"],
-        storageservice="local",
-        locationref="local",
-        mimetype=mimetype,
-        multimedia=dict(
-            width=multimedia.get("width"),
-            height=multimedia.get("height"),
-            duration=endtime - starttime
-        )
-    )])
+    # mimetype = source_file.get("mimetype")
+    # multimedia = source_file.get("multimedia") or dict()
+    # new_filename = f"{source_file['filename']}-{starttime}-{endtime}"
 
-    ffmpeg_extract_subclip(source_path, starttime, endtime, targetname=target_path)
+    # _LOCAL_FILE_CACHE.crg_client.create_files([dict(
+    #     fileid=new_fileid,
+    #     filename=new_filename,
+    #     sourceurl=source_file["sourceurl"],
+    #     storageservice="local",
+    #     locationref="local",
+    #     mimetype=mimetype,
+    #     multimedia=dict(
+    #         width=multimedia.get("width"),
+    #         height=multimedia.get("height"),
+    #         duration=endtime - starttime
+    #     )
+    # )])
 
-    _LOCAL_FILE_CACHE.crg_client.update_file(dict(
-        fileid=new_fileid,
-        size=os.stat(target_path).st_size,
-        lastopened=0,
-    ))
+    # ffmpeg_extract_subclip(source_path, starttime, endtime, targetname=target_path)
+
+    # _LOCAL_FILE_CACHE.crg_client.update_file(dict(
+    #     fileid=new_fileid,
+    #     size=os.stat(target_path).st_size,
+    #     lastopened=0,
+    # ))
 
 
 def forward_request(data, headers: dict, method: str, subpath: str):
