@@ -56,6 +56,7 @@ def split(fileid: str, timerange: Tuple[int, int]) -> dict:
     source_file = _LOCAL_FILE_CACHE.crg_client.get_file(fileid)
 
     multimedia = source_file.get("multimedia") or dict()
+    multimedia.pop("highlights")
     multimedia.update(dict(duration=endtime - starttime))
 
     new_file = dict(
