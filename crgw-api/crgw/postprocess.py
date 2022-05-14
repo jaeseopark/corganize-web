@@ -42,9 +42,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
             ffmpeg_extract_subclip(source_path, start, end, targetname=tmp_path)
             os.rename(tmp_path, target_path)
 
-        new_fileid = f"{fileid}-{start}-{end}"
-        kwargs = dict(new_filename_suffix=f"-{start}-{end}", new_duration=end - start, callback=ffmpeg_subclip)
-        new_file = _process(fileid, new_fileid, **kwargs)
+        new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, callback=ffmpeg_subclip)
         new_files.append(new_file)
 
     return new_files
@@ -82,18 +80,15 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         subprocess_call(cmd)
         os.rename(tmp_path, target_path)
 
-    new_fileid = f"{fileid}-trim-{trim_id}"
-    kwargs = dict(new_filename_suffix=f"-trim-{trim_id}", new_duration=duration, callback=ffmpeg_filter_trim)
-    return _process(fileid, new_fileid, **kwargs)
+    return _process(fileid, suffix=f"-trim-{trim_id}", new_duration=duration, callback=ffmpeg_filter_trim)
 
 
 def _process(fileid: str,
-             new_fileid: str,
-             new_filename_suffix: str,
+             suffix: str,
              new_duration: int,
              callback: Callable[[dict, str, str], None]) -> dict:
-    crg_client = CorganizeClient(
-        os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
+    new_fileid = fileid + suffix
+    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
 
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
@@ -108,7 +103,7 @@ def _process(fileid: str,
 
     new_file = dict(
         fileid=new_fileid,
-        filename=source_file["filename"] + new_filename_suffix,
+        filename=source_file["filename"] + suffix,
         sourceurl=source_file["sourceurl"],
         storageservice="local",
         locationref="local",
