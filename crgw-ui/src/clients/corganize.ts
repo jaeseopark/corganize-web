@@ -1,4 +1,5 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
+import { Segment } from "typedefs/Segment";
 import { SessionInfo } from "typedefs/Session";
 
 import { chunk } from "utils/arrayUtils";
@@ -39,6 +40,8 @@ const proxyFetch = (url: string, method: "POST" | "PATCH", data: object) => {
     headers,
   });
 };
+
+const segmentsToTuples = (segments: Segment[]) => segments.map((s) => [s.start, s.end]);
 
 class CorganizeClient {
   getFilesBySessionInfo(
@@ -191,10 +194,38 @@ class CorganizeClient {
       .then(dedupFilesById);
   }
 
-  subclip(fileid: string, timerange: number[]): Promise<CorganizeFile> {
-    const [start, end] = timerange;
-    const url = `/api/files/${fileid}/subclip?start=${start}&end=${end}`;
-    return fetch(url, { method: "POST" }).then(async (res) => {
+  trim(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {
+    const url = `/api/files/${fileid}/trim`;
+    return fetch(url, {
+      method: "POST",
+      body: JSON.stringify({ segments: segmentsToTuples(segments) }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (res) => {
+        if (res.status === 200) {
+          return res.json();
+        }
+
+        throw new Error(await res.text());
+      })
+      .then((f) => {
+        // The return type of the endpoint is CorganizeFile.
+        // Wrap it in an array to align with the function signature.
+        return [f];
+      });
+  }
+
+  cut(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {
+    const url = `/api/files/${fileid}/cut`;
+    return fetch(url, {
+      method: "POST",
+      body: JSON.stringify({ segments: segmentsToTuples(segments) }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(async (res) => {
       if (res.status === 200) {
         return res.json();
       }

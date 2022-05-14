@@ -1,16 +1,18 @@
+import json
 import logging
+from typing import List
 
 from flask import Flask, request as freq, Response
 
-from crgw.filemod import create_subclip
+from crgw.postprocessing import cut_clip, trim_clip
 from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
 logging.basicConfig(format="%(asctime)s %(levelname)s thread=%(thread)d %(module)s.%(funcName)s %(message)s")
-logging.root.setLevel(logging.INFO)
 
 # TODO: add logging.FileHandler
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("crgw-api")
+LOGGER.setLevel(logging.INFO)
 
 app = Flask(__name__)
 
@@ -27,14 +29,27 @@ def add_files():
     return "", 200
 
 
-@app.post("/files/<path:fileid>/subclip")
-def subclip(fileid: str):
-    start = int(freq.args.get("start"))
-    end = int(freq.args.get("end"))
+@app.post("/files/<path:fileid>/cut")
+def cut(fileid: str):
     try:
-        file = create_subclip(fileid, (start, end))
-    except FileNotFoundError:
-        return "", 404
+        files: List[dict] = cut_clip(fileid, freq.get_json().get("segments"))
+    except FileNotFoundError as e:
+        return str(e), 404
+    except ValueError as e:
+        return str(e), 400
+
+    res = Response(json.dumps(files))
+    res.headers = { "Content-Type": "application/json" }
+    res.status_code = 200
+    return res
+
+
+@app.post("/files/<path:fileid>/trim")
+def trim(fileid: str):
+    try:
+        file: dict = trim_clip(fileid, freq.get_json().get("segments"))
+    except FileNotFoundError as e:
+        return str(e), 404
     except ValueError as e:
         return str(e), 400
     return file, 200
