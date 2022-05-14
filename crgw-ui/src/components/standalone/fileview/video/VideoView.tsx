@@ -173,8 +173,8 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       openSegmentt(Math.floor(vid.currentTime));
     } else if (key === "o") {
       closeSegmentt(Math.floor(vid.currentTime));
-    } else if (key === "t") {
-      trim();
+      // } else if (key === "t") {
+      //   trim();
     } else if (key === "y") {
       cut();
     }
