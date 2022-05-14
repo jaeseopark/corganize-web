@@ -4,19 +4,20 @@ import { Segment } from "typedefs/Segment";
 import SegmentBlock from "./SegmentBlock";
 
 const SegmentsView = ({
-  segments,
+  openSegments,
+  closedSegments,
   multimedia,
   size,
-}: { segments: Segment[] } & Partial<CorganizeFile>) => {
+}: { openSegments: Segment[]; closedSegments: Segment[] } & Partial<CorganizeFile>) => {
   const duration = multimedia?.duration;
 
-  if (segments.length === 0 || !duration || !size) {
+  if (closedSegments.length === 0 || !duration || !size) {
     return null;
   }
 
   return (
     <div className="segments-view">
-      {segments.map((s) => (
+      {closedSegments.map((s) => (
         <SegmentBlock key={s.start} segment={s} duration={duration} />
       ))}
     </div>

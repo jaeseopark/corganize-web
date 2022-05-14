@@ -37,50 +37,54 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 
         def ffmpeg_subclip(new_file: dict, source_path: str, target_path: str):
             mimetype = new_file.get("mimetype")
-            ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
+            ext_with_dot = mimetypes.guess_extension(
+                mimetype) if mimetype else DEFAULT_EXT
             tmp_path = target_path + ext_with_dot
-            ffmpeg_extract_subclip(source_path, start, end, targetname=tmp_path)
+            ffmpeg_extract_subclip(
+                source_path, start, end, targetname=tmp_path)
             os.rename(tmp_path, target_path)
 
         new_fileid = f"{fileid}-{start}-{end}"
-        kwargs = dict(new_filename_suffix=f"-{start}-{end}", new_duration=end - start, callback=ffmpeg_subclip)
+        kwargs = dict(new_filename_suffix=f"-{start}-{end}",
+                      new_duration=end - start, callback=ffmpeg_subclip)
         new_file = _process(fileid, new_fileid, **kwargs)
         new_files.append(new_file)
 
     return new_files
 
 
-def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
+def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
     trim_id = md5(str(segments))
 
     def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
-        filter_arg = ""
+        cmd = [get_moviepy_setting("FFMPEG_BINARY")]
         for i, segment in enumerate(segments):
             start, end = validate_segment(segment)
-            filter_arg += f"[{i}:v]trim=start={start}:end={end},setpts=PTS-STARTPTS[{i}v];"  # ,format=yuv420p ?
-            filter_arg += f"[{i}:a]atrim=start={start}:end={end},asetpts=PTS-STARTPTS[{i}a];"
+            cmd += ["-ss", str(start), "-to", str(end), "-i", source_path]
+
+        filter_describer = ""
         for i in range(len(segments)):
-            filter_arg += f"[{i}v][{i}a]"
-        filter_arg += f"concat=n={len(segments)}:v=1:a=1[outv][outa]"
+            filter_arg += f"[{i}:v][{i}:a]"
+        filter_describer += f"concat=n={len(segments)}:v=1:a=1[outv][outa]"
+
+        cmd += ["-map", "[outv]",
+                "-map", "[outa]",
+                target_path]
 
         mimetype = new_file.get("mimetype")
-        ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
+        ext_with_dot = mimetypes.guess_extension(
+            mimetype) if mimetype else DEFAULT_EXT
         tmp_path = target_path + ext_with_dot
-        cmd = [get_moviepy_setting("FFMPEG_BINARY"),
-               "-i", source_path,
-               "-filter_complex", filter_arg,
-               "-map", "[outv]",
-               "-map", "[outa]",
-               target_path]
+
         subprocess_call(cmd)
         os.rename(tmp_path, target_path)
 
     new_fileid = f"{fileid}-trim-{trim_id}"
-    kwargs = dict(new_filename_suffix=f"-trim-{trim_id}", new_duration=duration, callback=ffmpeg_filter_trim)
-    new_file = _process(fileid, new_fileid, **kwargs)
-    return [new_file]
+    kwargs = dict(new_filename_suffix=f"-trim-{trim_id}",
+                  new_duration=duration, callback=ffmpeg_filter_trim)
+    return _process(fileid, new_fileid, **kwargs)
 
 
 def _process(fileid: str,
@@ -88,7 +92,8 @@ def _process(fileid: str,
              new_filename_suffix: str,
              new_duration: int,
              callback: Callable[[dict, str, str], None]) -> dict:
-    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
+    crg_client = CorganizeClient(
+        os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
 
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):

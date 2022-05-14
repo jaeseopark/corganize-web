@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 
-import { Multimedia } from "typedefs/CorganizeFile";
+import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
+import { Segment } from "typedefs/Segment";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
@@ -26,9 +27,9 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 };
 
 const VideoView = ({ fileid }: { fileid: string }) => {
-  const { findById, updateFile, trim } = useFileRepository();
+  const { findById, updateFile, postprocesses } = useFileRepository();
   const { multimedia, streamingurl, mimetype, size } = findById(fileid);
-  const { segments, closedSegments, open: openSegment, close: closeSegment } = useSegments();
+  const { openSegments, closedSegments, segmentActions } = useSegments();
 
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
   const highlightManager: HighlightManager = useMemo(
@@ -72,35 +73,42 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   };
 
   const openSegmentt = (t: number) => {
-    openSegment(t);
+    segmentActions.open(t);
     enqueue({ message: `Start: ${t}` });
   };
 
   const closeSegmentt = (t: number) => {
     try {
-      closeSegment(t);
+      segmentActions.close(t);
       enqueue({ message: `End: ${t}` });
     } catch (e) {
       enqueueWarning({ message: (e as Error).message });
     }
   };
 
-  const trimm = async () => {
+  const postprocessSegments = async (
+    name: string,
+    func: (fileid: string, segments: Segment[]) => Promise<CorganizeFile[]>
+  ) => {
     if (closedSegments.length === 0) {
       enqueueWarning({ message: "Need segments" });
       return;
     }
 
-    enqueue({ message: "Trimming..." });
+    enqueue({ header: name, message: "In progress" });
 
     try {
-      await trim(fileid, closedSegments);
-      enqueueSuccess({ message: "Trim complete" });
+      await func(fileid, closedSegments);
+      enqueueSuccess({ header: name, message: "Complete" });
     } catch (e) {
       const message = (e as Error).message || "Unknown reason";
-      enqueueError({ header: "Trim failed", message });
+      enqueueError({ header: name, message });
     }
   };
+
+  const trim = () => postprocessSegments("Trim", postprocesses.trim);
+
+  const cut = () => postprocessSegments("Cut", postprocesses.cut);
 
   const onKeyDown = (e: any) => {
     const { target: vid, shiftKey, ctrlKey } = e;
@@ -166,13 +174,20 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "o") {
       closeSegmentt(Math.floor(vid.currentTime));
     } else if (key === "t") {
-      trimm();
+      trim();
+    } else if (key === "y") {
+      cut();
     }
   };
 
   return (
     <div className="video-view">
-      <SegmentsView segments={closedSegments} multimedia={multimedia} size={size} />
+      <SegmentsView
+        openSegments={openSegments}
+        closedSegments={closedSegments}
+        multimedia={multimedia}
+        size={size}
+      />
       <video
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}

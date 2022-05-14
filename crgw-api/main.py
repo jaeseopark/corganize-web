@@ -1,4 +1,6 @@
+import json
 import logging
+from typing import List
 
 from flask import Flask, request as freq, Response
 
@@ -30,18 +32,22 @@ def add_files():
 @app.post("/files/<path:fileid>/cut")
 def cut(fileid: str):
     try:
-        file = cut_clip(fileid, freq.get_json().get("segments"))
+        files: List[dict] = cut_clip(fileid, freq.get_json().get("segments"))
     except FileNotFoundError:
         return "", 404
     except ValueError as e:
         return str(e), 400
-    return file, 200
+
+    res = Response(json.dumps(files))
+    res.headers = { "Content-Type": "application/json" }
+    res.status_code = 200
+    return res
 
 
 @app.post("/files/<path:fileid>/trim")
 def trim(fileid: str):
     try:
-        file = trim_clip(fileid, freq.get_json().get("segments"))
+        file: dict = trim_clip(fileid, freq.get_json().get("segments"))
     except FileNotFoundError:
         return "", 404
     except ValueError as e:

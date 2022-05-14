@@ -37,9 +37,9 @@ export const useSegments = () => {
   };
 
   return {
-    segments,
+    allSegments: segments,
+    openSegments: segments.filter(isOpen),
     closedSegments: segments.filter((s) => !isOpen(s)),
-    open,
-    close,
+    segmentActions: { open, close },
   };
 };

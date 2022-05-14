@@ -5,7 +5,7 @@ import { Segment } from "typedefs/Segment";
 
 import { FileRepository } from "providers/fileRepository/fileRepository";
 
-import { CreateResponse, getInstance } from "clients/corganize";
+import { CreateResponse, getInstance as getCorganizeClient } from "clients/corganize";
 
 import { addAll, addOne } from "shared/globalstore";
 
@@ -29,7 +29,7 @@ export const useFileRepository = () => {
   };
 
   const createScrapedFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
-    return getInstance()
+    return getCorganizeClient()
       .createFiles(fs)
       .then(({ created, skipped }) => {
         addAll([...created, ...skipped]);
@@ -42,7 +42,7 @@ export const useFileRepository = () => {
       return Promise.reject();
     }
 
-    return getInstance()
+    return getCorganizeClient()
       .updateFile(partialProps)
       .then(() => {
         dispatch!({ type: "UPDATE", payload: partialProps });
@@ -92,17 +92,22 @@ export const useFileRepository = () => {
     }));
   };
 
+  const addPostprocessedFiles = (fs: CorganizeFile[]) => {
+    fs.forEach((newFile) => {
+      const localFilename = `${newFile.fileid}.dec`;
+      newFile.isnewfile = true;
+      newFile.streamingurl = `/${localFilename}`;
+      addOne(newFile.fileid, localFilename);
+    });
+    dispatch!({ type: "ADD", payload: fs });
+    return fs;
+  };
+
   const trim = (fileid: string, segments: Segment[]) =>
-    getInstance()
-      .trim(fileid, segments)
-      .then((newFile) => {
-        const localFilename = `${newFile.fileid}.dec`;
-        newFile.isnewfile = true;
-        newFile.streamingurl = `/${localFilename}`;
-        addOne(newFile.fileid, localFilename);
-        dispatch!({ type: "ADD", payload: [newFile] });
-        return newFile;
-      });
+    getCorganizeClient().trim(fileid, segments).then(addPostprocessedFiles);
+
+  const cut = (fileid: string, segments: Segment[]) =>
+    getCorganizeClient().cut(fileid, segments).then(addPostprocessedFiles);
 
   return {
     files,
@@ -115,6 +120,9 @@ export const useFileRepository = () => {
     renew,
     findById,
     toggleActivation,
-    trim,
+    postprocesses: {
+      trim,
+      cut,
+    },
   };
 };

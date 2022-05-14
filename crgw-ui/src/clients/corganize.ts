@@ -41,6 +41,8 @@ const proxyFetch = (url: string, method: "POST" | "PATCH", data: object) => {
   });
 };
 
+const segmentsToTuples = (segments: Segment[]) => segments.map((s) => [s.start, s.end]);
+
 class CorganizeClient {
   getFilesBySessionInfo(
     sessionInfo: SessionInfo,
@@ -192,11 +194,34 @@ class CorganizeClient {
       .then(dedupFilesById);
   }
 
-  trim(fileid: string, segments: Segment[]): Promise<CorganizeFile> {
+  trim(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {
     const url = `/api/files/${fileid}/trim`;
     return fetch(url, {
       method: "POST",
-      body: JSON.stringify({ segments }),
+      body: JSON.stringify({ segments: segmentsToTuples(segments) }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (res) => {
+        if (res.status === 200) {
+          return res.json();
+        }
+
+        throw new Error(await res.text());
+      })
+      .then((f) => {
+        // Thereturn type of the endpoint is CorganizeFile.
+        // Wrap it in an array.
+        return [f];
+      });
+  }
+
+  cut(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {
+    const url = `/api/files/${fileid}/cut`;
+    return fetch(url, {
+      method: "POST",
+      body: JSON.stringify({ segments: segmentsToTuples(segments) }),
       headers: {
         "Content-Type": "application/json",
       },
