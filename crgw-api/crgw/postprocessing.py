@@ -15,7 +15,7 @@ TRIMID_LENGTH = 6
 LOGGER = logging.getLogger("crgw-api")
 
 
-def _subclip(source_path, ext_with_dot, target_path, start, end):
+def _subclip(source_path, target_path, ext_with_dot, start, end):
     tmp_path = target_path + ext_with_dot
 
     subprocess_call([
@@ -58,7 +58,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
         def ffmpeg_subclip(new_file: dict, source_path: str, target_path: str):
             mimetype = new_file.get("mimetype")
             ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
-            _subclip(source_path, ext_with_dot, target_path, start, end)
+            _subclip(source_path, target_path, ext_with_dot, start, end)
 
         new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, process=ffmpeg_subclip)
         new_files.append(new_file)
@@ -78,7 +78,7 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         segment_paths = list()
         for i, (start, end) in enumerate(segments):
             segment_path = f"{target_path}-{i}{ext_with_dot}"
-            _subclip(source_path, segment_path, start, end)
+            _subclip(source_path, segment_path, ext_with_dot, start, end)
             segment_paths.append(segment_path)
         return segment_paths
 
