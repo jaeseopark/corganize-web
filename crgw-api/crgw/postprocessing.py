@@ -50,7 +50,6 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
-    trim_id = md5(str(segments))[:TRIMID_LENGTH]
 
     def get_segment_paths(source_path, target_path, ext_with_dot) -> List[str]:
         segment_paths = list()
@@ -59,20 +58,19 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             ffmpeg_extract_subclip(source_path, start, end, targetname=segment_path)
             segment_paths.append(segment_path)
         return segment_paths
-    
-    def concat_remux(target_path, ext_with_dot, segment_paths):
+
+    def create_final_file(target_path, ext_with_dot, segment_paths):
         tmp_path = target_path + ext_with_dot
-        path_input = "concat:" + "|".join(segment_paths)
+        concat_input_arg = "concat:" + "|".join(segment_paths)
         cmd: List[str] = [
             get_moviepy_setting("FFMPEG_BINARY"), "-y",
-            "-i", path_input,
+            "-i", concat_input_arg,
             "-c", "copy",
             tmp_path
         ]
-
         subprocess_call(cmd)
         os.rename(tmp_path, target_path)
-    
+
     def cleanup_segment_files(segment_paths: List[str]):
         for segment_path in segment_paths:
             os.remove(segment_path)
@@ -82,10 +80,10 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
 
         segment_paths = get_segment_paths(source_path, target_path, ext_with_dot)
-        concat_remux(target_path, ext_with_dot, segment_paths)
+        create_final_file(target_path, ext_with_dot, segment_paths)
         cleanup_segment_files(segment_paths)
 
-    suffix = f"-trim-{trim_id}"
+    suffix = f"-trim-{md5(str(segments))[:TRIMID_LENGTH]}"
     return _process(fileid, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
