@@ -22,9 +22,9 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 };
 
 const VideoView = ({ fileid }: { fileid: string }) => {
-  const { findById, updateFile, splitVideo } = useFileRepository();
+  const { findById, updateFile, createSubclip } = useFileRepository();
   const { multimedia, streamingurl, mimetype, size } = findById(fileid);
-  const [splitStart, setSplitStart] = useState<number>();
+  const [subclipStart, setSubclipStart] = useState<number>();
 
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
   const highlightManager: HighlightManager = useMemo(
@@ -67,18 +67,18 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
-  const split = async (splitEnd: number) => {
-    if (splitStart === undefined) {
+  const split = async (subclipEnd: number) => {
+    if (subclipStart === undefined) {
       enqueueWarning({ message: "Mark the start time first" });
       return;
     }
 
-    if (splitEnd <= splitStart) {
+    if (subclipEnd <= subclipStart) {
       enqueueWarning({ message: "Negative duration" });
       return;
     }
 
-    const newDuration = splitEnd - splitStart;
+    const newDuration = subclipEnd - subclipStart;
     const newSize = (newDuration / multimedia?.duration!) * size!;
 
     const newDurationStr = toHumanDuration(newDuration);
@@ -86,13 +86,13 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
     enqueue({ header: "Split in progress", message: `${newDurationStr}, ${newSizeStr}` });
     try {
-      await splitVideo(fileid, [splitStart, splitEnd]);
+      await createSubclip(fileid, [subclipStart, subclipEnd]);
       enqueueSuccess({ message: "Split complete" });
     } catch (e) {
       const message = (e as Error).message || "Unknown reason";
       enqueueError({ header: "Split failed", message });
     } finally {
-      setSplitStart(undefined);
+      setSubclipStart(undefined);
     }
   };
 
@@ -157,7 +157,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       vid.currentTime = 0;
     } else if (key === "i") {
       const t = Math.floor(vid.currentTime);
-      setSplitStart(t);
+      setSubclipStart(t);
       enqueue({ message: `Start timestamp: ${t}` });
     } else if (key === "o") {
       split(Math.floor(vid.currentTime));

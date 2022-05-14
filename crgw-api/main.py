@@ -27,14 +27,16 @@ def add_files():
     return "", 200
 
 
-@app.post("/files/<path:fileid>/split")
-def split_file(fileid: str):
+@app.post("/files/<path:fileid>/subclip")
+def subclip(fileid: str):
     start = int(freq.args.get("start"))
     end = int(freq.args.get("end"))
     try:
         file = create_subclip(fileid, (start, end))
     except FileNotFoundError:
         return "", 404
+    except ValueError as e:
+        return str(e), 400
     return file, 200
 
 

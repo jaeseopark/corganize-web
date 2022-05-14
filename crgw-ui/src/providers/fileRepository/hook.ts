@@ -91,9 +91,9 @@ export const useFileRepository = () => {
     }));
   };
 
-  const splitVideo = (fileid: string, timerange: number[]) =>
+  const createSubclip = (fileid: string, timerange: number[]) =>
     getInstance()
-      .splitVideo(fileid, timerange)
+      .subclip(fileid, timerange)
       .then((newFile) => {
         const localFilename = `${newFile.fileid}.dec`;
         newFile.isnewfile = true;
@@ -115,6 +115,6 @@ export const useFileRepository = () => {
     renew,
     findById,
     toggleActivation,
-    splitVideo
+    createSubclip
   };
 };
