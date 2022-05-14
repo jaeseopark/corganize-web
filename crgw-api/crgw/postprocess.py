@@ -1,3 +1,4 @@
+import logging
 import mimetypes
 import os
 from typing import List, Tuple, Callable
@@ -10,6 +11,8 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 DATA_PATH = "/data"
 DEFAULT_EXT = ".mp4"
+
+LOGGER = logging.getLogger(__name__)
 
 
 def validate_segment(segment: Tuple[int, int]) -> Tuple[int, int]:
@@ -42,7 +45,8 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
             ffmpeg_extract_subclip(source_path, start, end, targetname=tmp_path)
             os.rename(tmp_path, target_path)
 
-        new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, callback=ffmpeg_subclip)
+        new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start,
+                            run_postprocessing=ffmpeg_subclip)
         new_files.append(new_file)
 
     return new_files
@@ -64,29 +68,28 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             filter_describer += f"[{i}:v][{i}:a]"
         filter_describer += f"concat=n={len(segments)}:v=1:a=1[outv][outa]"
 
-        cmd += [
-            "-filter_complex", filter_describer,
-            "-map", "[outv]",
-            "-map", "[outa]",
-            target_path
-        ]
-
-        print(f"{' '.join(cmd)=}")
-
         mimetype = new_file.get("mimetype")
         ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
         tmp_path = target_path + ext_with_dot
 
+        cmd += [
+            "-filter_complex", filter_describer,
+            "-map", "[outv]",
+            "-map", "[outa]",
+            tmp_path
+        ]
+        LOGGER.info(f"{' '.join(cmd)=}")
+
         subprocess_call(cmd)
         os.rename(tmp_path, target_path)
 
-    return _process(fileid, suffix=f"-trim-{trim_id}", new_duration=duration, callback=ffmpeg_filter_trim)
+    return _process(fileid, suffix=f"-trim-{trim_id}", new_duration=duration, run_postprocessing=ffmpeg_filter_trim)
 
 
 def _process(fileid: str,
              suffix: str,
              new_duration: int,
-             callback: Callable[[dict, str, str], None]) -> dict:
+             run_postprocessing: Callable[[dict, str, str], None]) -> dict:
     new_fileid = fileid + suffix
     crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
 
@@ -101,6 +104,7 @@ def _process(fileid: str,
     if "highlights" in multimedia:
         multimedia.pop("highlights")
 
+    target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
     new_file = dict(
         fileid=new_fileid,
         filename=source_file["filename"] + suffix,
@@ -109,16 +113,12 @@ def _process(fileid: str,
         locationref="local",
         mimetype=mimetype,
         multimedia=merge(multimedia, dict(duration=new_duration)),
-        dateactivated=now_seconds()
-    )
-    crg_client.create_files([new_file])
-
-    target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
-    callback(new_file, source_path, target_path)
-    new_file.update(dict(
+        dateactivated=now_seconds(),
         size=os.stat(target_path).st_size,
         lastopened=0,
-    ))
+    )
 
-    crg_client.update_file(new_file)
+    run_postprocessing(new_file, source_path, target_path)
+
+    crg_client.create_files([new_file])
     return new_file
