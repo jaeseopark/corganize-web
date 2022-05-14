@@ -7,7 +7,6 @@ from commmons import now_seconds, md5, merge
 from corganizeclient.client import CorganizeClient
 from moviepy.config import get_setting as get_moviepy_setting
 from moviepy.tools import subprocess_call
-from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 DATA_PATH = "/data"
 DEFAULT_EXT = ".mp4"
