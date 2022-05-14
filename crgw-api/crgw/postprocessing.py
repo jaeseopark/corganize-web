@@ -11,22 +11,20 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 DATA_PATH = "/data"
 DEFAULT_EXT = ".mp4"
+TRIMID_LENGTH = 6
 
 LOGGER = logging.getLogger("crgw-api")
-
-
-def validate_segment(segment: Tuple[int, int]) -> Tuple[int, int]:
-    start, end = segment
-    if start >= end:
-        raise ValueError("Negative duration")
-    return segment
 
 
 def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     if len(segments) == 0:
         raise ValueError("Need one or more segments for processing")
 
-    # TODO: detect intersections
+    for start, end in segments:
+        if start >= end:
+            raise ValueError("Negative duration")
+
+    # TODO sort segmens and merge overlaps
 
     return segments
 
@@ -35,9 +33,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
     segments = normalize_segments(segments)
 
     new_files = list()
-    for segment in segments:
-        start, end = validate_segment(segment)
-
+    for start, end in segments:
         def ffmpeg_subclip(new_file: dict, source_path: str, target_path: str):
             mimetype = new_file.get("mimetype")
             ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
@@ -54,12 +50,11 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
-    trim_id = md5(str(segments))
 
     def get_filter_describer() -> str:
+        # Credit: https://gist.github.com/FarisHijazi/eff7a7979440faa84a63657e085ec504
         filter_describer = ""
-        for i, segment in enumerate(segments):
-            start, end = validate_segment(segment)
+        for i, (start, end) in enumerate(segments):
             filter_describer += f"[0:v]trim=start={start}:end={end},setpts=PTS-STARTPTS[{i}v]; "  # format=yuv420p ?
             filter_describer += f"[0:a]atrim=start={start}:end={end},asetpts=PTS-STARTPTS[{i}a]; "
 
@@ -70,8 +65,6 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         return filter_describer
 
     def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
-        # Credit: https://gist.github.com/FarisHijazi/eff7a7979440faa84a63657e085ec504
-
         mimetype = new_file.get("mimetype")
         ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
         tmp_path = target_path + ext_with_dot
@@ -90,7 +83,8 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         subprocess_call(cmd)
         os.rename(tmp_path, target_path)
 
-    return _process(fileid, suffix=f"-trim-{trim_id}", new_duration=duration, run_postprocessing=ffmpeg_filter_trim)
+    suffix = f"-trim-{md5(str(segments))[:TRIMID_LENGTH]}"
+    return _process(fileid, suffix=suffix, new_duration=duration, run_postprocessing=ffmpeg_filter_trim)
 
 
 def _process(fileid: str,
@@ -122,11 +116,14 @@ def _process(fileid: str,
         mimetype=mimetype,
         multimedia=merge(multimedia, dict(duration=new_duration)),
         dateactivated=now_seconds(),
-        size=os.stat(target_path).st_size,
         lastopened=0,
     )
 
     run_postprocessing(new_file, source_path, target_path)
+
+    new_file.update(dict(
+        size=os.stat(target_path).st_size,
+    ))
 
     crg_client.create_files([new_file])
     return new_file
