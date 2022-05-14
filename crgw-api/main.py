@@ -2,7 +2,9 @@ import logging
 
 from flask import Flask, request as freq, Response
 
-from crgw.handlers import get_local_files, teardown, forward_request, add_local_files, split
+from crgw.filemod import create_subclip
+from crgw.forwarder import forward_request
+from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
 logging.basicConfig(format="%(asctime)s %(levelname)s thread=%(thread)d %(module)s.%(funcName)s %(message)s")
 logging.root.setLevel(logging.INFO)
@@ -30,7 +32,7 @@ def split_file(fileid: str):
     start = int(freq.args.get("start"))
     end = int(freq.args.get("end"))
     try:
-        file = split(fileid, (start, end))
+        file = create_subclip(fileid, (start, end))
     except FileNotFoundError:
         return "", 404
     return file, 200
