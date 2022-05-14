@@ -18,6 +18,8 @@ def create_subclip(fileid: str, timerange: Tuple[int, int]) -> dict:
     crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
 
     starttime, endtime = timerange
+    if starttime >= endtime:
+        raise ValueError("Negative duration")
     new_fileid = f"{fileid}-{starttime}-{endtime}"
     target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
 
