@@ -50,37 +50,42 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
+    trim_id = md5(str(segments))[:TRIMID_LENGTH]
 
-    def get_command(source_path: str, target_path: str) -> List[str]:
-        # Credit: https://superuser.com/a/1621363
-        cmd: List[str] = [get_moviepy_setting("FFMPEG_BINARY"), "-y", ]
-        for start, end in segments:
-            cmd += ["-ss", str(start), "-to", str(end), "-i", source_path]
-
-        tracks = "".join([f"[{i}:v][{i}:a]" for i in range(len(segments))])
-        filter_describer = f"{tracks}concat=n={len(segments)}:v=1:a=1[outv][outa]"
-
-        cmd += [
-            "-filter_complex", filter_describer,
-            "-map", "[outv]",
-            "-map", "[outa]",
-            target_path
+    def get_segment_paths(source_path, target_path, ext_with_dot) -> List[str]:
+        segment_paths = list()
+        for i, (start, end) in enumerate(segments):
+            segment_path = f"{target_path}-{i}{ext_with_dot}"
+            ffmpeg_extract_subclip(source_path, start, end, targetname=segment_path)
+            segment_paths.append(segment_path)
+        return segment_paths
+    
+    def concat_remux(target_path, ext_with_dot, segment_paths):
+        tmp_path = target_path + ext_with_dot
+        path_input = "concat:" + "|".join(segment_paths)
+        cmd: List[str] = [
+            get_moviepy_setting("FFMPEG_BINARY"), "-y",
+            "-i", path_input,
+            "-c", "copy",
+            tmp_path
         ]
 
-        return cmd
+        subprocess_call(cmd)
+        os.rename(tmp_path, target_path)
+    
+    def cleanup_segment_files(segment_paths: List[str]):
+        for segment_path in segment_paths:
+            os.remove(segment_path)
 
     def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
         mimetype = new_file.get("mimetype")
         ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
-        tmp_path = target_path + ext_with_dot
 
-        cmd = get_command(source_path, target_path=tmp_path)
-        LOGGER.info(f"{' '.join(cmd)=}")
+        segment_paths = get_segment_paths(source_path, target_path, ext_with_dot)
+        concat_remux(target_path, ext_with_dot, segment_paths)
+        cleanup_segment_files(segment_paths)
 
-        subprocess_call(cmd)
-        os.rename(tmp_path, target_path)
-
-    suffix = f"-trim-{md5(str(segments))[:TRIMID_LENGTH]}"
+    suffix = f"-trim-{trim_id}"
     return _process(fileid, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
