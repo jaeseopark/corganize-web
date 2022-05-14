@@ -12,7 +12,7 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 DATA_PATH = "/data"
 DEFAULT_EXT = ".mp4"
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("crgw-api")
 
 
 def validate_segment(segment: Tuple[int, int]) -> Tuple[int, int]:
@@ -45,8 +45,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
             ffmpeg_extract_subclip(source_path, start, end, targetname=tmp_path)
             os.rename(tmp_path, target_path)
 
-        new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start,
-                            run_postprocessing=ffmpeg_subclip)
+        new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, run_postprocessing=ffmpeg_subclip)
         new_files.append(new_file)
 
     return new_files
@@ -100,6 +99,7 @@ def _process(fileid: str,
 
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
+        LOGGER.info(f"file not found: {source_path=}")
         raise FileNotFoundError
 
     source_file = crg_client.get_file(fileid)

@@ -6,7 +6,7 @@ from time import sleep
 from types import SimpleNamespace
 from typing import List
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("crgw-api")
 
 _LOCAL_FILE_CACHE = SimpleNamespace(
     files=list(),

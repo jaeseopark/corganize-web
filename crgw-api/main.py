@@ -9,10 +9,10 @@ from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
 logging.basicConfig(format="%(asctime)s %(levelname)s thread=%(thread)d %(module)s.%(funcName)s %(message)s")
-logging.root.setLevel(logging.INFO)
 
 # TODO: add logging.FileHandler
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("crgw-api")
+LOGGER.setLevel(logging.INFO)
 
 app = Flask(__name__)
 
