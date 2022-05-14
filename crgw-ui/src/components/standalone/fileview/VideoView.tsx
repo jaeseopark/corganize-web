@@ -67,7 +67,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
-  const split = async (subclipEnd: number) => {
+  const closeSubclip = async (subclipEnd: number) => {
     if (subclipStart === undefined) {
       enqueueWarning({ message: "Mark the start time first" });
       return;
@@ -160,7 +160,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       setSubclipStart(t);
       enqueue({ message: `Start timestamp: ${t}` });
     } else if (key === "o") {
-      split(Math.floor(vid.currentTime));
+      closeSubclip(Math.floor(vid.currentTime));
     }
   };
 
