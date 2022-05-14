@@ -55,7 +55,7 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         # Credit: https://superuser.com/a/1621363
         cmd: List[str] = [get_moviepy_setting("FFMPEG_BINARY"), "-y", ]
         for start, end in segments:
-            cmd.append(f"-ss {start} -to {end} -i {source_path}")
+            cmd += ["-ss", str(start), "-to", str(end), "-i", source_path]
 
         tracks = "".join([f"[{i}:v][{i}:a]" for i in range(len(segments))])
         filter_describer = f"{tracks}concat=n={len(segments)}:v=1:a=1[outv][outa]"
