@@ -16,6 +16,24 @@ TRIMID_LENGTH = 6
 LOGGER = logging.getLogger("crgw-api")
 
 
+def _subclip(source_path, ext_with_dot, target_path, start, end):
+    tmp_path = target_path + ext_with_dot
+
+    subprocess_call([
+        get_moviepy_setting("FFMPEG_BINARY"), "-y",
+        "-ss", "%0.2f" % start,
+        "-i", source_path,
+        "-t", "%0.2f" % (end - start),
+        "-map", "0",
+        "-async", "1",
+        "-avoid_negative_ts", "make_zero",
+        "-c", "copy",
+        tmp_path
+    ])
+
+    os.rename(tmp_path, target_path)
+
+
 def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     if len(segments) == 0:
         raise ValueError("Need one or more segments for processing")
@@ -30,6 +48,10 @@ def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]
 
 
 def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
+    """
+    Splits the video into N files where N = length of 'segments'
+    The user needs to manually delete the original file afterwards.
+    """
     segments = normalize_segments(segments)
 
     new_files = list()
@@ -37,9 +59,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
         def ffmpeg_subclip(new_file: dict, source_path: str, target_path: str):
             mimetype = new_file.get("mimetype")
             ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
-            tmp_path = target_path + ext_with_dot
-            ffmpeg_extract_subclip(source_path, start, end, targetname=tmp_path)
-            os.rename(tmp_path, target_path)
+            _subclip(source_path, ext_with_dot, target_path, start, end)
 
         new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, process=ffmpeg_subclip)
         new_files.append(new_file)
@@ -48,6 +68,10 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 
 
 def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
+    """
+    Shortens the video by discarding parts that are not included in 'segments'
+    This functions creates a new copy. The user needs to manually delete the original file afterwards.
+    """
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
 
@@ -55,7 +79,7 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
         segment_paths = list()
         for i, (start, end) in enumerate(segments):
             segment_path = f"{target_path}-{i}{ext_with_dot}"
-            ffmpeg_extract_subclip(source_path, start, end, targetname=segment_path)
+            _subclip(source_path, segment_path, start, end)
             segment_paths.append(segment_path)
         return segment_paths
 
