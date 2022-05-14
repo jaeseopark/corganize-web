@@ -58,21 +58,26 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     trim_id = md5(str(segments))
 
     def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
-        cmd: List[str] = [get_moviepy_setting("FFMPEG_BINARY")]
-        for i, segment in enumerate(segments):
-            start, end = validate_segment(segment)
-            cmd += ["-ss", str(start), "-to", str(end), "-i", source_path]
+        # Credit: https://gist.github.com/FarisHijazi/eff7a7979440faa84a63657e085ec504
 
         filter_describer = ""
+        for i, segment in enumerate(segments):
+            start, end = validate_segment(segment)
+            filter_describer += f"[0:v]trim=start={start}:end={end},setpts=PTS-STARTPTS[{i}v]; "  # format=yuv420p ?
+            filter_describer += f"[0:a]atrim=start={start}:end={end},asetpts=PTS-STARTPTS[{i}a]; "
+
         for i in range(len(segments)):
-            filter_describer += f"[{i}:v][{i}:a]"
+            filter_describer += f"[{i}v][{i}a]"
         filter_describer += f"concat=n={len(segments)}:v=1:a=1[outv][outa]"
 
         mimetype = new_file.get("mimetype")
         ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
         tmp_path = target_path + ext_with_dot
 
-        cmd += [
+        cmd: List[str] = [
+            get_moviepy_setting("FFMPEG_BINARY"),
+            "-i", source_path,
+            "-y",
             "-filter_complex", filter_describer,
             "-map", "[outv]",
             "-map", "[outa]",
