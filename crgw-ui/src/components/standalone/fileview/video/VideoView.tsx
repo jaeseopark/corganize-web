@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
@@ -29,7 +29,8 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 const VideoView = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile, postprocesses } = useFileRepository();
   const { multimedia, streamingurl, mimetype, size } = findById(fileid);
-  const { openSegments, closedSegments, segmentActions } = useSegments();
+  const { openSegment, closedSegments, segmentActions } = useSegments();
+  const [currentTime, setCurrentTime] = useState<number>();
 
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
   const highlightManager: HighlightManager = useMemo(
@@ -173,8 +174,8 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       openSegmentt(Math.floor(vid.currentTime));
     } else if (key === "o") {
       closeSegmentt(Math.floor(vid.currentTime));
-      // } else if (key === "t") {
-      //   trim();
+    } else if (key === "t") {
+      trim();
     } else if (key === "y") {
       cut();
     }
@@ -183,14 +184,16 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   return (
     <div className="video-view">
       <SegmentsView
-        openSegments={openSegments}
+        openSegment={openSegment}
         closedSegments={closedSegments}
+        currentTime={currentTime}
         multimedia={multimedia}
         size={size}
       />
       <video
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}
+        onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
         muted
         autoPlay
         loop

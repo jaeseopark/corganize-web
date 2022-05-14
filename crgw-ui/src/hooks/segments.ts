@@ -11,6 +11,7 @@ export const useSegments = () => {
   const [segments, setSegments] = useState<Segment[]>([]);
   const lastSegment = [...segments].pop();
   const isLastSegmentOpen = isOpen(lastSegment);
+  const [openSegment] = segments.filter(isOpen);
 
   const open = (t: number) => {
     if (!isLastSegmentOpen) {
@@ -37,8 +38,7 @@ export const useSegments = () => {
   };
 
   return {
-    allSegments: segments,
-    openSegments: segments.filter(isOpen),
+    openSegment,
     closedSegments: segments.filter((s) => !isOpen(s)),
     segmentActions: { open, close },
   };

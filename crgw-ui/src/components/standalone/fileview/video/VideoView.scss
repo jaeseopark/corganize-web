@@ -8,6 +8,10 @@
 
     .segment {
       background-color: var(--chakra-colors-blue-300);
+
+      &.open {
+        background-color: var(--chakra-colors-pink-300);
+      }
     }
   }
 
