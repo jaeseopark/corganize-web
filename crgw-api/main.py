@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, request as freq, Response
 
-from crgw.filemod import create_subclip, trim_clip
+from crgw.postprocess import cut_clip, trim_clip
 from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
@@ -27,12 +27,10 @@ def add_files():
     return "", 200
 
 
-@app.post("/files/<path:fileid>/subclip")
-def subclip(fileid: str):
-    start = int(freq.args.get("start"))
-    end = int(freq.args.get("end"))
+@app.post("/files/<path:fileid>/cut")
+def cut(fileid: str):
     try:
-        file = create_subclip(fileid, (start, end))
+        file = cut_clip(fileid, freq.get_json().get("segments"))
     except FileNotFoundError:
         return "", 404
     except ValueError as e:
@@ -43,7 +41,7 @@ def subclip(fileid: str):
 @app.post("/files/<path:fileid>/trim")
 def trim(fileid: str):
     try:
-        file = trim_clip(fileid, freq.get_json())
+        file = trim_clip(fileid, freq.get_json().get("segments"))
     except FileNotFoundError:
         return "", 404
     except ValueError as e:
