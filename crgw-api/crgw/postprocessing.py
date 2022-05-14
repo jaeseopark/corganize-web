@@ -33,6 +33,20 @@ def _subclip(source_path, target_path, ext_with_dot, start, end):
     os.rename(tmp_path, target_path)
 
 
+def intersects(s1: Tuple[int, int], s2: Tuple[int, int]) -> bool:
+    s1_end = s1[1]
+    s2_start, s2_end = s2
+    assert s1_end <= s2_end
+    return s2_start <= s1_end
+
+
+def combine_segments(s1: Tuple[int, int], s2: Tuple[int, int]):
+    s1_start, s1_end = s1
+    s2_start, s2_end = s2
+    all_timestamps = (s1_start, s1_end, s2_start, s2_end)
+    return min(all_timestamps), max(all_timestamps)
+
+
 def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     if len(segments) == 0:
         raise ValueError("Need one or more segments for processing")
@@ -41,7 +55,14 @@ def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]
         if start >= end:
             raise ValueError("Negative duration")
 
-    # TODO sort segmens and merge overlaps
+    segments.sort(key=lambda s: s[1])  # sort by end timestamps
+    len_segments = len(segments)
+    for i in range(len_segments - 1, 0, -1):
+        segment = segments[i]
+        prev_segment = segments[i - 1]
+        if intersects(prev_segment, segment):
+            segments[i - 1] = combine_segments(prev_segment, segment)
+            segments = segments[:i] + segments[i + 1:]
 
     return segments
 
