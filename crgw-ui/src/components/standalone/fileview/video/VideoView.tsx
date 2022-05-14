@@ -1,14 +1,18 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
+import { useSegments } from "hooks/segments";
+
 import HighlightManager from "bizlog/HighlightManager";
 
 import { madFocus } from "utils/elementUtils";
-import { toHumanDuration, toHumanFileSize } from "utils/numberUtils";
+import { toHumanDuration } from "utils/numberUtils";
+
+import SegmentsView from "components/standalone/fileview/video/SegmentsView";
 
 import "./VideoView.scss";
 
@@ -22,9 +26,9 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 };
 
 const VideoView = ({ fileid }: { fileid: string }) => {
-  const { findById, updateFile, createSubclip } = useFileRepository();
+  const { findById, updateFile, trim } = useFileRepository();
   const { multimedia, streamingurl, mimetype, size } = findById(fileid);
-  const [subclipStart, setSubclipStart] = useState<number>();
+  const { segments, closedSegments, open: openSegment, close: closeSegment } = useSegments();
 
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
   const highlightManager: HighlightManager = useMemo(
@@ -67,32 +71,34 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
-  const closeSubclip = async (subclipEnd: number) => {
-    if (subclipStart === undefined) {
-      enqueueWarning({ message: "Mark the start time first" });
-      return;
-    }
+  const openSegmentt = (t: number) => {
+    openSegment(t);
+    enqueue({ message: `Start: ${t}` });
+  };
 
-    if (subclipEnd <= subclipStart) {
-      enqueueWarning({ message: "Negative duration" });
-      return;
-    }
-
-    const newDuration = subclipEnd - subclipStart;
-    const newSize = (newDuration / multimedia?.duration!) * size!;
-
-    const newDurationStr = toHumanDuration(newDuration);
-    const newSizeStr = toHumanFileSize(newSize);
-
-    enqueue({ header: "Split in progress", message: `${newDurationStr}, ${newSizeStr}` });
+  const closeSegmentt = (t: number) => {
     try {
-      await createSubclip(fileid, [subclipStart, subclipEnd]);
-      enqueueSuccess({ message: "Split complete" });
+      closeSegment(t);
+      enqueue({ message: `End: ${t}` });
+    } catch (e) {
+      enqueueWarning({ message: (e as Error).message });
+    }
+  };
+
+  const trimm = async () => {
+    if (closedSegments.length === 0) {
+      enqueueWarning({ message: "Need segments" });
+      return;
+    }
+
+    enqueue({ message: "Trimming..." });
+
+    try {
+      await trim(fileid, closedSegments);
+      enqueueSuccess({ message: "Trim complete" });
     } catch (e) {
       const message = (e as Error).message || "Unknown reason";
-      enqueueError({ header: "Split failed", message });
-    } finally {
-      setSubclipStart(undefined);
+      enqueueError({ header: "Trim failed", message });
     }
   };
 
@@ -156,16 +162,17 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "[") {
       vid.currentTime = 0;
     } else if (key === "i") {
-      const t = Math.floor(vid.currentTime);
-      setSubclipStart(t);
-      enqueue({ message: `Start timestamp: ${t}` });
+      openSegmentt(Math.floor(vid.currentTime));
     } else if (key === "o") {
-      closeSubclip(Math.floor(vid.currentTime));
+      closeSegmentt(Math.floor(vid.currentTime));
+    } else if (key === "t") {
+      trimm();
     }
   };
 
   return (
     <div className="video-view">
+      <SegmentsView segments={closedSegments} multimedia={multimedia} size={size} />
       <video
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}

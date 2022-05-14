@@ -1,6 +1,6 @@
 import { Button, Center, SimpleGrid } from "@chakra-ui/react";
 
-import VideoView from "components/standalone/fileview/VideoView";
+import VideoView from "components/standalone/fileview/video/VideoView";
 import GalleryView from "components/standalone/fileview/gallery/GalleryView";
 
 type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;

@@ -1,6 +1,7 @@
 import { useContext } from "react";
 
 import { CorganizeFile, getActivationEmoji } from "typedefs/CorganizeFile";
+import { Segment } from "typedefs/Segment";
 
 import { FileRepository } from "providers/fileRepository/fileRepository";
 
@@ -91,9 +92,9 @@ export const useFileRepository = () => {
     }));
   };
 
-  const createSubclip = (fileid: string, timerange: number[]) =>
+  const trim = (fileid: string, segments: Segment[]) =>
     getInstance()
-      .subclip(fileid, timerange)
+      .trim(fileid, segments)
       .then((newFile) => {
         const localFilename = `${newFile.fileid}.dec`;
         newFile.isnewfile = true;
@@ -114,6 +115,6 @@ export const useFileRepository = () => {
     renew,
     findById,
     toggleActivation,
-    createSubclip
+    trim,
   };
 };

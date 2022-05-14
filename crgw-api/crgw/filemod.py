@@ -1,6 +1,6 @@
 import mimetypes
 import os
-from typing import Tuple, Callable
+from typing import List, Tuple, Callable
 
 from commmons import merge, now_seconds
 from corganizeclient.client import CorganizeClient
@@ -66,3 +66,7 @@ def _create_subclip(fileid, new_fileid, starttime, endtime, crg_client, execute:
     execute(mimetype)
 
     return new_file
+
+
+def trim_clip(fileid: str, segments: List[dict]) -> dict:
+    pass
