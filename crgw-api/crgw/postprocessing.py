@@ -56,9 +56,7 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     duration = sum([end - start for start, end in segments])
     trim_id = md5(str(segments))
 
-    def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
-        # Credit: https://gist.github.com/FarisHijazi/eff7a7979440faa84a63657e085ec504
-
+    def get_filter_describer() -> str:
         filter_describer = ""
         for i, segment in enumerate(segments):
             start, end = validate_segment(segment)
@@ -67,7 +65,12 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
 
         for i in range(len(segments)):
             filter_describer += f"[{i}v][{i}a]"
+
         filter_describer += f"concat=n={len(segments)}:v=1:a=1[outv][outa]"
+        return filter_describer
+
+    def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
+        # Credit: https://gist.github.com/FarisHijazi/eff7a7979440faa84a63657e085ec504
 
         mimetype = new_file.get("mimetype")
         ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
@@ -77,7 +80,7 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             get_moviepy_setting("FFMPEG_BINARY"),
             "-i", source_path,
             "-y",
-            "-filter_complex", filter_describer,
+            "-filter_complex", get_filter_describer(),
             "-map", "[outv]",
             "-map", "[outa]",
             tmp_path
@@ -94,14 +97,13 @@ def _process(fileid: str,
              suffix: str,
              new_duration: int,
              run_postprocessing: Callable[[dict, str, str], None]) -> dict:
-    new_fileid = fileid + suffix
-    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
-
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
-        LOGGER.info(f"file not found: {source_path=}")
-        raise FileNotFoundError
+        message = f"file not found: {source_path=}"
+        LOGGER.info(message)
+        raise FileNotFoundError(message)
 
+    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
     source_file = crg_client.get_file(fileid)
 
     mimetype = source_file.get("mimetype")
@@ -109,6 +111,7 @@ def _process(fileid: str,
     if "highlights" in multimedia:
         multimedia.pop("highlights")
 
+    new_fileid = fileid + suffix
     target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
     new_file = dict(
         fileid=new_fileid,

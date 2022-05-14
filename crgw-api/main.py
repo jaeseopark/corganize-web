@@ -4,7 +4,7 @@ from typing import List
 
 from flask import Flask, request as freq, Response
 
-from crgw.postprocess import cut_clip, trim_clip
+from crgw.postprocessing import cut_clip, trim_clip
 from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
@@ -33,8 +33,8 @@ def add_files():
 def cut(fileid: str):
     try:
         files: List[dict] = cut_clip(fileid, freq.get_json().get("segments"))
-    except FileNotFoundError:
-        return "", 404
+    except FileNotFoundError as e:
+        return str(e), 404
     except ValueError as e:
         return str(e), 400
 
@@ -48,8 +48,8 @@ def cut(fileid: str):
 def trim(fileid: str):
     try:
         file: dict = trim_clip(fileid, freq.get_json().get("segments"))
-    except FileNotFoundError:
-        return "", 404
+    except FileNotFoundError as e:
+        return str(e), 404
     except ValueError as e:
         return str(e), 400
     return file, 200

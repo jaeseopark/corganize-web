@@ -211,8 +211,8 @@ class CorganizeClient {
         throw new Error(await res.text());
       })
       .then((f) => {
-        // Thereturn type of the endpoint is CorganizeFile.
-        // Wrap it in an array.
+        // The return type of the endpoint is CorganizeFile.
+        // Wrap it in an array to align with the function signature.
         return [f];
       });
   }
