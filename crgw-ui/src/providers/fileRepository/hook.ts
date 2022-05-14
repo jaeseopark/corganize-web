@@ -6,7 +6,7 @@ import { FileRepository } from "providers/fileRepository/fileRepository";
 
 import { CreateResponse, getInstance } from "clients/corganize";
 
-import { addAll } from "shared/globalstore";
+import { addAll, addOne } from "shared/globalstore";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
@@ -91,6 +91,18 @@ export const useFileRepository = () => {
     }));
   };
 
+  const createSubclip = (fileid: string, timerange: number[]) =>
+    getInstance()
+      .subclip(fileid, timerange)
+      .then((newFile) => {
+        const localFilename = `${newFile.fileid}.dec`;
+        newFile.isnewfile = true;
+        newFile.streamingurl = `/${localFilename}`;
+        addOne(newFile.fileid, localFilename);
+        dispatch!({ type: "ADD", payload: [newFile] });
+        return newFile;
+      });
+
   return {
     files,
     isMostRecentFile,
@@ -102,5 +114,6 @@ export const useFileRepository = () => {
     renew,
     findById,
     toggleActivation,
+    createSubclip
   };
 };

@@ -2,7 +2,9 @@ import logging
 
 from flask import Flask, request as freq, Response
 
-from crgw.handlers import get_local_files, teardown, forward_request, add_local_files
+from crgw.filemod import create_subclip
+from crgw.forwarder import forward_request
+from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
 logging.basicConfig(format="%(asctime)s %(levelname)s thread=%(thread)d %(module)s.%(funcName)s %(message)s")
 logging.root.setLevel(logging.INFO)
@@ -23,6 +25,19 @@ def get_files():
 def add_files():
     add_local_files(freq.get_json())
     return "", 200
+
+
+@app.post("/files/<path:fileid>/subclip")
+def subclip(fileid: str):
+    start = int(freq.args.get("start"))
+    end = int(freq.args.get("end"))
+    try:
+        file = create_subclip(fileid, (start, end))
+    except FileNotFoundError:
+        return "", 404
+    except ValueError as e:
+        return str(e), 400
+    return file, 200
 
 
 @app.get("/health/ready")

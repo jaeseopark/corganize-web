@@ -190,6 +190,18 @@ class CorganizeClient {
       )
       .then(dedupFilesById);
   }
+
+  subclip(fileid: string, timerange: number[]): Promise<CorganizeFile> {
+    const [start, end] = timerange;
+    const url = `/api/files/${fileid}/subclip?start=${start}&end=${end}`;
+    return fetch(url, { method: "POST" }).then(async (res) => {
+      if (res.status === 200) {
+        return res.json();
+      }
+
+      throw new Error(await res.text());
+    });
+  }
 }
 
 let instance: CorganizeClient;

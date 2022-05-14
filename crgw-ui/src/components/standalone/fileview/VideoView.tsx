@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 
@@ -8,7 +8,7 @@ import { useToast } from "providers/toast/hook";
 import HighlightManager from "bizlog/HighlightManager";
 
 import { madFocus } from "utils/elementUtils";
-import { toHumanDuration } from "utils/numberUtils";
+import { toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
 import "./VideoView.scss";
 
@@ -22,10 +22,11 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
 };
 
 const VideoView = ({ fileid }: { fileid: string }) => {
-  const { findById, updateFile } = useFileRepository();
-  const { multimedia, streamingurl, mimetype } = findById(fileid);
+  const { findById, updateFile, createSubclip } = useFileRepository();
+  const { multimedia, streamingurl, mimetype, size } = findById(fileid);
+  const [subclipStart, setSubclipStart] = useState<number>();
 
-  const { enqueue, enqueueSuccess } = useToast();
+  const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
@@ -64,6 +65,35 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       height: videoHeight,
       duration: Math.ceil(duration),
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
+  };
+
+  const closeSubclip = async (subclipEnd: number) => {
+    if (subclipStart === undefined) {
+      enqueueWarning({ message: "Mark the start time first" });
+      return;
+    }
+
+    if (subclipEnd <= subclipStart) {
+      enqueueWarning({ message: "Negative duration" });
+      return;
+    }
+
+    const newDuration = subclipEnd - subclipStart;
+    const newSize = (newDuration / multimedia?.duration!) * size!;
+
+    const newDurationStr = toHumanDuration(newDuration);
+    const newSizeStr = toHumanFileSize(newSize);
+
+    enqueue({ header: "Split in progress", message: `${newDurationStr}, ${newSizeStr}` });
+    try {
+      await createSubclip(fileid, [subclipStart, subclipEnd]);
+      enqueueSuccess({ message: "Split complete" });
+    } catch (e) {
+      const message = (e as Error).message || "Unknown reason";
+      enqueueError({ header: "Split failed", message });
+    } finally {
+      setSubclipStart(undefined);
+    }
   };
 
   const onKeyDown = (e: any) => {
@@ -125,6 +155,12 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       jumpTimeByDelta(SEEK_HOTKEY_MAP[key]);
     } else if (key === "[") {
       vid.currentTime = 0;
+    } else if (key === "i") {
+      const t = Math.floor(vid.currentTime);
+      setSubclipStart(t);
+      enqueue({ message: `Start timestamp: ${t}` });
+    } else if (key === "o") {
+      closeSubclip(Math.floor(vid.currentTime));
     }
   };
 

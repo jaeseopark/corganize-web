@@ -16,11 +16,14 @@ const FileMetadataView = ({ fileid }: { fileid: string }) => {
 
   const [edit, setEdit] = useState<string>(JSON.stringify(file, null, 2));
 
-  const save = () => {
-    (async () => JSON.parse(edit!))()
-      .then(updateFile)
-      .then(() => enqueueSuccess({ message: "Saved" }))
-      .catch((err) => enqueueError({ message: err.message }));
+  const save = async () => {
+    const payload = JSON.parse(edit!);
+    try {
+      await updateFile(payload);
+      enqueueSuccess({ message: "Saved" });
+    } catch (e) {
+      enqueueError({ message: (e as Error).message });
+    }
   };
 
   const renewwww = () => renew(fileid).then(() => enqueueSuccess({ message: "Renewed" }));
