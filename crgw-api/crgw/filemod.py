@@ -2,7 +2,7 @@ import mimetypes
 import os
 from typing import Tuple, Callable
 
-from commmons import merge
+from commmons import merge, now_seconds
 from corganizeclient.client import CorganizeClient
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
@@ -58,7 +58,8 @@ def _create_subclip(fileid, new_fileid, starttime, endtime, crg_client, execute:
         storageservice="local",
         locationref="local",
         mimetype=mimetype,
-        multimedia=multimedia
+        multimedia=multimedia,
+        dateactivated=now_seconds()
     )
     crg_client.create_files([new_file])
 

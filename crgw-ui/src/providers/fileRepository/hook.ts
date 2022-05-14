@@ -98,7 +98,6 @@ export const useFileRepository = () => {
         const localFilename = `${newFile.fileid}.dec`;
         newFile.isnewfile = true;
         newFile.streamingurl = `/${localFilename}`;
-        newFile.dateactivated = getPosixSeconds();
         addOne(newFile.fileid, localFilename);
         dispatch!({ type: "ADD", payload: [newFile] });
         return newFile;
