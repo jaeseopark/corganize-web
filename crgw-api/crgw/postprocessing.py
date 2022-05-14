@@ -48,7 +48,8 @@ def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]
 
 def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
     """
-    Splits the video into N files where N = length of 'segments'
+    Splits the video into N files where N = can be as high as the number of elements in 'segments.'
+    Note: the normalization process at the start of the function may decrease the number of elements in 'segments.'
     The user needs to manually delete the original file afterwards.
     """
     segments = normalize_segments(segments)
@@ -68,7 +69,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 
 def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     """
-    Shortens the video by discarding parts that are not included in 'segments'
+    Shortens the video by discarding parts that are not included in 'segments.'
     This functions creates a new copy. The user needs to manually delete the original file afterwards.
     """
     segments = normalize_segments(segments)
