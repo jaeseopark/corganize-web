@@ -10,7 +10,7 @@
 
     .segment {
       height: 1rem;
-      position: absolute;
+      position: relative;
       background-color: var(--chakra-colors-blue-300);
 
       &.open {
