@@ -104,6 +104,7 @@ dist
 
 tmp/
 .idea/
+.env
 venv/
 *.pyc
 docker-pip-freeze.txt
