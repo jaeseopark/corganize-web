@@ -28,6 +28,7 @@ def _subclip(source_path, target_path, start, end):
     ])
     os.rename(tmp_path, target_path)
 
+
 def _concat_clips(source_paths, target_path):
     tmp_path = target_path + ".mkv"
     concat_input_arg = "concat:" + "|".join(source_paths)
@@ -107,7 +108,6 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             _subclip(source_path, segment_path, start, end)
             segment_paths.append(segment_path)
         return segment_paths
-
 
     def cleanup_segment_files(segment_paths: List[str]):
         for segment_path in segment_paths:
