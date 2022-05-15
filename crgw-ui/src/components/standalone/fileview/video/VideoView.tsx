@@ -26,13 +26,15 @@ const SEEK_HOTKEY_MAP: { [key: string]: number } = {
   b: 300,
 };
 
+const ONE_HOUR = 3600000;
+
 const VideoView = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile, postprocesses } = useFileRepository();
   const { multimedia, streamingurl, mimetype, size } = findById(fileid);
   const { openSegment, closedSegments, segmentActions } = useSegments();
   const [currentTime, setCurrentTime] = useState<number>();
 
-  const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
+  const { enqueue, enqueueSuccess, enqueueWarning, enqueueError, dequeue } = useToast();
   const highlightManager: HighlightManager = useMemo(
     () => new HighlightManager(multimedia?.highlights),
     [multimedia]
@@ -73,20 +75,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
-  const openSegmentt = (t: number) => {
-    segmentActions.open(t);
-    enqueue({ message: `Start: ${t}` });
-  };
-
-  const closeSegmentt = (t: number) => {
-    try {
-      segmentActions.close(t);
-      enqueue({ message: `End: ${t}` });
-    } catch (e) {
-      enqueueWarning({ message: (e as Error).message });
-    }
-  };
-
   const postprocessSegments = async (
     name: string,
     func: (fileid: string, segments: Segment[]) => Promise<CorganizeFile[]>
@@ -96,14 +84,18 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       return;
     }
 
-    enqueue({ header: name, message: "In progress" });
+    const initialToastId = enqueue({ header: name, message: "In progress", duration: ONE_HOUR });
 
     try {
+      console.time("postprocess");
       await func(fileid, closedSegments);
+      console.timeEnd("postprocess");
       enqueueSuccess({ header: name, message: "Complete" });
     } catch (e) {
       const message = (e as Error).message || "Unknown reason";
       enqueueError({ header: name, message });
+    } finally {
+      dequeue(initialToastId);
     }
   };
 
@@ -171,10 +163,14 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "[") {
       vid.currentTime = 0;
     } else if (key === "i") {
-      openSegmentt(Math.floor(vid.currentTime));
+      segmentActions.open(Math.floor(vid.currentTime));
     } else if (key === "o") {
-      closeSegmentt(Math.floor(vid.currentTime));
+      segmentActions.close(Math.floor(vid.currentTime));
     } else if (key === "t") {
+      if (closedSegments.length === 1) {
+        enqueueWarning({ message: "Can't use trim for one segment" });
+        return;
+      }
       trim();
     } else if (key === "y") {
       cut();
