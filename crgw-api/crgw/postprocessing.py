@@ -1,5 +1,4 @@
 import logging
-import mimetypes
 import os
 from typing import List, Tuple, Callable
 
@@ -9,15 +8,13 @@ from moviepy.config import get_setting as get_moviepy_setting
 from moviepy.tools import subprocess_call
 
 DATA_PATH = "/data"
-DEFAULT_EXT = ".mp4"
 TRIMID_LENGTH = 6
 
 LOGGER = logging.getLogger("crgw-api")
 
 
-def _subclip(source_path, target_path, ext_with_dot, start, end):
-    tmp_path = target_path + ext_with_dot
-
+def _subclip(source_path, target_path, start, end):
+    tmp_path = target_path + ".mkv"
     subprocess_call([
         get_moviepy_setting("FFMPEG_BINARY"), "-y",
         "-ss", "%0.2f" % start,
@@ -29,7 +26,17 @@ def _subclip(source_path, target_path, ext_with_dot, start, end):
         "-c", "copy",
         tmp_path
     ])
+    os.rename(tmp_path, target_path)
 
+def _concat_clips(source_paths, target_path):
+    tmp_path = target_path + ".mkv"
+    concat_input_arg = "concat:" + "|".join(source_paths)
+    subprocess_call([
+        get_moviepy_setting("FFMPEG_BINARY"), "-y",
+        "-i", concat_input_arg,
+        "-c", "copy",
+        tmp_path
+    ])
     os.rename(tmp_path, target_path)
 
 
@@ -69,18 +76,15 @@ def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]
 
 def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
     """
-    Splits the video into N files where N = can be as high as the number of elements in 'segments.'
-    Note: the normalization process at the start of the function may decrease the number of elements in 'segments.'
+    Splits the video into N files, where N = len(normalize_segments(segments)).
     The user needs to manually delete the original file afterwards.
     """
     segments = normalize_segments(segments)
 
     new_files = list()
     for start, end in segments:
-        def ffmpeg_subclip(new_file: dict, source_path: str, target_path: str):
-            mimetype = new_file.get("mimetype")
-            ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
-            _subclip(source_path, target_path, ext_with_dot, start, end)
+        def ffmpeg_subclip(source_path: str, target_path: str):
+            _subclip(source_path, target_path, start, end)
 
         new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, process=ffmpeg_subclip)
         new_files.append(new_file)
@@ -90,42 +94,28 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
 
 def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     """
-    Shortens the video by discarding parts that are not included in 'segments.'
-    This functions creates a new copy. The user needs to manually delete the original file afterwards.
+    Composes a new video by stitching the given segments.
+    The user needs to manually delete the original file afterwards.
     """
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
 
-    def get_segment_paths(source_path, target_path, ext_with_dot) -> List[str]:
+    def get_segment_paths(source_path, target_path) -> List[str]:
         segment_paths = list()
         for i, (start, end) in enumerate(segments):
-            segment_path = f"{target_path}-{i}{ext_with_dot}"
-            _subclip(source_path, segment_path, ext_with_dot, start, end)
+            segment_path = f"{target_path}-{i}.mkv"
+            _subclip(source_path, segment_path, start, end)
             segment_paths.append(segment_path)
         return segment_paths
 
-    def create_final_file(target_path, ext_with_dot, segment_paths):
-        tmp_path = target_path + ext_with_dot
-        concat_input_arg = "concat:" + "|".join(segment_paths)
-        cmd: List[str] = [
-            get_moviepy_setting("FFMPEG_BINARY"), "-y",
-            "-i", concat_input_arg,
-            "-c", "copy",
-            tmp_path
-        ]
-        subprocess_call(cmd)
-        os.rename(tmp_path, target_path)
 
     def cleanup_segment_files(segment_paths: List[str]):
         for segment_path in segment_paths:
             os.remove(segment_path)
 
-    def ffmpeg_filter_trim(new_file: dict, source_path: str, target_path: str):
-        mimetype = new_file.get("mimetype")
-        ext_with_dot = mimetypes.guess_extension(mimetype) if mimetype else DEFAULT_EXT
-
-        segment_paths = get_segment_paths(source_path, target_path, ext_with_dot)
-        create_final_file(target_path, ext_with_dot, segment_paths)
+    def ffmpeg_filter_trim(source_path: str, target_path: str):
+        segment_paths = get_segment_paths(source_path, target_path)
+        _concat_clips(segment_paths, target_path)
         cleanup_segment_files(segment_paths)
 
     suffix = f"-trim-{md5(str(segments))[:TRIMID_LENGTH]}"
@@ -135,7 +125,7 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
 def _process(fileid: str,
              suffix: str,
              new_duration: int,
-             process: Callable[[dict, str, str], None]) -> dict:
+             process: Callable[[str, str], None]) -> dict:
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
         message = f"file not found: {source_path=}"
@@ -145,7 +135,6 @@ def _process(fileid: str,
     crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
     source_file = crg_client.get_file(fileid)
 
-    mimetype = source_file.get("mimetype")
     multimedia = source_file.get("multimedia") or dict()
     if "highlights" in multimedia:
         multimedia.pop("highlights")
@@ -158,13 +147,13 @@ def _process(fileid: str,
         sourceurl=source_file["sourceurl"],
         storageservice="local",
         locationref="local",
-        mimetype=mimetype,
+        mimetype="video/x-matroska",
         multimedia=merge(multimedia, dict(duration=new_duration)),
         dateactivated=now_seconds(),
         lastopened=0,
     )
 
-    process(new_file, source_path, target_path)
+    process(source_path, target_path)
 
     new_file.update(dict(
         size=os.stat(target_path).st_size,
