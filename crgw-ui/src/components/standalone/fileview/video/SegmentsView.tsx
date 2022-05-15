@@ -46,12 +46,12 @@ const SegmentsView = ({
       return null;
     }
 
-    const endTime = currentTime + Math.min(1, duration / 100);
     return (
       <SegmentBlock
-        segment={{ start: currentTime, end: endTime }}
+        segment={{ start: currentTime, end: currentTime + 1 }}
         duration={duration}
         isOpen={true}
+        isLeadIndicator={true}
       />
     );
   };

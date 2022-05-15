@@ -1,21 +1,16 @@
-import styled from "styled-components";
 import cls from "classnames";
+import styled from "styled-components";
 
-const SegmentBlock = ({ segment, duration, isOpen = false }) => {
-  const offset = segment.start * 100 / duration;
-  let width = (segment.end - segment.start) * 100 / duration;
-
-  if (width < 0.5) {
-    // make the segment visible
-    width = 0.5;
-  }
-
-  return <StyledBlock className={cls("segment", { open: isOpen })} offset={`${offset}%`} width={`${width}%`} isOpen={isOpen} />
-}
+const SegmentBlock = ({ segment, duration, isOpen = false, isLeadIndicator = false }) => {
+  const left = (segment.start / duration) * 100;
+  const right = (1 - segment.end / duration) * 100;
+  const clsName = cls("segment", { open: isOpen, lead: isLeadIndicator });
+  return <StyledBlock className={clsName} left={`${left}%`} right={`${right}%`} isOpen={isOpen} />;
+};
 
 export default SegmentBlock;
 
 const StyledBlock = styled.div`
-  left: ${({ offset }) => offset};
-  width: ${(width) => width};
+  left: ${({ left }) => left};
+  right: ${({ right }) => right};
 `;
