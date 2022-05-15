@@ -14,7 +14,7 @@ LOGGER = logging.getLogger("crgw-api")
 
 
 def _subclip(source_path, target_path, start, end):
-    tmp_path = target_path + ".mkv"
+    tmp_path = target_path + ".mp4"
     subprocess_call([
         get_moviepy_setting("FFMPEG_BINARY"), "-y",
         "-ss", "%0.2f" % start,
@@ -23,18 +23,6 @@ def _subclip(source_path, target_path, start, end):
         "-map", "0",
         "-async", "1",
         "-avoid_negative_ts", "make_zero",
-        "-c", "copy",
-        tmp_path
-    ])
-    os.rename(tmp_path, target_path)
-
-
-def _concat_clips(source_paths, target_path):
-    tmp_path = target_path + ".mkv"
-    concat_input_arg = "concat:" + "|".join(source_paths)
-    subprocess_call([
-        get_moviepy_setting("FFMPEG_BINARY"), "-y",
-        "-i", concat_input_arg,
         "-c", "copy",
         tmp_path
     ])
@@ -100,25 +88,36 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     """
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
+    trim_id = md5(str(segments))[:TRIMID_LENGTH]
 
-    def get_segment_paths(source_path, target_path) -> List[str]:
+    def ffmpeg_filter_trim(source_path: str, target_path: str):
+        concat_specs_path = f"/tmp/{trim_id}.sources"
+        tmp_path = target_path + ".mp4"
+
         segment_paths = list()
         for i, (start, end) in enumerate(segments):
-            segment_path = f"{target_path}-{i}.mkv"
+            segment_path = f"{target_path}-{i}.mp4"
             _subclip(source_path, segment_path, start, end)
             segment_paths.append(segment_path)
-        return segment_paths
 
-    def cleanup_segment_files(segment_paths: List[str]):
+        with open(concat_specs_path, "w") as fp:
+            fp.writelines([f"file '{p}'" for p in segment_paths])
+
+        subprocess_call([
+            get_moviepy_setting("FFMPEG_BINARY"), "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i", concat_specs_path,
+            "-c", "copy",
+            tmp_path
+        ])
+
+        # Cleanup temporary files...
+        os.rename(tmp_path, target_path)
         for segment_path in segment_paths:
             os.remove(segment_path)
 
-    def ffmpeg_filter_trim(source_path: str, target_path: str):
-        segment_paths = get_segment_paths(source_path, target_path)
-        _concat_clips(segment_paths, target_path)
-        cleanup_segment_files(segment_paths)
-
-    suffix = f"-trim-{md5(str(segments))[:TRIMID_LENGTH]}"
+    suffix = f"-trim-{trim_id}"
     return _process(fileid, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
