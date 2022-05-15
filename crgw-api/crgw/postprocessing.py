@@ -100,8 +100,9 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             _subclip(source_path, segment_path, start, end)
             segment_paths.append(segment_path)
 
+        os.makedirs("/tmp", exist_ok=True)
         with open(concat_specs_path, "w") as fp:
-            fp.writelines([f"file '{p}'" for p in segment_paths])
+            fp.write("\n".join([f"file '{p}'" for p in segment_paths]))
 
         subprocess_call([
             get_moviepy_setting("FFMPEG_BINARY"), "-y",
@@ -111,9 +112,10 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             "-c", "copy",
             tmp_path
         ])
+        os.rename(tmp_path, target_path)
 
         # Cleanup temporary files...
-        os.rename(tmp_path, target_path)
+        os.remove(concat_specs_path)
         for segment_path in segment_paths:
             os.remove(segment_path)
 
