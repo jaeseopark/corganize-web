@@ -6,14 +6,14 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ./data:/data:ro
+      - ${MNT_PATH}/data:/data:ro
     ports:
       - "5823:80"
     depends_on:
       - "ui"
       - "api"
     environment:
-      SCRAPE_HOST: PLACEHOLDER
+      SCRAPE_HOST: ${SCRAPE_HOST}
   ui:
     image: node:16.13.1
     working_dir: /app
@@ -38,10 +38,10 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       - ./crgw-api:/app
-      - ./data:/data:ro
+      - ${MNT_PATH}:/data:ro
     environment:
-      CRG_REMOTE_HOST: PLACEHOLDER
-      CRG_REMOTE_APIKEY: PLACEHOLDER
+      CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
+      CRG_REMOTE_APIKEY: ${CRG_REMOTE_APIKEY}
   daemon:
     container_name: daemon
     build:
@@ -52,4 +52,4 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ./mnt:/mnt
+      - ${MNT_PATH}:/mnt
