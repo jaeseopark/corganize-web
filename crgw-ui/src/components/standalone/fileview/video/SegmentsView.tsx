@@ -46,9 +46,10 @@ const SegmentsView = ({
       return null;
     }
 
+    const endTime = currentTime + Math.min(1, duration / 100);
     return (
       <SegmentBlock
-        segment={{ start: currentTime, end: currentTime + 1 }}
+        segment={{ start: currentTime, end: endTime }}
         duration={duration}
         isOpen={true}
       />

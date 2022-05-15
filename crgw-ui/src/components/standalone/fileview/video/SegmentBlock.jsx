@@ -12,6 +12,4 @@ export default SegmentBlock;
 const StyledBlock = styled.div`
   margin-left: ${({ offset }) => offset};
   width: ${(width) => width};
-  height: 1rem;
-  position: absolute;
 `;

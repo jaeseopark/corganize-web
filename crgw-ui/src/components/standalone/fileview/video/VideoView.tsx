@@ -1,3 +1,4 @@
+import { Flex } from "@chakra-ui/react";
 import { useCallback, useMemo, useState } from "react";
 
 import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
@@ -178,7 +179,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   };
 
   return (
-    <div className="video-view">
+    <Flex className="video-view">
       <SegmentsView
         openSegment={openSegment}
         closedSegments={closedSegments}
@@ -189,7 +190,13 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       <video
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}
-        onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
+        onTimeUpdate={(e) => {
+          const newTime = (e.target as HTMLVideoElement).currentTime;
+          if (Math.abs((currentTime || 0) - newTime) > 1) {
+            // This if statement reduces the frequency of rerender.
+            setCurrentTime(newTime);
+          }
+        }}
         muted
         autoPlay
         loop
@@ -199,7 +206,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       >
         <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
       </video>
-    </div>
+    </Flex>
   );
 };
 
