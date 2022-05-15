@@ -102,7 +102,6 @@ dist
 # TernJS port file
 .tern-port
 
-data/
 tmp/
 .idea/
 venv/
@@ -110,7 +109,6 @@ venv/
 docker-pip-freeze.txt
 docker-venv/
 docker-compose-local.yml
-mnt/
 runner.py
 crgwatch/
 watch/
