@@ -41,6 +41,7 @@ export const useToast = () => {
     };
     setTimeout(close, duration);
     dispatch!({ type: "ADD", payload: toast });
+    return toastId;
   };
 
   const enqueueInfo = (props: EnqueueProps) => enqueueWithType({ ...props, type: "info" });
@@ -48,8 +49,11 @@ export const useToast = () => {
   const enqueueWarning = (props: EnqueueProps) => enqueueWithType({ ...props, type: "warning" });
   const enqueueError = (props: EnqueueProps) => enqueueWithType({ ...props, type: "error" });
 
+  const dequeue = (toastId: string) => dispatch!({ type: "REMOVE", payload: toastId });
+
   return {
     toasts,
+    dequeue,
     enqueue: enqueueInfo,
     enqueueSuccess,
     enqueueWarning,

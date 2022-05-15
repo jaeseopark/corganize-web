@@ -41,8 +41,7 @@ const SegmentsView = ({
   );
 
   const Seeker = () => {
-    if (openSegment || currentTime === undefined) {
-      // Do not render the seeker if there is an open segment because they deliver the same information to the user.
+    if (currentTime === undefined) {
       return null;
     }
 
@@ -51,6 +50,7 @@ const SegmentsView = ({
         segment={{ start: currentTime, end: currentTime + 1 }}
         duration={duration}
         isOpen={true}
+        isLeadIndicator={true}
       />
     );
   };
