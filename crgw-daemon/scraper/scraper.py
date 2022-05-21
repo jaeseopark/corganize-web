@@ -12,7 +12,7 @@ HOST_URL = "http://nginx/redir/scrape"
 
 def run_scraper(config: dict):
     cc = CorganizeClient(**config["server"])
-    recent_files = cc.get_active_files(limit=config["scrape"]["quick_dedup"]["query_limit"], interval=15)
+    recent_files = cc.get_active_files(limit=config["scrape"]["quick_dedup"]["query_limit"])
     recent_fileids = set([f["fileid"] for f in recent_files])
     banned_keywords = set([n.lower() for n in config["scrape"]["blacklist"]])
 
