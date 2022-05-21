@@ -38,7 +38,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       - ./crgw-api:/app
-      - ${MNT_PATH}/data:/data:ro
+      - ${MNT_PATH}/data:/data
     environment:
       CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
       CRG_REMOTE_APIKEY: ${CRG_REMOTE_APIKEY}

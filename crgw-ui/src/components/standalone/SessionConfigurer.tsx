@@ -3,29 +3,22 @@ import { useState } from "react";
 
 import { SessionInfo } from "typedefs/Session";
 
-import { addDays, dateToPosixSeconds } from "utils/dateUtils";
-
-import ExpandableDateRange from "components/reusable/ExpandableDateRange";
-
 import "./LibrarySelector.scss";
 
+<<<<<<< HEAD
 const DEFAULT_LOOKBACK_DAYS = 14;
+=======
+>>>>>>> 93bdc25 (drop date range selection)
 const INCREMENT = 2500;
 
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
   const [fileLimit, setFileLimit] = useState(5000);
   const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
   const [showLocalOnly, setLocalOnly] = useState(true);
-  const [dateRange, setDateRange] = useState({
-    startDate: addDays(new Date(), -DEFAULT_LOOKBACK_DAYS),
-    endDate: new Date(),
-  });
 
   const onOK = () =>
     setInfo({
       limit: fileLimit,
-      dateRangeStart: dateToPosixSeconds(dateRange.startDate),
-      dateRangeEnd: dateToPosixSeconds(dateRange.endDate),
       endpoint,
       showLocalOnly,
     });
@@ -39,21 +32,6 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
       min={INCREMENT}
     />
   );
-
-  const DateRangerPicker = () => {
-    if (endpoint !== "active") {
-      return null;
-    }
-
-    return (
-      <tr className="date-picker">
-        <td>Date Range</td>
-        <td>
-          <ExpandableDateRange dateRange={dateRange} setDateRange={setDateRange} />
-        </td>
-      </tr>
-    );
-  };
 
   const renderEndpointPicker = () => (
     <select value={endpoint} onChange={(e) => setEndpoint(e.target.value as "stale" | "active")}>
@@ -78,7 +56,6 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
             <td>Endpoint</td>
             <td>{renderEndpointPicker()}</td>
           </tr>
-          <DateRangerPicker />
           <tr>
             <td>File Limit</td>
             <td>{renderFilecountLimiter()}</td>

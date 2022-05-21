@@ -58,11 +58,8 @@ class CorganizeClient {
     );
   }
 
-  getFiles(path: string, info: SessionInfo, nexttoken?: string) {
-    const headers = {
-      rangestart: info.dateRangeStart,
-      rangeend: info.dateRangeEnd,
-    };
+  getFiles(path: string, nexttoken?: string) {
+    const headers = {};
 
     if (nexttoken) {
       // @ts-ignore
@@ -83,7 +80,7 @@ class CorganizeClient {
   ): Promise<null> {
     if (remaining <= 0) return Promise.resolve(null);
 
-    return this.getFiles(path, sessionInfo, paginationToken)
+    return this.getFiles(path, paginationToken)
       .then((r) => {
         // @ts-ignore
         return r.json() as FileResponse;
