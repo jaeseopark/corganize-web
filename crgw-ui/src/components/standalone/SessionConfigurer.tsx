@@ -5,10 +5,6 @@ import { SessionInfo } from "typedefs/Session";
 
 import "./LibrarySelector.scss";
 
-<<<<<<< HEAD
-const DEFAULT_LOOKBACK_DAYS = 14;
-=======
->>>>>>> 93bdc25 (drop date range selection)
 const INCREMENT = 2500;
 
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
