@@ -10,10 +10,10 @@ import ExpandableDateRange from "components/reusable/ExpandableDateRange";
 import "./LibrarySelector.scss";
 
 const DEFAULT_LOOKBACK_DAYS = 14;
-const INCREMENT = 250;
+const INCREMENT = 2500;
 
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
-  const [fileLimit, setFileLimit] = useState(500);
+  const [fileLimit, setFileLimit] = useState(5000);
   const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
   const [showLocalOnly, setLocalOnly] = useState(true);
   const [dateRange, setDateRange] = useState({
