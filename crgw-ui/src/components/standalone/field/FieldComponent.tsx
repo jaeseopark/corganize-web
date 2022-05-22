@@ -6,6 +6,7 @@ import { useGrid } from "providers/grid/hook";
 import { Field, Filter, SortDirection } from "providers/grid/types";
 
 import BooleanControl from "components/standalone/field/BooleanControl";
+import DropdownControl from "components/standalone/field/DropdownControl";
 
 const rotate = (direction: SortDirection): SortDirection | undefined => {
   if (direction === "desc") return "asc";
@@ -19,6 +20,8 @@ const FilterControl = ({ filter }: { filter?: Filter }) => {
   switch (filter.field.filterType) {
     case "boolean":
       return <BooleanControl filter={filter} />;
+    case "dropdown":
+      return <DropdownControl filter={filter} />;
     default:
       return null;
   }

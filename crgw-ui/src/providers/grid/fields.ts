@@ -24,7 +24,7 @@ export const fieldLastOpened: Field = {
 export const fieldMimetype: Field = {
   displayName: "Mimetype",
   key: "mimetype",
-  filterType: "boolean", // TODO: change to dropdown later
+  filterType: "dropdown",
   sortType: "string",
 };
 

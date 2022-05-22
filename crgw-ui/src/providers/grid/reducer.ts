@@ -1,6 +1,6 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
-import { createMegaFilter } from "providers/grid/filter";
+import { applyPrefilter, createMegaFilter } from "providers/grid/filter";
 import { createMegaComparer } from "providers/grid/sort";
 import { Action, Page, State } from "providers/grid/types";
 
@@ -32,13 +32,15 @@ const paginate = (files: CorganizeFile[], page: Page) => {
 
 const recompute = (state: State): State => {
   const { files, filters, prefilter, sorts, page } = state;
-  const newFilteredAndSorted = files
-    .filter(createMegaFilter(filters, prefilter))
+  const { prefilteredFiles, newFilters } = applyPrefilter(files, filters, prefilter);
+  const newFilteredAndSorted = prefilteredFiles
+    .filter(createMegaFilter(newFilters))
     .sort(createMegaComparer(sorts));
   const newPage = getNewPage(page, newFilteredAndSorted.length);
   const newFilteredSortedAndPaginated = paginate(newFilteredAndSorted, newPage);
   return {
     ...state,
+    filters: newFilters,
     filteredAndSorted: newFilteredAndSorted,
     filteredSortedAndPaginated: newFilteredSortedAndPaginated,
     page: newPage,
