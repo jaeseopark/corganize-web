@@ -20,11 +20,10 @@ import "./VideoView.scss";
 
 const DEFAULT_MIMETYPE = "video/mp4";
 const SEEK_HOTKEY_MAP: { [key: string]: number } = {
-  z: -15,
-  x: -3,
-  c: 3,
-  v: 15,
-  b: 300,
+  z: 3,
+  x: 15,
+  c: 30,
+  v: 60,
 };
 
 const ONE_HOUR = 3600000;
@@ -125,26 +124,17 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       } catch (e) {}
     };
 
-    /**
-     * @param percentage 0-1.0
-     */
-    const jumpTimeByPercentage = (percentage: number) => {
-      try {
-        vid.currentTime = vid.duration * percentage;
-      } catch (e) {}
-    };
-
     const jumptToNextHighlight = () => {
       const nextHighlight = highlightManager.next(vid.currentTime);
       if (nextHighlight !== null) vid.currentTime = nextHighlight;
     };
 
-    if (shiftKey) {
-      if (SEEK_HOTKEY_MAP[key]) {
-        jumpTimeByDelta(SEEK_HOTKEY_MAP[key] * 2);
-      } else {
-        return;
+    if (SEEK_HOTKEY_MAP[key]) {
+      let delta = SEEK_HOTKEY_MAP[key];
+      if (shiftKey) {
+        delta *= -1;
       }
+      return jumpTimeByDelta(delta);
     }
 
     if (key === "e") {
@@ -158,11 +148,15 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "b") {
       addHighlight();
     } else if (key >= "0" && key <= "9") {
-      jumpTimeByPercentage(parseInt(key, 10) / 10);
+      const percentage = parseInt(key) / 10;
+      vid.currentTime = vid.duration * percentage;
     } else if (SEEK_HOTKEY_MAP[key]) {
       jumpTimeByDelta(SEEK_HOTKEY_MAP[key]);
     } else if (key === "[") {
       vid.currentTime = 0;
+    } else if (key === "]") {
+      vid.currentTime = vid.duration - 1;
+      vid.pause();
     } else if (key === "i") {
       segmentActions.open(Math.floor(vid.currentTime));
     } else if (key === "o") {
