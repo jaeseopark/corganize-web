@@ -14,7 +14,7 @@ const PRESET_DEFAULT: Preset = {
       field: fieldMimetype,
       dropdown: {
         value: "(All)",
-        options: ["(All)", "(Blank)"],
+        options: [],
       },
     },
     {
