@@ -14,15 +14,10 @@ def run_scraper(config: dict):
     cc = CorganizeClient(**config["server"])
     recent_files = cc.get_active_files(limit=config["scrape"]["quick_dedup"]["query_limit"])
     recent_fileids = set([f["fileid"] for f in recent_files])
-    banned_keywords = set([n.lower() for n in config["scrape"]["blacklist"]])
 
     def filt(files: Iterable[dict]) -> Iterable[dict]:
         for file in files:
             if file["fileid"] in recent_fileids:
-                continue
-
-            # TODO: use regex instead
-            if any([s in file["filename"].lower() for s in banned_keywords]):
                 continue
 
             yield file
@@ -44,7 +39,7 @@ def run_scraper(config: dict):
     filtered = filt(unfiltered)
 
     result = cc.create_files(list(filtered))
-    logger.info(f"{len(result['created'])=} {len(result['skipped'])=} {len(result['failed'])=}")
+    logger.info(f"{len(result['created'])=} {len(result['skipped'])=}")
 
 
 def init_scraper(config: dict):

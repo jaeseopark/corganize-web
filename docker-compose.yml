@@ -3,10 +3,8 @@ services:
   nginx:
     image: nginx
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
       - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ${MNT_PATH}/data:/data:ro
+      - ${DATA_MNT_DIR}/data:/data:ro
     ports:
       - "5823:80"
     depends_on:
@@ -14,6 +12,7 @@ services:
       - "api"
     environment:
       SCRAPE_HOST: ${SCRAPE_HOST}
+      TZ: ${TIMEZONE}
   ui:
     image: node:16.13.1
     working_dir: /app
@@ -21,9 +20,9 @@ services:
       sh -c "yarn install &&
              yarn start-port80"
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
       - ./crgw-ui:/app
+    environment:
+      TZ: ${TIMEZONE}
   api:
     image: python:3.10-slim-bullseye
     working_dir: /app
@@ -35,11 +34,10 @@ services:
                pip freeze > docker-pip-freeze.txt &&
                python main.py"
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
       - ./crgw-api:/app
-      - ${MNT_PATH}/data:/data
+      - ${DATA_MNT_DIR}/data:/data
     environment:
+      TZ: ${TIMEZONE}
       CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
       CRG_REMOTE_APIKEY: ${CRG_REMOTE_APIKEY}
   daemon:
@@ -49,7 +47,11 @@ services:
       dockerfile: Dockerfile
     command: python -m daemon
     restart: unless-stopped
+    environment:
+      TZ: ${TIMEZONE}
+      CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
+      CRG_REMOTE_APIKEY: ${CRG_REMOTE_APIKEY}
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-      - ${MNT_PATH}:/mnt
+      - ${CONFIG_PATH}:/config/config.yml
+      - ${DATA_MNT_DIR}:/mnt
+      - ${LOG_DIR}:/var/log/crgw-daemon
