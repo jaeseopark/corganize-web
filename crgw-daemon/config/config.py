@@ -4,17 +4,14 @@ import os
 import yaml
 from commmons import merge
 
-_OVERRIDE_PATH = "/mnt/config.yml"
+_OVERRIDE_PATH = "/config/config.yml"
 
 _DEFAULT = """
-server:
-  host: ""
-  apikey: ""
 log:
-  all: /mnt/logs/all.log
-  watcher: /mnt/logs/watcher.log
-  cleaner: /mnt/logs/cleaner.log
-  scraper: /mnt/logs/scraper.log
+  daemon: /var/log/crgw-daemon/daemon.log
+  watcher: /var/log/crgw-daemon/watcher.log
+  cleaner: /var/log/crgw-daemon/cleaner.log
+  scraper: /var/log/crgw-daemon/scraper.log
 data:
   path: /mnt/data
 watch:
@@ -30,8 +27,6 @@ scrape:
       max_items: 5
   quick_dedup:
     query_limit: 5000
-  blacklist:
-  - PLACEHOLDER
 """
 
 _INSTANCE = dict()
@@ -55,7 +50,11 @@ def get_config() -> dict:
     if len(_INSTANCE) == 0:
         _INSTANCE.update(merge(
             _get_default_config(),
-            _get_override()
+            _get_override(),
+            dict(server=dict(
+                host=os.getenv("CRG_REMOTE_HOST"),
+                apikey=os.getenv("CRG_REMOTE_APIKEY")
+            ))
         ))
         if not _INSTANCE["server"]["host"] or not _INSTANCE["server"]["apikey"]:
             raise RuntimeError("Server information must be provided")

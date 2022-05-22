@@ -72,7 +72,7 @@ def run_daemon():
 
     config = get_config()
     os.makedirs(config["data"]["path"], exist_ok=True)
-    init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["all"])
+    init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["daemon"])
 
     threads = []
 

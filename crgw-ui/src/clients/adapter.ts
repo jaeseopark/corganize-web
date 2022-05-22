@@ -36,7 +36,7 @@ export const retrieveFiles = (
   };
 
   const decorateAndFilter = (files: CorganizeFile[]) => {
-    files = files.map(decorate);
+    files = files.map(decorate).filter((f) => f.size === undefined || f.size > sessionInfo.minSize);
     if (sessionInfo.showLocalOnly) {
       return files.filter((f: CorganizeFile) => f.streamingurl);
     }

@@ -5,27 +5,41 @@ import { SessionInfo } from "typedefs/Session";
 
 import "./LibrarySelector.scss";
 
-const INCREMENT = 2500;
+const FILE_COUNT_INCREMENT = 2500;
+const MIN_FILE_SIZE_INCREMENT = 50;
+const MB_TO_BYTES = 1000000;
 
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
-  const [fileLimit, setFileLimit] = useState(5000);
+  const [fileCountLimit, setFileCountLimit] = useState(1000);
+  const [minFileSize, setMinFileSize] = useState(50);
   const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
   const [showLocalOnly, setLocalOnly] = useState(true);
 
   const onOK = () =>
     setInfo({
-      limit: fileLimit,
+      limit: fileCountLimit,
+      minSize: minFileSize * MB_TO_BYTES,
       endpoint,
       showLocalOnly,
     });
 
-  const renderFilecountLimiter = () => (
+  const renderFileCountLimiter = () => (
     <input
       type="number"
-      onChange={(e) => setFileLimit(Number.parseInt(e.target.value))}
-      value={fileLimit}
-      step={INCREMENT}
-      min={INCREMENT}
+      onChange={(e) => setFileCountLimit(Number.parseInt(e.target.value))}
+      value={fileCountLimit}
+      step={FILE_COUNT_INCREMENT}
+      min={FILE_COUNT_INCREMENT}
+    />
+  );
+
+  const renderFileSizeLimiter = () => (
+    <input
+      type="number"
+      onChange={(e) => setMinFileSize(Number.parseInt(e.target.value))}
+      value={minFileSize}
+      step={MIN_FILE_SIZE_INCREMENT}
+      min={0}
     />
   );
 
@@ -53,8 +67,12 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
             <td>{renderEndpointPicker()}</td>
           </tr>
           <tr>
-            <td>File Limit</td>
-            <td>{renderFilecountLimiter()}</td>
+            <td>File Count Limit</td>
+            <td>{renderFileCountLimiter()}</td>
+          </tr>
+          <tr>
+            <td>Min File Size (MB)</td>
+            <td>{renderFileSizeLimiter()}</td>
           </tr>
           <tr>
             <td>Show Local Files Only</td>
