@@ -29,6 +29,7 @@ export type BooleanFilter = {
 
 export type DropdownFilter = {
   value: string;
+  options: string[];
 };
 
 export type NumberFilter = {

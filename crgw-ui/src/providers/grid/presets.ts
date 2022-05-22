@@ -12,8 +12,9 @@ const PRESET_DEFAULT: Preset = {
     },
     {
       field: fieldMimetype,
-      boolean: {
-        value: "checked",
+      dropdown: {
+        value: "(All)",
+        options: ["(All)", "(Blank)"],
       },
     },
     {
