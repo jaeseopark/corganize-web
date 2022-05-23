@@ -81,8 +81,8 @@ const SegmentsView = ({
     <div className="segments-view">
       <ClosedSegments />
       <OpenSegmentt />
-      <Markers />
       <Highlights />
+      <Markers />
       <Seekerr />
     </div>
   );
