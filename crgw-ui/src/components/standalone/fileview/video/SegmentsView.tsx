@@ -1,17 +1,27 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
 
-import SegmentBlock from "./SegmentBlock";
+import {
+  ClosedSegmentBlock,
+  Highlight,
+  OpenSegmentBlock,
+  Seeker,
+  TimeMarker,
+} from "components/standalone/fileview/video/SegmentBlock";
+
+const MARKERS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const SegmentsView = ({
   openSegment,
   closedSegments,
   currentTime,
   multimedia,
+  highlights,
 }: {
   openSegment?: Segment;
   closedSegments: Segment[];
   currentTime?: number;
+  highlights: number[];
 } & Partial<CorganizeFile>) => {
   const duration = multimedia?.duration;
 
@@ -29,29 +39,41 @@ const SegmentsView = ({
       return null;
     }
 
-    return <SegmentBlock segment={{ start, end: currentTime }} duration={duration} isOpen={true} />;
+    return <OpenSegmentBlock start={start} currentTime={currentTime} duration={duration} />;
   };
 
   const ClosedSegments = () => (
     <>
       {closedSegments.map((s) => (
-        <SegmentBlock key={s.start} segment={s} duration={duration} />
+        <ClosedSegmentBlock key={s.start} segment={s} duration={duration} />
       ))}
     </>
   );
 
-  const Seeker = () => {
-    if (currentTime === undefined) {
-      return null;
-    }
+  const Seekerr = () => {
+    if (currentTime === undefined) return null;
+    return <Seeker currentTime={currentTime} duration={duration} />;
+  };
 
+  const Markers = () => {
+    if (!duration) return null;
     return (
-      <SegmentBlock
-        segment={{ start: currentTime, end: currentTime + 1 }}
-        duration={duration}
-        isOpen={true}
-        isLeadIndicator={true}
-      />
+      <>
+        {MARKERS.map((m) => (
+          <TimeMarker key={m} value={m} />
+        ))}
+      </>
+    );
+  };
+
+  const Highlights = () => {
+    if (!duration) return null;
+    return (
+      <>
+        {highlights.map((h) => (
+          <Highlight timestamp={h} duration={duration} />
+        ))}
+      </>
     );
   };
 
@@ -59,7 +81,9 @@ const SegmentsView = ({
     <div className="segments-view">
       <ClosedSegments />
       <OpenSegmentt />
-      <Seeker />
+      <Markers />
+      <Highlights />
+      <Seekerr />
     </div>
   );
 };
