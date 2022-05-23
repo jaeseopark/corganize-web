@@ -71,7 +71,7 @@ const SegmentsView = ({
     return (
       <>
         {highlights.map((h) => (
-          <Highlight timestamp={h} duration={duration} />
+          <Highlight key={h} timestamp={h} duration={duration} />
         ))}
       </>
     );
