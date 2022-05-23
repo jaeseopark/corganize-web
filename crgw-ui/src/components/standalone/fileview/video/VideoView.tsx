@@ -179,6 +179,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
         closedSegments={closedSegments}
         currentTime={currentTime}
         multimedia={multimedia}
+        highlights={highlightManager.highlights}
         size={size}
       />
       <video
