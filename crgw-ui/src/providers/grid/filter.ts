@@ -2,25 +2,22 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { Filter, MaybeBoolean } from "providers/grid/types";
 
-const filterGlobalText = (value: string) => (f: CorganizeFile) => {
-  const lowered = value.toLowerCase().trim();
-  return f.filename.toLowerCase().includes(lowered) || f.fileid.toLowerCase().includes(lowered);
-};
-
 export const applyPrefilter = (files: CorganizeFile[], filters: Filter[], prefilter: string) => {
-  const prefilteredFiles = files.filter(filterGlobalText(prefilter));
+  const prefilteredFiles = files.filter((f: CorganizeFile) => {
+    const lowered = prefilter.toLowerCase().trim();
+    return f.filename.toLowerCase().includes(lowered) || f.fileid.toLowerCase().includes(lowered);
+  });
+
   const newFilters = filters.map((filter) => {
     if (filter.field.filterType === "dropdown") {
       const { dropdown, ...rest } = filter;
-      const options = Array.from(
-        new Set([
-          "(All)",
-          ...prefilteredFiles.map((file) => {
-            const fieldValue = file[filter.field.key];
-            return fieldValue ? String(fieldValue) : "(Blank)";
-          }),
-        ])
-      ).sort();
+
+      const fieldValues = prefilteredFiles
+        .map((file) => file[filter.field.key])
+        .filter((fieldValue) => !!fieldValue)
+        .map((fieldValue) => String(fieldValue));
+      const uniqueFieldValues = Array.from(new Set(fieldValues)).sort();
+      const options = ["(All)", "(Blank)", ...uniqueFieldValues];
 
       const getValue = () => {
         const { value } = dropdown!;
