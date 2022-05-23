@@ -34,8 +34,8 @@ export const Highlight = ({ timestamp, duration }) => (
     isHighlight={true}
   />
 );
-export const TimeMarker = ({ value }) => (
-  <StyledTimeMarker className="time-marker" left={value * 10}>
+export const TimeMarker = ({ value, onClick }) => (
+  <StyledTimeMarker className="time-marker clickable" left={value * 10} onClick={onClick}>
     {value}
   </StyledTimeMarker>
 );

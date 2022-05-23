@@ -17,11 +17,13 @@ const SegmentsView = ({
   currentTime,
   multimedia,
   highlights,
+  jumpToTime,
 }: {
   openSegment?: Segment;
   closedSegments: Segment[];
   currentTime?: number;
   highlights: number[];
+  jumpToTime: (percent: number) => void;
 } & Partial<CorganizeFile>) => {
   const duration = multimedia?.duration;
 
@@ -60,7 +62,7 @@ const SegmentsView = ({
     return (
       <>
         {MARKERS.map((m) => (
-          <TimeMarker key={m} value={m} />
+          <TimeMarker key={m} value={m} onClick={() => jumpToTime((duration * m) / 10)} />
         ))}
       </>
     );

@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
@@ -33,6 +33,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   const { multimedia, streamingurl, mimetype, size } = findById(fileid);
   const { openSegment, closedSegments, segmentActions } = useSegments();
   const [currentTime, setCurrentTime] = useState<number>();
+  const vidRef = useRef<HTMLVideoElement | null>(null);
 
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError, dequeue } = useToast();
   const highlightManager: HighlightManager = useMemo(
@@ -103,6 +104,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
   const cut = () => postprocessSegments("Cut", postprocesses.cut);
 
+  const jumpTo = (time: number) => {
+    if (vidRef.current) vidRef.current.currentTime = time;
+  };
+
   const onKeyDown = (e: any) => {
     const { target: vid, shiftKey, ctrlKey } = e;
     const key = e.key.toLowerCase();
@@ -118,15 +123,11 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       );
     };
 
-    const jumpTimeByDelta = (deltaInSeconds: number) => {
-      try {
-        vid.currentTime += deltaInSeconds;
-      } catch (e) {}
-    };
+    const jumpTimeByDelta = (deltaInSeconds: number) => jumpTo(vid.currentTime + deltaInSeconds);
 
     const jumptToNextHighlight = () => {
       const nextHighlight = highlightManager.next(vid.currentTime);
-      if (nextHighlight !== null) vid.currentTime = nextHighlight;
+      if (nextHighlight !== null) jumpTo(nextHighlight);
     };
 
     if (SEEK_HOTKEY_MAP[key]) {
@@ -149,7 +150,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       addHighlight();
     } else if (key >= "0" && key <= "9") {
       const percentage = parseInt(key) / 10;
-      vid.currentTime = vid.duration * percentage;
+      jumpTo(vid.duration * percentage);
     } else if (SEEK_HOTKEY_MAP[key]) {
       jumpTimeByDelta(SEEK_HOTKEY_MAP[key]);
     } else if (key === "[") {
@@ -181,8 +182,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
         multimedia={multimedia}
         highlights={highlightManager.highlights}
         size={size}
+        jumpToTime={jumpTo}
       />
       <video
+        ref={vidRef}
         onKeyDown={onKeyDown}
         onLoadedMetadata={onMetadata}
         onTimeUpdate={(e) => {
@@ -197,7 +200,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
         loop
         controls
         playsInline
-        webkit-playsinline
       >
         <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
       </video>
