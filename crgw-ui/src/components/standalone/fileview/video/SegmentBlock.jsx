@@ -22,7 +22,7 @@ export const OpenSegmentBlock = ({ duration, start, currentTime }) => (
 );
 export const Seeker = ({ currentTime, duration }) => (
   <SegmentBlock
-    segment={{ start: currentTime, end: currentTime + 1 }}
+    segment={{ start: 0, end: currentTime }}
     duration={duration}
     isLeadIndicator={true}
   />
