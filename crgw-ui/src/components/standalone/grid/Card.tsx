@@ -6,8 +6,8 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 
+import FileBadges from "components/reusable/FileBadges";
 import FileIcon from "components/reusable/FileIcon";
-import FileTags from "components/reusable/FileTags";
 
 import "./Card.scss";
 
@@ -59,7 +59,7 @@ const Card = ({
         <Divider />
         <FileIcon f={file} />
         <Divider />
-        <FileTags f={file} />
+        <FileBadges f={file} />
         <HStack>
           <InfoIcon className="clickable" onClick={openJsonEditorr} />
           <SearchIcon className="clickable" onClick={openScrapePanell} />

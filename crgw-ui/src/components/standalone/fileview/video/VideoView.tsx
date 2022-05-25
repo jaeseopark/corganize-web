@@ -52,7 +52,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
         multimedia: m,
       });
     },
-    [multimedia, updateFile]
+    [multimedia, updateFile, fileid]
   );
 
   const onMetadata = (e: any) => {
