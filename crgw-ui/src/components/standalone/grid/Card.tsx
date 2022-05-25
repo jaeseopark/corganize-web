@@ -6,8 +6,8 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 
-import FileIcon from "components/reusable/FileIcon";
 import FileBadges from "components/reusable/FileBadges";
+import FileIcon from "components/reusable/FileIcon";
 
 import "./Card.scss";
 
