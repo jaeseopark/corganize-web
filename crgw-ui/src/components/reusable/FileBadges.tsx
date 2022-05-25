@@ -5,7 +5,7 @@ import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/Corganiz
 
 import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
-import "./FileTags.scss";
+import "./FileBadges.scss";
 
 type TagKey = keyof CorganizeFile | keyof Multimedia;
 type Tag = {
@@ -13,7 +13,7 @@ type Tag = {
   styleClasses?: ClsArg[];
 };
 
-const FileTags = ({ f }: { f: CorganizeFile }) => {
+const FileBadges = ({ f }: { f: CorganizeFile }) => {
   return (
     <Wrap className="file-tags" spacing="3px" justify="center">
       {Array.from(TAG_GENERATION_MAP.entries()).map(([fieldName, func]) =>
@@ -27,7 +27,7 @@ const FileTags = ({ f }: { f: CorganizeFile }) => {
   );
 };
 
-export default FileTags;
+export default FileBadges;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

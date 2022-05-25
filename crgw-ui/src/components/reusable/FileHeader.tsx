@@ -2,7 +2,7 @@ import { Center, VStack } from "@chakra-ui/react";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 
-import FileTags from "components/reusable/FileTags";
+import FileBadges from "components/reusable/FileBadges";
 
 import "./FileHeader.scss";
 
@@ -13,7 +13,7 @@ const FileHeader = ({ fileid }: { fileid: string }) => {
 
   return (
     <VStack className="file-header" spacing=".5em">
-      <FileTags f={file} />
+      <FileBadges f={file} />
       <Center>{filename}</Center>
     </VStack>
   );

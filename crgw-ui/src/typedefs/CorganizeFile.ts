@@ -21,6 +21,7 @@ export type CorganizeFile = {
   mimetype?: string;
   lastopened?: number;
   multimedia?: Multimedia;
+  tags?: string[];
 
   // UI-only fields
   isnewfile: boolean;
