@@ -158,7 +158,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     } else if (key === "]") {
       vid.currentTime = vid.duration - 1;
       vid.pause();
-    } else if (key === "j") {
+    } else if (key === "i") {
       segmentActions.open(Math.floor(vid.currentTime));
     } else if (key === "o") {
       segmentActions.close(Math.floor(vid.currentTime));
