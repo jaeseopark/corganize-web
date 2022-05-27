@@ -1,5 +1,11 @@
-import { fieldDateActivated, fieldLastOpened, fieldMimetype, fieldNew, fieldSize } from "./fields";
-import { Preset } from "./types";
+import {
+  fieldDateActivated,
+  fieldLastOpened,
+  fieldMimetype,
+  fieldNew,
+  fieldSize,
+} from "providers/grid/fields";
+import { Preset } from "providers/grid/types";
 
 const PRESET_DEFAULT: Preset = {
   name: "Default",

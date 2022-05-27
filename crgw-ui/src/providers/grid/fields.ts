@@ -1,4 +1,4 @@
-import { Field } from "./types";
+import { Field } from "providers/grid/types";
 
 export const fieldDateActivated: Field = {
   displayName: "Active",

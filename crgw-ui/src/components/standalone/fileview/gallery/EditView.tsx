@@ -1,6 +1,6 @@
 import { Button, HStack } from "@chakra-ui/react";
 
-import { GalleryProps, GalleryRenderer } from "./hook";
+import { GalleryProps, GalleryRenderer } from "components/standalone/fileview/gallery/hook";
 
 const EditControls = ({
   basicProps: { imageUrls },

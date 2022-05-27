@@ -8,9 +8,9 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import "./FileMetadataView.scss";
+import "./FileJsonEditor.scss";
 
-const FileMetadataView = ({ fileid }: { fileid: string }) => {
+const FileJsonEditor = ({ fileid }: { fileid: string }) => {
   const [jsonError, setJsonError] = useState<Error>();
 
   const { enableHotkey, disableHotkey, upsertUserAction } = useBlanket();
@@ -69,4 +69,4 @@ const FileMetadataView = ({ fileid }: { fileid: string }) => {
   );
 };
 
-export default FileMetadataView;
+export default FileJsonEditor;

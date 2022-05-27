@@ -1,10 +1,15 @@
 import React, { Dispatch, useReducer } from "react";
 
+import {
+  fieldDateActivated,
+  fieldLastOpened,
+  fieldMimetype,
+  fieldNew,
+  fieldSize,
+} from "providers/grid/fields";
+import { ALL_PRESETS } from "providers/grid/presets";
 import { gridReducer } from "providers/grid/reducer";
 import { Action, State } from "providers/grid/types";
-
-import { fieldDateActivated, fieldLastOpened, fieldMimetype, fieldNew, fieldSize } from "./fields";
-import { ALL_PRESETS } from "./presets";
 
 const [defaultPreset] = ALL_PRESETS;
 

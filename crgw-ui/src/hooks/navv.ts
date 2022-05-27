@@ -7,7 +7,7 @@ export const useNavv = () => {
 
   return {
     navRoot: () => navigate("/"),
-    navInfo: (file: CorganizeFile) => navigate(`/file/${file.fileid}/info`),
+    navJsonEditor: (file: CorganizeFile) => navigate(`/file/${file.fileid}/json`),
     navContent: (file: CorganizeFile) => navigate(`/file/${file.fileid}/content`),
     navLabels: (file: CorganizeFile) => navigate(`/file/${file.fileid}/labels`),
     navScrape: (file: CorganizeFile) => navigate(`/scrape?urls=${window.btoa(file.sourceurl)}`),
