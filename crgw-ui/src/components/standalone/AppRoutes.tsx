@@ -6,9 +6,10 @@ import { useFileRepository } from "providers/fileRepository/hook";
 
 import { useNavv } from "hooks/navv";
 
-import FileMetadataView from "./fileview/FileMetadataView";
-import FileView from "./fileview/FileView";
-import ScrapePanel from "./scrape/ScrapePanel";
+import FileJsonEditor from "components/standalone/fileview/FileJsonEditor";
+import FileTagEditor from "components/standalone/fileview/FileTagEditor";
+import FileView from "components/standalone/fileview/FileView";
+import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 type FileRenderer = ({ fileid }: { fileid: string }) => JSX.Element;
 
@@ -67,7 +68,8 @@ const AppRoutes = () => (
     <Route path="/" element={<BlanketResetter />} />
     <Route path="/scrape" element={<ScrapeRouteHandler />} />
     <Route path="/file/:fileid/content" element={<FileHandler renderer={FileView} />} />
-    <Route path="/file/:fileid/info" element={<FileHandler renderer={FileMetadataView} />} />
+    <Route path="/file/:fileid/json" element={<FileHandler renderer={FileJsonEditor} />} />
+    <Route path="/file/:fileid/tags" element={<FileHandler renderer={FileTagEditor} />} />
   </Routes>
 );
 

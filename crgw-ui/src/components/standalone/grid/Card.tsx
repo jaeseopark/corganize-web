@@ -1,4 +1,4 @@
-import { InfoIcon, SearchIcon } from "@chakra-ui/icons";
+import { AttachmentIcon, EditIcon, SearchIcon } from "@chakra-ui/icons";
 import { Box, Divider, HStack, VStack, useColorModeValue } from "@chakra-ui/react";
 import cls from "classnames";
 
@@ -27,12 +27,14 @@ const Card = ({
   openFile,
   openScrapePanel,
   openJsonEditor,
+  openTagEditor,
 }: {
   fileid: string;
   index: number;
   openFile: FileAction;
   openScrapePanel: FileAction;
   openJsonEditor: FileAction;
+  openTagEditor: FileAction;
 }) => {
   const { findById } = useFileRepository();
   const file = findById(fileid);
@@ -43,6 +45,7 @@ const Card = ({
   const openFilee = () => openFile(file);
   const openScrapePanell = () => openScrapePanel(file);
   const openJsonEditorr = () => openJsonEditor(file);
+  const openTagEditorr = () => openTagEditor(file);
 
   return (
     <Box
@@ -61,8 +64,9 @@ const Card = ({
         <Divider />
         <FileBadges f={file} />
         <HStack>
-          <InfoIcon className="clickable" onClick={openJsonEditorr} />
+          <EditIcon className="clickable" onClick={openJsonEditorr} />
           <SearchIcon className="clickable" onClick={openScrapePanell} />
+          <AttachmentIcon className="clickable" onClick={openTagEditorr} />
         </HStack>
       </VStack>
     </Box>

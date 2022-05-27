@@ -16,6 +16,14 @@
   border-color: #b1b1b1;
 }
 
+.file-tag-editor {
+  &.disabled {
+    * {
+      background-color: var(--chakra-colors-gray-200);
+    }
+  }
+}
+
 .react-tags__selected {
   display: inline;
 }

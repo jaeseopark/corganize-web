@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 
 import { madFocus, scrollToElement } from "utils/elementUtils";
 
-import Thumbnail from "./Thumbnail";
-import { GalleryProps } from "./hook";
+import Thumbnail from "components/standalone/fileview/gallery/Thumbnail";
+import { GalleryProps } from "components/standalone/fileview/gallery/hook";
 
 const Thumbnails = ({
   basicProps: { imageUrls, currentIndex },

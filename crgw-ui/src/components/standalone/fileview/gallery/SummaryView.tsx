@@ -1,4 +1,4 @@
-import { GalleryProps, GalleryRenderer } from "./hook";
+import { GalleryProps, GalleryRenderer } from "components/standalone/fileview/gallery/hook";
 
 const SummaryViewHOC = (Inner: GalleryRenderer) => (props: GalleryProps) => {
   return (

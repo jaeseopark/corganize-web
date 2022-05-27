@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 import { madFocus } from "utils/elementUtils";
 
-import { GalleryProps } from "./hook";
+import { GalleryProps } from "components/standalone/fileview/gallery/hook";
 
 const Lightbox = ({
   basicProps: { imageUrls, currentIndex, incrementIndexWithWraparound },

@@ -1,5 +1,5 @@
 import { MinusIcon, TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import { Tag } from "@chakra-ui/react";
+import { Tag as ChakraTag } from "@chakra-ui/react";
 import styled from "styled-components";
 
 import { useGrid } from "providers/grid/hook";
@@ -66,13 +66,13 @@ const FieldComponent = ({ field }: { field: Field }) => {
   };
 
   return (
-    <Tag size="lg">
+    <ChakraTag size="lg">
       <div className="clickable" onClick={updateSortOrder}>
         <SortIcon />
         <StyledFieldLabel>{displayName}</StyledFieldLabel>
       </div>
       <FilterControl filter={filter} />
-    </Tag>
+    </ChakraTag>
   );
 };
 

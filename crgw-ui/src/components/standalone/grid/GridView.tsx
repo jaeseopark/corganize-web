@@ -22,7 +22,7 @@ const GridView = () => {
   const { isBlanketEnabled } = useBlanket();
   const { enqueueSuccess } = useToast();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
-  const { navContent, navScrape, navInfo } = useNavv();
+  const { navContent, navScrape, navJson, navTags } = useNavv();
 
   const refocus = () => madFocus(gridRef.current);
 
@@ -41,7 +41,12 @@ const GridView = () => {
 
   const openJsonEditor = (file?: CorganizeFile) => {
     if (!file) return;
-    navInfo(file);
+    navJson(file);
+  };
+
+  const openTagEditor = (file?: CorganizeFile) => {
+    if (!file) return;
+    navTags(file);
   };
 
   const openScrapePanel = (file?: CorganizeFile) => {
@@ -59,8 +64,10 @@ const GridView = () => {
       openFile(mostRecentFile);
     } else if (key === "s") {
       openScrapePanel(mostRecentFile);
-    } else if (key === "i") {
+    } else if (key === "j") {
       openJsonEditor(mostRecentFile);
+    } else if (key === "l") {
+      openTagEditor(mostRecentFile);
     } else if (key === "w") {
       if (!mostRecentFile) return;
       toggleActivation(mostRecentFile.fileid).then(({ message, emoji }) =>
@@ -93,6 +100,7 @@ const GridView = () => {
           openFile={openFile}
           openScrapePanel={openScrapePanel}
           openJsonEditor={openJsonEditor}
+          openTagEditor={openTagEditor}
         />
       ))}
     </SimpleGrid>
