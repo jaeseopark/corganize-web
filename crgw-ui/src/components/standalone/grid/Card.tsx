@@ -27,14 +27,14 @@ const Card = ({
   openFile,
   openScrapePanel,
   openJsonEditor,
-  openLabelEditor,
+  openTagEditor,
 }: {
   fileid: string;
   index: number;
   openFile: FileAction;
   openScrapePanel: FileAction;
   openJsonEditor: FileAction;
-  openLabelEditor: FileAction;
+  openTagEditor: FileAction;
 }) => {
   const { findById } = useFileRepository();
   const file = findById(fileid);
@@ -45,7 +45,7 @@ const Card = ({
   const openFilee = () => openFile(file);
   const openScrapePanell = () => openScrapePanel(file);
   const openJsonEditorr = () => openJsonEditor(file);
-  const openLabelEditorr = () => openLabelEditor(file);
+  const openTagEditorr = () => openTagEditor(file);
 
   return (
     <Box
@@ -66,7 +66,7 @@ const Card = ({
         <HStack>
           <EditIcon className="clickable" onClick={openJsonEditorr} />
           <SearchIcon className="clickable" onClick={openScrapePanell} />
-          <AttachmentIcon className="clickable" onClick={openLabelEditorr} />
+          <AttachmentIcon className="clickable" onClick={openTagEditorr} />
         </HStack>
       </VStack>
     </Box>

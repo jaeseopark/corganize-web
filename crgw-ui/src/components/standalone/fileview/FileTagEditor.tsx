@@ -8,17 +8,16 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import "./FileLabelEditor.scss";
+import "./FileTagEditor.scss";
 
-const FileLabelEditor = ({ fileid }: { fileid: string }) => {
+const FileTagEditor = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
   const { enableHotkey, disableHotkey } = useBlanket();
   const [isProcessing, setProcessing] = useState(false);
 
   const file = findById(fileid);
-  const tags =
-    (file.labels && file.labels.map((t) => ({ id: uuidv4().toString(), name: t }))) || [];
+  const tags = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
   const suggestions = useMemo(() => {
     const uniqueTokens = Array.from(
       new Set(
@@ -32,10 +31,10 @@ const FileLabelEditor = ({ fileid }: { fileid: string }) => {
     return [...uniqueTokens, ...permutations].map((t) => ({ id: uuidv4().toString(), name: t }));
   }, [file.filename]);
 
-  const onChange = (newTags: string[]) => {
+  const onChange = (tags: string[]) => {
     const payload = {
       fileid,
-      tags: newTags,
+      tags,
     };
 
     setProcessing(true);
@@ -60,7 +59,7 @@ const FileLabelEditor = ({ fileid }: { fileid: string }) => {
   };
 
   return (
-    <div className={cls("file-label-editor", { disabled: isProcessing })}>
+    <div className={cls("file-tag-editor", { disabled: isProcessing })}>
       <ReactTags
         delimiters={["Enter", "Tab", ","]}
         tags={tags}
@@ -75,4 +74,4 @@ const FileLabelEditor = ({ fileid }: { fileid: string }) => {
   );
 };
 
-export default FileLabelEditor;
+export default FileTagEditor;

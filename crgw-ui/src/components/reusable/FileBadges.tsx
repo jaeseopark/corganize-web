@@ -23,6 +23,11 @@ const FileBadges = ({ f }: { f: CorganizeFile }) => {
           </WrapItem>
         ))
       )}
+      {(f.tags || []).map((t) => (
+        <WrapItem key={`tag-${t}`}>
+          <ChakraBadge className="file-tag">{t}</ChakraBadge>
+        </WrapItem>
+      ))}
     </Wrap>
   );
 };

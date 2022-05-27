@@ -22,7 +22,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const { navScrape, navJsonEditor, navLabels } = useNavv();
+  const { navScrape, navJsonEditor, navTags } = useNavv();
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
@@ -90,7 +90,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
     } else if (key === "j") {
       navJsonEditor(file);
     } else if (key === "l") {
-      navLabels(file);
+      navTags(file);
     } else if (key === "f") {
       if (handle.active) {
         handle.exit();

@@ -7,7 +7,7 @@ import { useFileRepository } from "providers/fileRepository/hook";
 import { useNavv } from "hooks/navv";
 
 import FileJsonEditor from "components/standalone/fileview/FileJsonEditor";
-import FileLabelEditor from "components/standalone/fileview/FileLabelEditor";
+import FileTagEditor from "components/standalone/fileview/FileTagEditor";
 import FileView from "components/standalone/fileview/FileView";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
@@ -69,7 +69,7 @@ const AppRoutes = () => (
     <Route path="/scrape" element={<ScrapeRouteHandler />} />
     <Route path="/file/:fileid/content" element={<FileHandler renderer={FileView} />} />
     <Route path="/file/:fileid/json" element={<FileHandler renderer={FileJsonEditor} />} />
-    <Route path="/file/:fileid/labels" element={<FileHandler renderer={FileLabelEditor} />} />
+    <Route path="/file/:fileid/tags" element={<FileHandler renderer={FileTagEditor} />} />
   </Routes>
 );
 
