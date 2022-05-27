@@ -64,6 +64,7 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
         delimiters={["Enter", "Tab", ","]}
         tags={tags}
         suggestions={suggestions}
+        suggestionsFilter={(a, b) => a.name.startsWith(b)}
         onAddition={onAddition}
         onDelete={onDelete}
         onFocus={disableHotkey}
