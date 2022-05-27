@@ -1,4 +1,4 @@
-import { Badge, Wrap, WrapItem } from "@chakra-ui/react";
+import { Badge as ChakraBadge, Wrap, WrapItem } from "@chakra-ui/react";
 import cls, { Argument as ClsArg } from "classnames";
 
 import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
@@ -7,19 +7,19 @@ import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils
 
 import "./FileBadges.scss";
 
-type TagKey = keyof CorganizeFile | keyof Multimedia;
-type Tag = {
+type BadgeKey = keyof CorganizeFile | keyof Multimedia;
+type Badge = {
   value: string;
   styleClasses?: ClsArg[];
 };
 
 const FileBadges = ({ f }: { f: CorganizeFile }) => {
   return (
-    <Wrap className="file-tags" spacing="3px" justify="center">
-      {Array.from(TAG_GENERATION_MAP.entries()).map(([fieldName, func]) =>
+    <Wrap className="file-badges" spacing="3px" justify="center">
+      {Array.from(BADGE_GENERATION_MAP.entries()).map(([fieldName, func]) =>
         func(f).map(({ value, styleClasses }) => (
           <WrapItem key={value}>
-            <Badge className={cls(fieldName, value, styleClasses)}>{value}</Badge>
+            <ChakraBadge className={cls(fieldName, value, styleClasses)}>{value}</ChakraBadge>
           </WrapItem>
         ))
       )}
@@ -31,7 +31,7 @@ export default FileBadges;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const TAG_GENERATION_MAP: Map<TagKey, (f: CorganizeFile) => Tag[]> = new Map([
+const BADGE_GENERATION_MAP: Map<BadgeKey, (f: CorganizeFile) => Badge[]> = new Map([
   [
     "dateactivated",
     (f) => [
@@ -83,7 +83,7 @@ const TAG_GENERATION_MAP: Map<TagKey, (f: CorganizeFile) => Tag[]> = new Map([
   [
     "width",
     (f) => {
-      const tags: Tag[] = [];
+      const badges: Badge[] = [];
       if (f.multimedia?.width) {
         const { width, height } = f.multimedia;
         const dimensions = [height!, width!];
@@ -91,28 +91,28 @@ const TAG_GENERATION_MAP: Map<TagKey, (f: CorganizeFile) => Tag[]> = new Map([
 
         if (isVertical) {
           dimensions.reverse();
-          tags.push({ value: "Vertical", styleClasses: ["orientation", "vertical"] });
+          badges.push({ value: "Vertical", styleClasses: ["orientation", "vertical"] });
         }
 
         const [short, long] = dimensions;
         const isCommonAspectRatio = closeEnough(long / short, 16 / 9, 0.15);
 
         if (isCommonAspectRatio) {
-          tags.push({ value: `${short}p` });
+          badges.push({ value: `${short}p` });
         }
       }
-      return tags;
+      return badges;
     },
   ],
   [
     "duration",
     (f) => {
-      const tags: Tag[] = [];
+      const badges: Badge[] = [];
       if (f.multimedia?.duration) {
         const TOO_SHORT = 60;
         const TOO_LONG = 3600;
 
-        tags.push({
+        badges.push({
           value: toHumanDuration(f.multimedia.duration),
           styleClasses: [
             {
@@ -127,13 +127,13 @@ const TAG_GENERATION_MAP: Map<TagKey, (f: CorganizeFile) => Tag[]> = new Map([
           const bitrate = (f.size / f.multimedia.duration) * 8;
           const adequate = ADEQUATE_RANGE[0] <= bitrate && bitrate <= ADEQUATE_RANGE[1];
 
-          tags.push({
+          badges.push({
             value: `${Math.ceil(bitrate / 1000 ** 2)}Mbps`,
             styleClasses: ["bitrate", { adequate, inadequate: bitrate > TOO_HIGH }],
           });
         }
       }
-      return tags;
+      return badges;
     },
   ],
 ]);

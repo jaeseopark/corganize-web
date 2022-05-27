@@ -122,9 +122,9 @@ const ScrapeInputBar = ({
           </Flex>
           <HStack className="form-row metadata">
             <Spacer flexGrow={1} />
-            <Flex className="tag-container">
+            <Flex className="badge-container">
               {countByStatus.map(({ status, length }) => (
-                <Badge className={cls("tag", status)} key={status}>
+                <Badge className={cls("badge", status)} key={status}>
                   {status}: {length}
                 </Badge>
               ))}
