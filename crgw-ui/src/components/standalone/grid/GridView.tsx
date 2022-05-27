@@ -22,7 +22,7 @@ const GridView = () => {
   const { isBlanketEnabled } = useBlanket();
   const { enqueueSuccess } = useToast();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
-  const { navContent, navScrape, navJsonEditor, navTags } = useNavv();
+  const { navContent, navScrape, navJson, navTags } = useNavv();
 
   const refocus = () => madFocus(gridRef.current);
 
@@ -41,7 +41,7 @@ const GridView = () => {
 
   const openJsonEditor = (file?: CorganizeFile) => {
     if (!file) return;
-    navJsonEditor(file);
+    navJson(file);
   };
 
   const openTagEditor = (file?: CorganizeFile) => {
