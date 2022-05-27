@@ -66,7 +66,7 @@ const GridView = () => {
       openScrapePanel(mostRecentFile);
     } else if (key === "j") {
       openJsonEditor(mostRecentFile);
-    } else if (key === "a") {
+    } else if (key === "l") {
       openTagEditor(mostRecentFile);
     } else if (key === "w") {
       if (!mostRecentFile) return;
