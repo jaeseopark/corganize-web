@@ -89,7 +89,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
       navScrape(file);
     } else if (key === "j") {
       navJsonEditor(file);
-    } else if (key === "l") {
+    } else if (key === "a") {
       navTags(file);
     } else if (key === "f") {
       if (handle.active) {
