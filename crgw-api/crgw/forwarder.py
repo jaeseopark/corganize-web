@@ -23,7 +23,7 @@ def forward_request(data, headers: dict, method: str, subpath: str, query_params
         headers["Content-Type"] = "application/json"
         data = base64.b64decode(headers.pop("crg-body").encode()).decode().encode('utf-8')
 
-    LOGGER.info(f"{url=} {method=}")
+    LOGGER.info(f"{url=} {method=} {headers=} {query_params=}")
 
     r = requests.request(url=url, method=method, data=data, headers=headers, query_params=query_params)
     return r.content, r.status_code, dict(r.headers)
