@@ -15,12 +15,12 @@ import "./FileTagEditor.scss";
 
 const generateSuggestions = (filename: string) => {
   const tokenizedFilename = filename
-    .split(/[^A-Za-z]/)
+    .split(/[^A-Za-z0-9]/)
     .map((t) => t.trim().toLowerCase())
     .filter((t) => t);
   const tokens = new Set(tokenizedFilename);
   tokenizedFilename.forEach((token, i, ary) => {
-    if (i < tokenizedFilename.length - 1) {
+    if (i < ary.length - 1) {
       const nextToken = ary[i + 1];
       tokens.add([token, nextToken].join(" "));
     }
