@@ -3,7 +3,7 @@ import { SessionInfo } from "typedefs/Session";
 
 import { getInstance } from "clients/corganize";
 
-import { getLocalFilename, initWithLocalFilenames } from "shared/globalstore";
+import { addGlobalTags, getLocalFilename, initWithLocalFilenames } from "shared/globalstore";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
@@ -42,6 +42,8 @@ export const retrieveFiles = (
     }
     return files;
   };
+
+  getInstance().getTags().then(addGlobalTags);
 
   getInstance()
     .getLocalFilenames()

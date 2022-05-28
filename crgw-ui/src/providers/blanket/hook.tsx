@@ -34,9 +34,7 @@ export const useBlanket = () => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
-      onClick: () => {
-        nagivate("/");
-      },
+      onClick: () => nagivate("/"),
     };
 
     const payload = {

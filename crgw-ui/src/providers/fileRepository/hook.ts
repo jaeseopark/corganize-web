@@ -7,7 +7,7 @@ import { FileRepository } from "providers/fileRepository/fileRepository";
 
 import { CreateResponse, getInstance as getCorganizeClient } from "clients/corganize";
 
-import { addAll, addOne } from "shared/globalstore";
+import { addAll, addGlobalTags, addOne } from "shared/globalstore";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
@@ -45,6 +45,7 @@ export const useFileRepository = () => {
     return getCorganizeClient()
       .updateFile(partialProps)
       .then(() => {
+        if (partialProps.tags) addGlobalTags(partialProps.tags);
         dispatch!({ type: "UPDATE", payload: partialProps });
       });
   };

@@ -1,5 +1,4 @@
 import cls from "classnames";
-import { Permutation } from "js-combinatorics";
 import { useMemo, useState } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
@@ -8,28 +7,39 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
+import { useNavv } from "hooks/navv";
+
+import { getGlobalTags } from "shared/globalstore";
+
 import "./FileTagEditor.scss";
+
+const generateSuggestions = (filename: string) => {
+  const tokenizedFilename = filename
+    .split(/[^A-Za-z]/)
+    .map((t) => t.trim().toLowerCase())
+    .filter((t) => t);
+  const tokens = new Set(tokenizedFilename);
+  tokenizedFilename.forEach((token, i, ary) => {
+    if (i < tokenizedFilename.length - 1) {
+      const nextToken = ary[i + 1];
+      tokens.add([token, nextToken].join(" "));
+    }
+  });
+  getGlobalTags().forEach(tokens.add, tokens);
+
+  return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
+};
 
 const FileTagEditor = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
+  const { navRoot } = useNavv();
   const { enableHotkey, disableHotkey } = useBlanket();
   const [isProcessing, setProcessing] = useState(false);
 
   const file = findById(fileid);
   const tags = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
-  const suggestions = useMemo(() => {
-    const uniqueTokens = Array.from(
-      new Set(
-        file.filename
-          .split(/[^A-Za-z]/)
-          .map((t) => t.trim().toLowerCase())
-          .filter((t) => t)
-      )
-    );
-    const permutations = new Permutation(uniqueTokens, 2).toArray().map((p) => p.join(" "));
-    return [...uniqueTokens, ...permutations].map((t) => ({ id: uuidv4().toString(), name: t }));
-  }, [file.filename]);
+  const suggestions = useMemo(() => generateSuggestions(file.filename), [file.filename]);
 
   const onChange = (tags: string[]) => {
     const payload = {
@@ -58,8 +68,15 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
     onChange(clone.map((t) => t.name));
   };
 
+  const onKeyDown = (e: any) => {
+    const { key, shiftKey } = e;
+    if (shiftKey && key.toLowerCase() === "q") {
+      navRoot();
+    }
+  };
+
   return (
-    <div className={cls("file-tag-editor", { disabled: isProcessing })}>
+    <div className={cls("file-tag-editor", { disabled: isProcessing })} onKeyDown={onKeyDown}>
       <ReactTags
         delimiters={["Enter", "Tab", ","]}
         tags={tags}
@@ -70,6 +87,7 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
         onFocus={disableHotkey}
         onBlur={enableHotkey}
         allowNew
+        autofocus
       />
     </div>
   );
