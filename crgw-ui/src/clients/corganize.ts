@@ -182,6 +182,12 @@ class CorganizeClient {
       .then(({ files }) => files);
   }
 
+  getTags(): Promise<string[]> {
+    return fetch("/api/remote/tags")
+      .then((res) => res.json())
+      .then(({ tags }) => tags);
+  }
+
   scrapeAsync(
     ...urls: string[]
   ): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> {
