@@ -38,6 +38,7 @@ const ScrapeRouteHandler = () => {
       body: <ScrapePanel defaultUrls={urls} />,
     });
   }, []);
+
   return <Fragment />;
 };
 
@@ -57,7 +58,7 @@ const FileHandler = ({ renderer: Renderer }: { renderer: FileRenderer }) => {
     } else {
       navRoot();
     }
-  }, []);
+  }, [params.fileid, Renderer]);
 
   return <Fragment />;
 };

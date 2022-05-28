@@ -75,7 +75,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
       icon: <SearchIcon />,
       onClick: () => navScrape(file),
     });
-  });
+  }, []);
 
   const onKeyDown = (e: any) => {
     if (e.shiftKey || e.ctrlKey) {
