@@ -7,8 +7,6 @@ import { useToast } from "providers/toast/hook";
 
 import { CreateResponse, getInstance } from "clients/corganize";
 
-import { isDiscovered } from "shared/globalstore";
-
 import { madFocus } from "utils/elementUtils";
 
 import ScrapeGrid from "components/standalone/scrape/Grid";
@@ -45,21 +43,19 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
 
       getInstance()
         .scrapeAsync(...urls)
-        .then((scrapedFiles) => {
-          setRawScrapeCount(scrapedFiles.length);
+        .then(({ available, discarded }) => {
+          setRawScrapeCount(available.length + discarded.length);
 
-          if (scrapedFiles.length > 0) {
-            enqueue({ message: `Scraped ${scrapedFiles.length} files` });
+          if (available.length + discarded.length > 0) {
+            enqueue({ message: `${available.length + discarded.length} files scraped` });
           } else {
             enqueueWarning({ message: "No files scraped" });
           }
 
-          return scrapedFiles
-            .filter((file) => !isDiscovered(file.fileid))
-            .map((file: CorganizeFile) => ({
-              file,
-              status: CARD_STATUS.AVAILABLE,
-            }));
+          return available.map((file: CorganizeFile) => ({
+            file,
+            status: CARD_STATUS.AVAILABLE,
+          }));
         })
         .then(setCards)
         .catch(setError)

@@ -12,7 +12,8 @@ type FileResponse = {
   files: CorganizeFile[];
 };
 
-const CHUNK_SIZE = 10;
+const CREATE_FILE_CHUNK_SIZE = 10;
+const POST_SCRAPE_DEDUP_CHUNK_SIZE = 50;
 
 export type CreateResponse = {
   created: CorganizeFile[];
@@ -42,6 +43,26 @@ const proxyFetch = (url: string, method: "POST" | "PATCH", data: object) => {
 };
 
 const segmentsToTuples = (segments: Segment[]) => segments.map((s) => [s.start, s.end]);
+
+const getFilesById = (fileIds: string[]) => {
+  const chunks = chunk(fileIds, POST_SCRAPE_DEDUP_CHUNK_SIZE);
+
+  const getByChunk = (fileIds: string[]) => {
+    const params = new URLSearchParams({ fileIds: fileIds.join("|") });
+    return fetch("/api/remote/files?" + params)
+      .then((r) => r.json())
+      .then(({ files }) => files);
+  };
+
+  return Promise.allSettled(chunks.map((aChunk) => getByChunk(aChunk))).then((results) =>
+    results.reduce((acc, result) => {
+      if (result.status === "fulfilled") {
+        acc.push(...result.value);
+      }
+      return acc;
+    }, new Array<CorganizeFile>())
+  );
+};
 
 class CorganizeClient {
   getFilesBySessionInfo(
@@ -112,7 +133,7 @@ class CorganizeClient {
         dateactivated: getPosixSeconds(),
       } as CorganizeFile);
 
-    const promises = chunk(files, CHUNK_SIZE).map((thisChunk) =>
+    const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
       proxyFetch("/api/remote/files", "POST", thisChunk)
         .then(async (res) => {
           if (res.status === 200) {
@@ -161,19 +182,19 @@ class CorganizeClient {
       .then(({ files }) => files);
   }
 
-  scrapeAsync(...urls: string[]): Promise<CorganizeFile[]> {
+  scrapeAsync(
+    ...urls: string[]
+  ): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> {
     const dedupFilesById = (files: CorganizeFile[]) =>
       files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
 
-    const dedupAgainstDatabase = (files: CorganizeFile[]) => {
-      const fileIds = files.map((f) => f.fileid).join("|");
-      const params = new URLSearchParams({ fileIds });
-      return fetch("/api/remote/files?" + params)
-        .then((r) => r.json())
-        .then(({ files: filesInDb }) => (filesInDb as CorganizeFile[]).map((f) => f.fileid))
-        .then((fileIdsInDb) => new Set(fileIdsInDb))
-        .then((fileIdSet) => files.filter((f) => !fileIdSet.has(f.fileid)));
-    };
+    const dedupAgainstDatabase = (files: CorganizeFile[]) =>
+      getFilesById(files.map((f) => f.fileid))
+        .then((files) => new Set((files as CorganizeFile[]).map((f) => f.fileid)))
+        .then((fileIds) => ({
+          available: files.filter((f) => !fileIds.has(f.fileid)),
+          discarded: files.filter((f) => fileIds.has(f.fileid)),
+        }));
 
     const scrapeSingleUrl = (url: string) =>
       fetch("/redir/scrape", {
