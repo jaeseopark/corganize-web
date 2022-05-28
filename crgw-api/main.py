@@ -72,7 +72,7 @@ def fwd_remote(subpath: str):
       https://www.rfc-editor.org/rfc/rfc2616#section-10.3.3
     """
 
-    content, status_code, headers = forward_request(freq.data, dict(freq.headers), freq.method, subpath)
+    content, status_code, headers = forward_request(freq.data, dict(freq.headers), freq.method, subpath, freq.args)
 
     res = Response(content)
     res.headers = headers

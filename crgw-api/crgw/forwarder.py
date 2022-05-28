@@ -9,7 +9,7 @@ ALLOWED_FWD_HEADERS = ("rangeend", "rangestart", "content-type", "order", "nextt
 LOGGER = logging.getLogger("crgw-api")
 
 
-def forward_request(data, headers: dict, method: str, subpath: str):
+def forward_request(data, headers: dict, method: str, subpath: str, query_params: dict):
     assert "CRG_REMOTE_HOST" in os.environ
     assert "CRG_REMOTE_APIKEY" in os.environ
 
@@ -25,5 +25,5 @@ def forward_request(data, headers: dict, method: str, subpath: str):
 
     LOGGER.info(f"{url=} {method=}")
 
-    r = requests.request(url=url, method=method, data=data, headers=headers)
+    r = requests.request(url=url, method=method, data=data, headers=headers, query_params=query_params)
     return r.content, r.status_code, dict(r.headers)
