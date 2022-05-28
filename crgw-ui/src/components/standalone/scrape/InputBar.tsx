@@ -96,7 +96,7 @@ const ScrapeInputBar = ({
       length: filterCards(status).length,
     }))
     .concat(
-      { status: "Hidden", length: rawScrapeCount - cards.length },
+      { status: "Discarded", length: rawScrapeCount - cards.length },
       { status: "Scraped", length: rawScrapeCount }
     );
 

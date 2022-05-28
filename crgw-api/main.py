@@ -2,17 +2,14 @@ import json
 import logging
 from typing import List
 
+from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
 
 from crgw.postprocessing import cut_clip, trim_clip
 from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
-logging.basicConfig(format="%(asctime)s %(levelname)s thread=%(thread)d %(module)s.%(funcName)s %(message)s")
-
-# TODO: add logging.FileHandler
-LOGGER = logging.getLogger("crgw-api")
-LOGGER.setLevel(logging.INFO)
+LOGGER = init_logger_with_handlers("crgw-api", logging.INFO, "/var/log/crgw-api/api.log")
 
 app = Flask(__name__)
 
@@ -39,7 +36,7 @@ def cut(fileid: str):
         return str(e), 400
 
     res = Response(json.dumps(files))
-    res.headers = { "Content-Type": "application/json" }
+    res.headers = {"Content-Type": "application/json"}
     res.status_code = 200
     return res
 
@@ -75,7 +72,8 @@ def fwd_remote(subpath: str):
       https://www.rfc-editor.org/rfc/rfc2616#section-10.3.3
     """
 
-    content, status_code, headers = forward_request(freq.data, dict(freq.headers), freq.method, subpath)
+    content, status_code, headers = forward_request(freq.data, dict(freq.headers), freq.method, subpath,
+                                                    dict(freq.args))
 
     res = Response(content)
     res.headers = headers

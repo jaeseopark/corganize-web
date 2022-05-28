@@ -22,7 +22,7 @@ export const initWithLocalFilenames = (filenames: string[]) => {
 
 export const getLocalFilename = (fileid: string) => STORE.map!.get(fileid);
 
-export const isDiscovered = (fileid: string) => STORE.map!.has(fileid);
+const isDiscovered = (fileid: string) => STORE.map!.has(fileid);
 
 export const addAll = (fs: CorganizeFile[]) =>
   fs.reduce((acc, f) => {
