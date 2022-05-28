@@ -1,19 +1,30 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
-const STORE: { fileMap: Map<string, string> | null; tags: Set<string> } = {
-  fileMap: null,
-  tags: new Set(),
+const STORE = {
+  fileMap: new Map<string, string>(),
+  tags: new Set<string>(),
 };
+
+/* ---------------------------------
+ * local file related functions below
+ * ---------------------------------
+ */
+
+export const getLocalFilename = (fileid: string) => STORE.fileMap!.get(fileid);
 
 export const addOne = (fileid: string, filename: string) => {
   STORE.fileMap!.set(fileid, filename);
 };
 
-export const initWithLocalFilenames = (filenames: string[]) => {
-  if (STORE.fileMap) {
-    throw new Error("Cannot initialize global store twice");
-  }
+export const addAll = (files: CorganizeFile[]) => {
+  files.forEach((f) => {
+    if (!STORE.fileMap!.has(f.fileid)) {
+      addOne(f.fileid, "");
+    }
+  });
+};
 
+export const initLocalFilenames = (filenames: string[]) => {
   STORE.fileMap = new Map<string, string>();
   filenames.forEach((filename) => {
     const [withoutExt] = filename.split(".");
@@ -21,18 +32,10 @@ export const initWithLocalFilenames = (filenames: string[]) => {
   });
 };
 
-export const getLocalFilename = (fileid: string) => STORE.fileMap!.get(fileid);
-
-const isDiscovered = (fileid: string) => STORE.fileMap!.has(fileid);
-
-export const addAll = (fs: CorganizeFile[]) =>
-  fs.reduce((acc, f) => {
-    if (!isDiscovered(f.fileid)) {
-      acc.push(f);
-      addOne(f.fileid, "");
-    }
-    return acc;
-  }, new Array<CorganizeFile>());
+/* ---------------------------------
+ * global tag related functions below
+ * ---------------------------------
+ */
 
 export const getGlobalTags = () => STORE.tags;
 

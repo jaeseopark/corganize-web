@@ -3,7 +3,7 @@ import { SessionInfo } from "typedefs/Session";
 
 import { getInstance } from "clients/corganize";
 
-import { addGlobalTags, getLocalFilename, initWithLocalFilenames } from "shared/globalstore";
+import { addGlobalTags, getLocalFilename, initLocalFilenames } from "shared/globalstore";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
@@ -16,7 +16,7 @@ const isnewfile = (lastopened?: number) => {
   return true; // never opened before
 };
 
-export const retrieveFiles = (
+export const retrieveFiles = async (
   sessionInfo: SessionInfo,
   addToRedux: (moreFiles: CorganizeFile[]) => void
 ) => {
@@ -43,10 +43,12 @@ export const retrieveFiles = (
     return files;
   };
 
-  getInstance().getTags().then(addGlobalTags);
+  const client = getInstance();
+  const tags = await client.getTags();
+  const localFilenames = await client.getLocalFilenames();
 
-  getInstance()
-    .getLocalFilenames()
-    .then(initWithLocalFilenames)
-    .then(() => getInstance().getFilesBySessionInfo(sessionInfo, addToRedux, decorateAndFilter));
+  addGlobalTags(tags);
+  initLocalFilenames(localFilenames);
+
+  client.getFilesBySessionInfo(sessionInfo, addToRedux, decorateAndFilter);
 };
