@@ -165,6 +165,16 @@ class CorganizeClient {
     const dedupFilesById = (files: CorganizeFile[]) =>
       files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
 
+    const dedupAgainstDatabase = (files: CorganizeFile[]) => {
+      const fileIds = files.map((f) => f.fileid).join("|");
+      const params = new URLSearchParams({ fileIds });
+      return fetch("/api/remote/files?" + params)
+        .then((r) => r.json())
+        .then(({ files: filesInDb }) => (filesInDb as CorganizeFile[]).map((f) => f.fileid))
+        .then((fileIdsInDb) => new Set(fileIdsInDb))
+        .then((fileIdSet) => files.filter((f) => !fileIdSet.has(f.fileid)));
+    };
+
     const scrapeSingleUrl = (url: string) =>
       fetch("/redir/scrape", {
         method: "POST",
@@ -188,7 +198,8 @@ class CorganizeClient {
           return acc;
         }, new Array<CorganizeFile>())
       )
-      .then(dedupFilesById);
+      .then(dedupFilesById)
+      .then(dedupAgainstDatabase);
   }
 
   trim(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {

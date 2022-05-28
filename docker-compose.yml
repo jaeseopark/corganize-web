@@ -36,6 +36,7 @@ services:
     volumes:
       - ./crgw-api:/app
       - ${DATA_MNT_DIR}/data:/data
+      - ${LOG_DIR}:/var/log/crgw-api
     environment:
       TZ: ${TIMEZONE}
       CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
