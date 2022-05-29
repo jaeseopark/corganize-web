@@ -1,4 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { Badge, Center, Flex } from "@chakra-ui/react";
+import { useEffect, useMemo, useState } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
@@ -6,15 +8,16 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import { useNavv } from "hooks/navv";
-
 import { getGlobalTags } from "shared/globalstore";
 
 import { madReferenceByClassName } from "utils/elementUtils";
 
 import "./FileTagEditor.scss";
 
-const generateSuggestions = (filename: string) => {
+const AUTOCOMP_DISPLAY_LENGTH = 5;
+const MODIFIER_KEYS = new Set(["Alt", "Control", "Shift", "Meta"]);
+
+const getTokens = (filename: string) => {
   const tokenizedFilename = filename
     .split(/[^A-Za-z0-9]/)
     .map((t) => t.trim().toLowerCase())
@@ -26,8 +29,12 @@ const generateSuggestions = (filename: string) => {
       tokens.add([token, nextToken].join(" "));
     }
   });
-  getGlobalTags().forEach(tokens.add, tokens);
+  return tokens;
+};
 
+const generateSuggestions = (filename: string) => {
+  const tokens = getTokens(filename);
+  getGlobalTags().forEach(tokens.add, tokens);
   return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
 };
 
@@ -35,11 +42,15 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
+  const [candidates, setCandidates] = useState<string[]>([]);
 
   const file = findById(fileid);
   const tags = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
   const suggestions = useMemo(() => generateSuggestions(file.filename), [file.filename]);
 
+  /**
+   * Focuses the input element when the component mounts; allowing the user to start typing right away.
+   */
   useEffect(() => {
     (async () => {
       const elements = await madReferenceByClassName("react-tags__search-input");
@@ -50,7 +61,20 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
     })();
   }, []);
 
-  const onChange = (tags: string[]) => {
+  /**
+   * Generates the autocomplete candidates, if applicable.
+   */
+  useEffect(() => {
+    if (tags.length === 0) {
+      const globalTags = getGlobalTags();
+      const matches = Array.from(getTokens(file.filename)).filter((t) => globalTags.has(t));
+      if (matches.length > 0) {
+        setCandidates(matches);
+      }
+    }
+  }, []);
+
+  const assignTags = (tags: string[]) => {
     const payload = {
       fileid,
       tags,
@@ -64,30 +88,88 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
   const onAddition = (newTag: Tag) => {
     newTag.name = newTag.name.trim();
     if (newTag.name) {
-      onChange([...tags, newTag].map((t) => t.name));
+      assignTags([...(file.tags || []), newTag.name]);
     }
   };
 
   const onDelete = (i: number) => {
     if (i < 0) return;
-    const clone = tags.slice(0);
+    const clone = (file.tags || []).slice(0);
     clone.splice(i, 1);
-    onChange(clone.map((t) => t.name));
+    assignTags(clone);
+  };
+
+  const acceptCandidate = () => {
+    const [candidate, ...rest] = candidates;
+    assignTags([...(file.tags || []), candidate]);
+    setCandidates(rest);
+  };
+
+  const rejectCandidate = () => {
+    const [_, ...rest] = candidates;
+    setCandidates(rest);
+  };
+
+  const onKeyDown = (e: any) => {
+    const { key } = e;
+    if (candidates.length === 0 || MODIFIER_KEYS.has(key)) {
+      return;
+    }
+
+    if (key === "ArrowUp") {
+      acceptCandidate();
+    } else if (key === "ArrowDown") {
+      rejectCandidate();
+    } else {
+      setCandidates([]);
+    }
+  };
+
+  const AutocompleteView = () => {
+    if (candidates.length === 0) {
+      return null;
+    }
+
+    const [first, ...rest] = candidates;
+
+    return (
+      <Flex className="autocomplete-candidates" direction="row">
+        <div>
+          <Center>
+            <ChevronUpIcon className="arrow up" />
+          </Center>
+          <Center>
+            <Badge className="candidate first">{first}</Badge>
+          </Center>
+          <Center>
+            <ChevronDownIcon className="arrow down" />
+          </Center>
+        </div>
+        <Center className="upcoming">
+          {rest.slice(0, AUTOCOMP_DISPLAY_LENGTH).map((c) => (
+            <Badge key={c} className="candidate">
+              {c}
+            </Badge>
+          ))}
+        </Center>
+      </Flex>
+    );
   };
 
   return (
-    <div className="file-tag-editor">
+    <div className="file-tag-editor" onKeyDown={onKeyDown}>
       <ReactTags
         delimiters={["Enter", "Tab", ","]}
         tags={tags}
         suggestions={suggestions}
-        suggestionsFilter={(a, b) => a.name.startsWith(b)}
+        suggestionsFilter={(a, b) => a.name.startsWith(b.toLowerCase())}
         onAddition={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
         allowNew
       />
+      <AutocompleteView />
     </div>
   );
 };

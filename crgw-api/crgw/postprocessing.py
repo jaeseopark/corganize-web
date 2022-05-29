@@ -154,6 +154,11 @@ def _process(fileid: str,
         lastopened=0,
     )
 
+    if source_file.get("tags"):
+        new_file.update(dict(
+            tags=source_file.get("tags")
+        ))
+
     process(source_path, target_path)
 
     new_file.update(dict(

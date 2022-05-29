@@ -1,3 +1,28 @@
+.file-tag-editor {
+  padding: 0 20em 0 20em;
+}
+
+.autocomplete-candidates {
+  margin-top: 1em;
+
+  .candidate {
+    margin: 0.2em;
+
+    &.first {
+      background-color: var(--chakra-colors-blue-100);
+      font-size: var(--chakra-fontSizes-md);
+      border-radius: var(--chakra-radii-md);
+      margin: 0 1em;
+      padding: 0.2em 0.7em;
+    }
+  }
+
+  .arrow {
+    width: 2em;
+    height: 2em;
+  }
+}
+
 .react-tags {
   position: relative;
   padding: 6px 0 0 6px;
