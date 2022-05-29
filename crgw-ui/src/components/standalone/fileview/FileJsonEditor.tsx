@@ -64,6 +64,7 @@ const FileJsonEditor = ({ fileid }: { fileid: string }) => {
         value={edit}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
+        autoFocus
       />
     </div>
   );
