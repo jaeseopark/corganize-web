@@ -1,5 +1,4 @@
-import cls from "classnames";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
@@ -11,7 +10,11 @@ import { useNavv } from "hooks/navv";
 
 import { getGlobalTags } from "shared/globalstore";
 
+import { madReferenceByClassName } from "utils/elementUtils";
+
 import "./FileTagEditor.scss";
+
+const EXIT_MAGIC_KEYWORD = "qq";
 
 const generateSuggestions = (filename: string) => {
   const tokenizedFilename = filename
@@ -35,11 +38,20 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
   const { enqueueSuccess, enqueueError } = useToast();
   const { navRoot } = useNavv();
   const { enableHotkey, disableHotkey } = useBlanket();
-  const [isProcessing, setProcessing] = useState(false);
 
   const file = findById(fileid);
   const tags = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
   const suggestions = useMemo(() => generateSuggestions(file.filename), [file.filename]);
+
+  useEffect(() => {
+    (async () => {
+      const elements = await madReferenceByClassName("react-tags__search-input");
+      if (elements) {
+        const [inputElement] = elements as HTMLElement[];
+        inputElement.focus();
+      }
+    })();
+  }, []);
 
   const onChange = (tags: string[]) => {
     const payload = {
@@ -47,11 +59,9 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
       tags,
     };
 
-    setProcessing(true);
     updateFile(payload)
       .then(() => enqueueSuccess({ message: "Tags updated" }))
-      .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }))
-      .finally(() => setProcessing(false));
+      .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }));
   };
 
   const onAddition = (newTag: Tag) => {
@@ -68,15 +78,14 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
     onChange(clone.map((t) => t.name));
   };
 
-  const onKeyDown = (e: any) => {
-    const { key, shiftKey } = e;
-    if (shiftKey && key.toLowerCase() === "q") {
+  const onInput = (query: string) => {
+    if (query.toLowerCase().endsWith(EXIT_MAGIC_KEYWORD)) {
       navRoot();
     }
   };
 
   return (
-    <div className={cls("file-tag-editor", { disabled: isProcessing })} onKeyDown={onKeyDown}>
+    <div className="file-tag-editor">
       <ReactTags
         delimiters={["Enter", "Tab", ","]}
         tags={tags}
@@ -86,8 +95,8 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
         onDelete={onDelete}
         onFocus={disableHotkey}
         onBlur={enableHotkey}
+        onInput={onInput}
         allowNew
-        autofocus
       />
     </div>
   );
