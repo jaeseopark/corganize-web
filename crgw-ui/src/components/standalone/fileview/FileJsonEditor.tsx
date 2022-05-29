@@ -8,20 +8,14 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import { useNavv } from "hooks/navv";
-
 import "./FileJsonEditor.scss";
-
-const EXIT_MAGIC_KEYWORD = "qq";
 
 const FileJsonEditor = ({ fileid }: { fileid: string }) => {
   const [jsonError, setJsonError] = useState<Error>();
-  const [lastKey, setLastKey] = useState("");
 
-  const { enableHotkey, disableHotkey, upsertUserAction } = useBlanket();
+  const { protectHotkey, exposeHotkey, upsertUserAction } = useBlanket();
   const { enqueueSuccess, enqueueError } = useToast();
   const { updateFile, findById, renew } = useFileRepository();
-  const { navRoot } = useNavv();
 
   const file = findById(fileid);
 
@@ -62,24 +56,14 @@ const FileJsonEditor = ({ fileid }: { fileid: string }) => {
     editAsObjectAsync().catch(() => {});
   }, [edit]);
 
-  const onKeyDown = (e: any) => {
-    const key = e.key.toLowerCase();
-    if (lastKey + key === EXIT_MAGIC_KEYWORD) {
-      navRoot();
-    } else {
-      setLastKey(key);
-    }
-  };
-
   return (
     <div className="file-metadata-view">
       <textarea
         className={cls("json-editor", { error: jsonError })}
-        onKeyDown={onKeyDown}
         onChange={(e) => setEdit(e.target.value)}
         value={edit}
-        onFocus={disableHotkey}
-        onBlur={enableHotkey}
+        onFocus={protectHotkey}
+        onBlur={exposeHotkey}
       />
     </div>
   );

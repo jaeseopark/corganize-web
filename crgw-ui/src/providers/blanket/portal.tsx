@@ -1,6 +1,7 @@
 import { Button, Center, HStack } from "@chakra-ui/react";
+import { useState } from "react";
 
-import { isHotkeyEnabled, useBlanket } from "providers/blanket/hook";
+import { isHotkeyProtected, useBlanket } from "providers/blanket/hook";
 
 import { useNavv } from "hooks/navv";
 
@@ -44,23 +45,24 @@ const Footer = () => {
 const BlanketPortal = () => {
   const { isBlanketEnabled } = useBlanket();
   const { navRoot } = useNavv();
+  const [lastKey, setLastKey] = useState("");
 
   if (!isBlanketEnabled) {
     return null;
   }
 
-  const handleKey = (key: string) => {
-    if (key === "q") {
-      navRoot();
-    }
-  };
-
   return (
     <div
       className="blanket-portal"
       onKeyDown={(e) => {
-        if (!isHotkeyEnabled || e.shiftKey || e.ctrlKey) return;
-        handleKey(e.key.toLowerCase());
+        const key = e.key.toLowerCase();
+
+        if (!e.shiftKey && !e.ctrlKey && key === "q" && (!isHotkeyProtected || lastKey === "q")) {
+          setLastKey("");
+          return navRoot();
+        }
+
+        setLastKey(key);
       }}
     >
       <Header />

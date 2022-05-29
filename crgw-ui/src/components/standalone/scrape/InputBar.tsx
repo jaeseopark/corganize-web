@@ -29,7 +29,7 @@ const ScrapeInputBar = ({
   scrape,
   rawScrapeCount,
 }: ScrapeInputBarProps) => {
-  const { enableHotkey, disableHotkey } = useBlanket();
+  const { protectHotkey, exposeHotkey } = useBlanket();
   const filterCards = (status: string) => cards.filter((c) => c.status === status);
 
   const getAvailableCards = () => filterCards(CARD_STATUS.AVAILABLE);
@@ -112,8 +112,8 @@ const ScrapeInputBar = ({
               placeholder="Use <p1-p2> to scrape multiple pages"
               onChange={(e) => setUrl(e.target.value)}
               value={url as string}
-              onFocus={() => disableHotkey()}
-              onBlur={() => enableHotkey()}
+              onFocus={protectHotkey}
+              onBlur={exposeHotkey}
             />
             <Button className="scrape-button" type="submit" disabled={disabled || !url}>
               Scrape

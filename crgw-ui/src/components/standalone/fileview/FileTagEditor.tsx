@@ -14,8 +14,6 @@ import { madReferenceByClassName } from "utils/elementUtils";
 
 import "./FileTagEditor.scss";
 
-const EXIT_MAGIC_KEYWORD = "qq";
-
 const generateSuggestions = (filename: string) => {
   const tokenizedFilename = filename
     .split(/[^A-Za-z0-9]/)
@@ -36,8 +34,7 @@ const generateSuggestions = (filename: string) => {
 const FileTagEditor = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
-  const { navRoot } = useNavv();
-  const { enableHotkey, disableHotkey } = useBlanket();
+  const { protectHotkey, exposeHotkey } = useBlanket();
 
   const file = findById(fileid);
   const tags = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
@@ -78,12 +75,6 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
     onChange(clone.map((t) => t.name));
   };
 
-  const onInput = (query: string) => {
-    if (query.toLowerCase().endsWith(EXIT_MAGIC_KEYWORD)) {
-      navRoot();
-    }
-  };
-
   return (
     <div className="file-tag-editor">
       <ReactTags
@@ -93,9 +84,8 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
         suggestionsFilter={(a, b) => a.name.startsWith(b)}
         onAddition={onAddition}
         onDelete={onDelete}
-        onFocus={disableHotkey}
-        onBlur={enableHotkey}
-        onInput={onInput}
+        onFocus={protectHotkey}
+        onBlur={exposeHotkey}
         allowNew
       />
     </div>

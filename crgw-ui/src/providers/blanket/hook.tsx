@@ -18,7 +18,7 @@ type SetBlanketProps = RequireOnlyOne<
   "title" | "fileid"
 >;
 
-export let isHotkeyEnabled = true;
+export let isHotkeyProtected = false;
 
 export const useBlanket = () => {
   const {
@@ -56,12 +56,12 @@ export const useBlanket = () => {
       },
     });
 
-  const enableHotkey = () => {
-    isHotkeyEnabled = true;
+  const protectHotkey = () => {
+    isHotkeyProtected = true;
   };
 
-  const disableHotkey = () => {
-    isHotkeyEnabled = false;
+  const exposeHotkey = () => {
+    isHotkeyProtected = false;
   };
 
   return {
@@ -69,11 +69,11 @@ export const useBlanket = () => {
     body,
     userActions,
     isBlanketEnabled,
-    isHotkeyEnabled,
+    isHotkeyProtected,
     setBlanket,
     exitBlanket,
     upsertUserAction,
-    enableHotkey,
-    disableHotkey,
+    protectHotkey,
+    exposeHotkey,
   };
 };
