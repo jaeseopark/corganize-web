@@ -13,7 +13,7 @@ import "./FileJsonEditor.scss";
 const FileJsonEditor = ({ fileid }: { fileid: string }) => {
   const [jsonError, setJsonError] = useState<Error>();
 
-  const { enableHotkey, disableHotkey, upsertUserAction } = useBlanket();
+  const { protectHotkey, exposeHotkey, upsertUserAction } = useBlanket();
   const { enqueueSuccess, enqueueError } = useToast();
   const { updateFile, findById, renew } = useFileRepository();
 
@@ -62,8 +62,8 @@ const FileJsonEditor = ({ fileid }: { fileid: string }) => {
         className={cls("json-editor", { error: jsonError })}
         onChange={(e) => setEdit(e.target.value)}
         value={edit}
-        onFocus={disableHotkey}
-        onBlur={enableHotkey}
+        onFocus={protectHotkey}
+        onBlur={exposeHotkey}
       />
     </div>
   );
