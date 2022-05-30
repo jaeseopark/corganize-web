@@ -5,7 +5,7 @@ import os
 import requests
 from pydash import url as pydash_url
 
-ALLOWED_FWD_HEADERS = ("rangeend", "rangestart", "content-type", "order", "nexttoken", "crg-method", "crg-body")
+ALLOWED_FWD_HEADERS = ("content-type", "order", "nexttoken", "crg-method", "crg-body")
 LOGGER = logging.getLogger("crgw-api")
 
 

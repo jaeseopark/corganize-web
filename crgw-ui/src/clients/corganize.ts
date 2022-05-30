@@ -79,16 +79,20 @@ class CorganizeClient {
     );
   }
 
-  getFiles(path: string, nexttoken?: string) {
-    const headers = {};
+  getFiles(path: string, sessionInfo: SessionInfo, nexttoken?: string) {
+    const params: { [key: string]: string } = {};
 
     if (nexttoken) {
-      // @ts-ignore
-      headers.nexttoken = nexttoken;
+      params.nexttoken = nexttoken;
     }
 
-    // @ts-ignore
-    return fetch(path, { headers, mode: "cors" });
+    if (sessionInfo.minSize) {
+      params.minsize = String(sessionInfo.minSize);
+    }
+
+    // TODO: sessionInfo.mimetypes
+
+    return fetch(path + "?" + new URLSearchParams(params), { mode: "cors" });
   }
 
   getFilesWithPagination(
@@ -101,7 +105,7 @@ class CorganizeClient {
   ): Promise<null> {
     if (remaining <= 0) return Promise.resolve(null);
 
-    return this.getFiles(path, paginationToken)
+    return this.getFiles(path, sessionInfo, paginationToken)
       .then((r) => {
         // @ts-ignore
         return r.json() as FileResponse;
