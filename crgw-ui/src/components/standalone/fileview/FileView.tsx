@@ -91,6 +91,8 @@ const FileView = ({ fileid }: { fileid: string }) => {
       navJson(file);
     } else if (key === "l") {
       navTags(file);
+    } else if (key === "u") {
+      window.open(file.sourceurl, "_blank");
     } else if (key === "f") {
       if (handle.active) {
         handle.exit();

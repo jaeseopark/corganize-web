@@ -64,6 +64,8 @@ const GridView = () => {
       openFile(mostRecentFile);
     } else if (key === "s") {
       openScrapePanel(mostRecentFile);
+    } else if (key === "u") {
+      window.open(mostRecentFile.sourceurl, "_blank");
     } else if (key === "j") {
       openJsonEditor(mostRecentFile);
     } else if (key === "l") {
