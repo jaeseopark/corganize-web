@@ -15,7 +15,6 @@ import { madFocusByClassName } from "utils/elementUtils";
 import "./FileTagEditor.scss";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
-const MODIFIER_KEYS = new Set(["Alt", "Control", "Shift", "Meta"]);
 
 const getTokens = (filename: string) => {
   const tokenizedFilename = filename
@@ -56,6 +55,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
+  const [autocompEnabled, setAutocompEnabled] = useState(true);
   const [candidates, setCandidates] = useState<string[]>([]);
 
   const file = findById(fileid);
@@ -102,6 +102,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
     if (newTag.name) {
       assignTags([...(file.tags || []), newTag.name]);
     }
+    setAutocompEnabled(true);
   };
 
   const onDelete = (i: number) => {
@@ -122,9 +123,20 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
     setCandidates(rest);
   };
 
+  /**
+   * Enables the autocomplete mode only when user isn't typing.
+   * @param query search string from the input component
+   */
+  const onInput = (query: string) => {
+    const shouldEnableAutocomp = !query.trim();
+    if (autocompEnabled !== shouldEnableAutocomp) {
+      setAutocompEnabled(shouldEnableAutocomp);
+    }
+  };
+
   const onKeyDown = (e: any) => {
     const { key } = e;
-    if (candidates.length === 0 || MODIFIER_KEYS.has(key)) {
+    if (!autocompEnabled || candidates.length === 0) {
       return;
     }
 
@@ -132,8 +144,6 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
       acceptCandidate();
     } else if (key === "ArrowDown") {
       rejectCandidate();
-    } else {
-      setCandidates([]);
     }
   };
 
@@ -175,6 +185,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
         tags={tags}
         suggestions={suggestions}
         suggestionsFilter={(a, b) => a.name.startsWith(b.toLowerCase())}
+        onInput={onInput}
         onAddition={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
