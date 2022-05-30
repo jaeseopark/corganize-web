@@ -30,6 +30,21 @@ export const madReferenceByClassName = async (clsName, interval = 100, limit = 1
   }
 };
 
+/**
+ * Focuses the first HTML Element matching the classname
+ * @param {string} clsName 
+ * @returns boolean indicating whether or not the focus was successful
+ */
+export const madFocusByClassName = async (clsName) => {
+  const elements = await madReferenceByClassName(clsName);
+  if (elements) {
+    const [inputElement] = elements;
+    inputElement.focus();
+    return true;
+  }
+  return false;
+};
+
 export const madFocus = (el, shouldTargetChild = false, interval = 100, initialDelay = 100) => {
   const getTargetElement = () => {
     if (shouldTargetChild) {
