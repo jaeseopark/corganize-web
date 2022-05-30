@@ -10,7 +10,7 @@ import { useToast } from "providers/toast/hook";
 
 import { getGlobalTags } from "shared/globalstore";
 
-import { madReferenceByClassName } from "utils/elementUtils";
+import { madFocusByClassName } from "utils/elementUtils";
 
 import "./FileTagEditor.scss";
 
@@ -38,7 +38,21 @@ const generateSuggestions = (filename: string) => {
   return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
 };
 
-const FileTagEditor = ({ fileid }: { fileid: string }) => {
+const normalizeForAutocomplete = (s: string) => {
+  // Note: can add more normalization later
+  return s.replace(" ", "");
+};
+
+const buildAutocompleteIndex = () =>
+  Array.from(getGlobalTags()).reduce((acc, next) => {
+    acc[next] = next;
+    acc[normalizeForAutocomplete(next)] = next;
+    return acc;
+  }, {} as { [key: string]: string });
+
+type FileTagEditorProps = { fileid: string; autofocus?: boolean };
+
+const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
@@ -52,13 +66,9 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
    */
   useEffect(() => {
-    (async () => {
-      const elements = await madReferenceByClassName("react-tags__search-input");
-      if (elements) {
-        const [inputElement] = elements as HTMLElement[];
-        inputElement.focus();
-      }
-    })();
+    if (autofocus !== undefined) {
+      madFocusByClassName("react-tags__search-input");
+    }
   }, []);
 
   /**
@@ -66,8 +76,10 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
    */
   useEffect(() => {
     if (tags.length === 0) {
-      const globalTags = getGlobalTags();
-      const matches = Array.from(getTokens(file.filename)).filter((t) => globalTags.has(t));
+      const autocompleteIndex = buildAutocompleteIndex();
+      const matches = Array.from(getTokens(file.filename))
+        .map((t) => autocompleteIndex[normalizeForAutocomplete(t)])
+        .filter((t) => t);
       if (matches.length > 0) {
         setCandidates(matches);
       }
@@ -173,5 +185,13 @@ const FileTagEditor = ({ fileid }: { fileid: string }) => {
     </div>
   );
 };
+
+const FileTagEditor = ({ fileid }: FileTagEditorProps) => (
+  <FileTagEditorr fileid={fileid} autofocus />
+);
+
+export const EmbeddableFileTagEditor = ({ fileid }: FileTagEditorProps) => (
+  <FileTagEditorr fileid={fileid} />
+);
 
 export default FileTagEditor;
