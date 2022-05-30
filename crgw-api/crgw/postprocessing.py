@@ -44,12 +44,10 @@ def combine_segments(s1: Tuple[int, int], s2: Tuple[int, int]):
 
 
 def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    if len(segments) == 0:
-        raise ValueError("Need one or more segments for processing")
+    assert segments, "Need one or more segments for processing"
 
     for start, end in segments:
-        if start >= end:
-            raise ValueError("Negative duration")
+        assert start < end, "segment must have a positive duration"
 
     segments.sort(key=lambda s: s[1])  # sort by end timestamps
     len_segments = len(segments)

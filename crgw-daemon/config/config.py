@@ -56,7 +56,8 @@ def get_config() -> dict:
                 apikey=os.getenv("CRG_REMOTE_APIKEY")
             ))
         ))
-        if not _INSTANCE["server"]["host"] or not _INSTANCE["server"]["apikey"]:
-            raise RuntimeError("Server information must be provided")
+
+        svr = _INSTANCE["server"]
+        assert svr["host"] and svr["apikey"], "Server information must be provided"
 
     return _INSTANCE
