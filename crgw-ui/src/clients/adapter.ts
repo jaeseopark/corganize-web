@@ -20,23 +20,17 @@ export const retrieveFiles = async (
   sessionInfo: SessionInfo,
   addToRedux: (moreFiles: CorganizeFile[]) => void
 ) => {
-  const decorate = (f: CorganizeFile): CorganizeFile => {
-    const decorated: CorganizeFile = {
-      ...f,
-      isnewfile: isnewfile(f.lastopened),
-    };
-    decorated.filename = decorated.filename || decorated.fileid;
+  const decorate = (f: CorganizeFile) => {
+    f.isnewfile = isnewfile(f.lastopened);
 
     const localFilename = getLocalFilename(f.fileid);
     if (localFilename) {
-      decorated.streamingurl = `/${localFilename}`;
+      f.streamingurl = `/${localFilename}`;
     }
-
-    return decorated;
   };
 
   const decorateAndFilter = (files: CorganizeFile[]) => {
-    files = files.map(decorate).filter((f) => f.size === undefined || f.size > sessionInfo.minSize);
+    files.forEach(decorate);
     if (sessionInfo.showLocalOnly) {
       return files.filter((f: CorganizeFile) => f.streamingurl);
     }
