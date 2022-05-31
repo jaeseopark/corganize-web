@@ -5,6 +5,11 @@ import { Filter, MaybeBoolean } from "providers/grid/types";
 export const applyPrefilter = (files: CorganizeFile[], filters: Filter[], prefilter: string) => {
   const prefilteredFiles = files.filter((f: CorganizeFile) => {
     const lowered = prefilter.toLowerCase().trim();
+
+    if (f.tags && f.tags.includes(lowered)) {
+      return true;
+    }
+
     return f.filename.toLowerCase().includes(lowered) || f.fileid.toLowerCase().includes(lowered);
   });
 
