@@ -100,7 +100,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   const onAddition = (newTag: Tag) => {
     newTag.name = newTag.name.trim();
     if (newTag.name) {
-      assignTags([...(file.tags || []), newTag.name]);
+      assignTags([...(file.tags || []), newTag.name.toLowerCase()]);
     }
     setAutocompEnabled(true);
   };
