@@ -2,6 +2,11 @@
   background-color: var(--chakra-colors-blue-100);
 }
 
+.file-tag:hover {
+  background-color: var(--chakra-colors-blue-500);
+  color: white;
+}
+
 .orientation {
   &.vertical {
     background-image: url("/assets/phone.svg");
@@ -31,6 +36,7 @@
 }
 
 .dateactivated {
+
   &.active,
   &.inactive {
     background-color: transparent;

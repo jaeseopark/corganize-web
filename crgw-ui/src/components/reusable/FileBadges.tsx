@@ -5,6 +5,7 @@ import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/Corganiz
 
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
+import { useToast } from "providers/toast/hook";
 
 import { useNavv } from "hooks/navv";
 
@@ -24,11 +25,16 @@ const TagBadge = ({ tag }: { tag: string }) => {
   } = useGrid();
   const { loadFilesByTag } = useFileRepository();
   const { navRoot } = useNavv();
+  const { enqueue } = useToast();
 
   const onClick = () => {
-    loadFilesByTag(tag);
-    setPrefilter(tag);
-    navRoot();
+    const onFinsh = ({ count }: { count: number }) => {
+      enqueue({ message: `${count} files added` });
+      setPrefilter(tag);
+      navRoot();
+    };
+
+    loadFilesByTag(tag).then(onFinsh);
   };
 
   return (

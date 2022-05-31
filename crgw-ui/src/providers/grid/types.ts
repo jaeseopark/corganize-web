@@ -87,6 +87,7 @@ export type State = {
 
 export type Action =
   | { type: "SET_FILES"; payload: CorganizeFile[] }
+  | { type: "SET_TAG_VIEW"; payload: string }
   | { type: "UPSERT_FILTERS"; payload: Filter[] }
   | { type: "REMOVE_FILTERS"; payload: Filter[] }
   | { type: "UPSERT_SORTS"; payload: Sort[] }

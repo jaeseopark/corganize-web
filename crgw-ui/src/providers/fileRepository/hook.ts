@@ -115,9 +115,7 @@ export const useFileRepository = () => {
     retrieveFiles(sessionInfo, addFiles);
   };
 
-  const loadFilesByTag = (tag: string) => {
-    retrieveFiles([tag], addFiles);
-  };
+  const loadFilesByTag = (tag: string) => retrieveFiles([tag], addFiles);
 
   return {
     files,

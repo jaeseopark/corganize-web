@@ -7,11 +7,11 @@ import {
   fieldNew,
   fieldSize,
 } from "providers/grid/fields";
-import { ALL_PRESETS } from "providers/grid/presets";
+import { EXPOSED_PRESETS } from "providers/grid/presets";
 import { gridReducer } from "providers/grid/reducer";
 import { Action, State } from "providers/grid/types";
 
-const [defaultPreset] = ALL_PRESETS;
+const [defaultPreset] = EXPOSED_PRESETS;
 
 const initialState: State = {
   files: [],
