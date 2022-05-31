@@ -71,49 +71,56 @@ export const getFilesBySessionInfo = (sessionInfo: SessionInfo, callback: Retrie
     params.minsize = String(sessionInfo.minSize);
   }
 
-  return getFilesWithPagination(
+  const fileGetter = createFileGetter(
     `/api/remote/files/${sessionInfo.endpoint}`,
     params,
-    sessionInfo.limit,
     callback
   );
+
+  return getFilesWithPagination(fileGetter, sessionInfo.limit);
 };
 
 export const getFilesByTags = (
   tags: string[],
   callback: (files: CorganizeFile[]) => CorganizeFile[]
 ) => {
-  return getFilesWithPagination("/api/remote/files", { tags: tags.join("|") }, 99999, callback);
+  const fileGetter = createFileGetter("/api/remote/files", { tags: tags.join("|") }, callback);
+  return getFilesWithPagination(fileGetter, 99999);
 };
 
-const getFiles = (path: string, params: { [key: string]: string }, nexttoken?: string) => {
-  const clone = { ...params };
-  if (nexttoken) {
-    clone.nexttoken = nexttoken;
-  }
-  return fetch(path + "?" + new URLSearchParams(clone), { mode: "cors" }).then((r) => {
-    // @ts-ignore
-    return r.json() as FileResponse;
-  });
-};
-
-export const getFilesWithPagination = (
+const createFileGetter = (
   path: string,
   params: { [key: string]: string },
+  callback: RetrievalCallback
+) => {
+  return async (nexttoken?: string): Promise<FileResponse> => {
+    const clone = { ...params };
+    if (nexttoken) {
+      clone.nexttoken = nexttoken;
+    }
+    const finalPath = path + "?" + new URLSearchParams(clone);
+
+    const res = await fetch(finalPath, { mode: "cors" });
+    const { metadata, files } = await res.json();
+    return { metadata: metadata || {}, files: callback(files) };
+  };
+};
+
+export const getFilesWithPagination = async (
+  getFiles: (token?: string) => Promise<FileResponse>,
   remaining: number,
-  callback: RetrievalCallback,
   paginationToken?: string
-): Promise<null> => {
-  if (remaining <= 0) return Promise.resolve(null);
+): Promise<void> => {
+  if (remaining <= 0) return;
 
-  return getFiles(path, params, paginationToken)
-    .then(({ metadata, files }) => ({ metadata, files: callback(files) }))
-    .then(({ metadata, files }: FileResponse) => {
-      const nexttoken = metadata?.nexttoken;
-      if (!nexttoken) return null;
+  const {
+    metadata: { nexttoken },
+    files,
+  } = await getFiles(paginationToken);
 
-      return getFilesWithPagination(path, params, remaining - files.length, callback, nexttoken);
-    });
+  if (!nexttoken) return;
+
+  return getFilesWithPagination(getFiles, remaining - files.length, nexttoken);
 };
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
