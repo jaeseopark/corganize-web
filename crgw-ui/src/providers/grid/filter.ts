@@ -6,6 +6,7 @@ export const applyPrefilter = (files: CorganizeFile[], filters: Filter[], prefil
   const prefilteredFiles = files.filter((f: CorganizeFile) => {
     const lowered = prefilter.toLowerCase().trim();
 
+    // Note: tags are in lower case (by design)
     if (f.tags && f.tags.includes(lowered)) {
       return true;
     }
