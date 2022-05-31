@@ -21,6 +21,7 @@ export type CreateResponse = {
 };
 
 type RawCreateResponse = { created: string[]; skipped: string[] };
+type RetrievalCallback = (files: CorganizeFile[]) => CorganizeFile[];
 
 function b64EncodeUnicode(str: string) {
   return window.btoa(
@@ -65,65 +66,60 @@ const getFilesById = (fileIds: string[]) => {
 };
 
 class CorganizeClient {
-  getFilesBySessionInfo(
-    sessionInfo: SessionInfo,
-    addFilesToRedux: (files: CorganizeFile[]) => void,
-    filterFiles: (files: CorganizeFile[]) => CorganizeFile[]
-  ) {
-    return this.getFilesWithPagination(
-      `/api/remote/files/${sessionInfo.endpoint}`,
-      sessionInfo,
-      sessionInfo.limit,
-      addFilesToRedux,
-      filterFiles
-    );
-  }
-
-  getFiles(path: string, sessionInfo: SessionInfo, nexttoken?: string) {
-    const params: { [key: string]: string } = {};
-
-    if (nexttoken) {
-      params.nexttoken = nexttoken;
-    }
-
+  getFilesBySessionInfo(sessionInfo: SessionInfo, callback: RetrievalCallback) {
+    const params = {} as { [key: string]: string };
     if (sessionInfo.minSize) {
       params.minsize = String(sessionInfo.minSize);
     }
 
-    // TODO: sessionInfo.mimetypes
+    return this.getFilesWithPagination(
+      `/api/remote/files/${sessionInfo.endpoint}`,
+      params,
+      sessionInfo.limit,
+      callback
+    );
+  }
 
-    return fetch(path + "?" + new URLSearchParams(params), { mode: "cors" });
+  getFilesByTags(tags: string[], callback: (files: CorganizeFile[]) => CorganizeFile[]) {
+    return this.getFilesWithPagination(
+      "/api/remote/files",
+      { tags: tags.join("|") },
+      99999,
+      callback
+    );
+  }
+
+  _getFiles(path: string, params: { [key: string]: string }, nexttoken?: string) {
+    const clone = { ...params };
+    if (nexttoken) {
+      clone.nexttoken = nexttoken;
+    }
+    return fetch(path + "?" + new URLSearchParams(clone), { mode: "cors" }).then((r) => {
+      // @ts-ignore
+      return r.json() as FileResponse;
+    });
   }
 
   getFilesWithPagination(
     path: string,
-    sessionInfo: SessionInfo,
+    params: { [key: string]: string },
     remaining: number,
-    addFilesToRedux: (files: CorganizeFile[]) => void,
-    filterFiles: (files: CorganizeFile[]) => CorganizeFile[],
+    callback: RetrievalCallback,
     paginationToken?: string
   ): Promise<null> {
     if (remaining <= 0) return Promise.resolve(null);
 
-    return this.getFiles(path, sessionInfo, paginationToken)
-      .then((r) => {
-        // @ts-ignore
-        return r.json() as FileResponse;
-      })
-      .then(({ metadata, files }) => {
-        return { metadata, files: filterFiles(files || []) };
-      })
-      .then(({ metadata: { nexttoken }, files }: FileResponse) => {
-        addFilesToRedux(files);
-
+    return this._getFiles(path, params, paginationToken)
+      .then(({ metadata, files }) => ({ metadata, files: callback(files) }))
+      .then(({ metadata, files }: FileResponse) => {
+        const nexttoken = metadata?.nexttoken;
         if (!nexttoken) return null;
 
         return this.getFilesWithPagination(
           path,
-          sessionInfo,
+          params,
           remaining - files.length,
-          addFilesToRedux,
-          filterFiles,
+          callback,
           nexttoken
         );
       });
@@ -186,7 +182,7 @@ class CorganizeClient {
       .then(({ files }) => files);
   }
 
-  getTags(): Promise<string[]> {
+  getGlobalTags(): Promise<string[]> {
     return fetch("/api/remote/tags")
       .then((res) => res.json())
       .then(({ tags }) => tags);
@@ -274,10 +270,6 @@ class CorganizeClient {
   }
 }
 
-let instance: CorganizeClient;
-export const getInstance = () => {
-  if (!instance) {
-    instance = new CorganizeClient();
-  }
-  return instance;
-};
+const instance = new CorganizeClient();
+
+export default instance;

@@ -5,7 +5,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import { CreateResponse, getInstance } from "clients/corganize";
+import client, { CreateResponse } from "clients/corganize";
 
 import { madFocus } from "utils/elementUtils";
 
@@ -41,7 +41,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
 
       const urls = (url as string).split(",");
 
-      getInstance()
+      client
         .scrapeAsync(...urls)
         .then(({ available, discarded }) => {
           setRawScrapeCount(available.length + discarded.length);

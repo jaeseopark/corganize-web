@@ -8,7 +8,7 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import { getGlobalTags } from "shared/globalstore";
+import { globalTags } from "clients/adapter";
 
 import { madFocusByClassName } from "utils/elementUtils";
 
@@ -33,7 +33,7 @@ const getTokens = (filename: string) => {
 
 const generateSuggestions = (filename: string) => {
   const tokens = getTokens(filename);
-  getGlobalTags().forEach(tokens.add, tokens);
+  globalTags.forEach(tokens.add, tokens);
   return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
 };
 
@@ -43,7 +43,7 @@ const normalizeForAutocomplete = (s: string) => {
 };
 
 const buildAutocompleteIndex = () =>
-  Array.from(getGlobalTags()).reduce((acc, next) => {
+  Array.from(globalTags).reduce((acc, next) => {
     acc[next] = next;
     acc[normalizeForAutocomplete(next)] = next;
     return acc;

@@ -2,14 +2,19 @@ import { useContext } from "react";
 
 import { CorganizeFile, getActivationEmoji } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
+import { SessionInfo } from "typedefs/Session";
 
 import { FileRepository } from "providers/fileRepository/fileRepository";
 
-import { CreateResponse, getInstance as getCorganizeClient } from "clients/corganize";
-
-import { addAll, addGlobalTags, addOne } from "shared/globalstore";
+import { addGlobalTags, populateGlobalTags, retrieveFiles } from "clients/adapter";
+import client, { CreateResponse } from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
+
+const discoveredFileids = new Set<string>();
+
+const discover = (files: CorganizeFile[]) =>
+  files.map((f) => f.fileid).forEach(discoveredFileids.add, discoveredFileids);
 
 export const useFileRepository = () => {
   const {
@@ -23,18 +28,18 @@ export const useFileRepository = () => {
 
   const isMostRecentFile = (f: CorganizeFile) => f.fileid === mostRecentFileid;
 
-  const addFiles = (fs: CorganizeFile[]) => {
-    addAll(fs);
-    dispatch!({ type: "ADD", payload: fs });
+  const addFiles = (files: CorganizeFile[]) => {
+    const undiscoveredFiles = files.filter((f) => !discoveredFileids.has(f.fileid));
+    discover(undiscoveredFiles);
+    dispatch!({ type: "ADD", payload: undiscoveredFiles });
+    return undiscoveredFiles;
   };
 
-  const createScrapedFiles = (fs: CorganizeFile[]): Promise<CreateResponse> => {
-    return getCorganizeClient()
-      .createFiles(fs)
-      .then(({ created, skipped }) => {
-        addAll([...created, ...skipped]);
-        return { created, skipped };
-      });
+  const createScrapedFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
+    return client.createFiles(files).then(({ created, skipped }) => {
+      discover([...created, ...skipped]);
+      return { created, skipped };
+    });
   };
 
   const updateFile = (partialProps: Partial<CorganizeFile>) => {
@@ -42,12 +47,10 @@ export const useFileRepository = () => {
       return Promise.reject();
     }
 
-    return getCorganizeClient()
-      .updateFile(partialProps)
-      .then(() => {
-        if (partialProps.tags) addGlobalTags(partialProps.tags);
-        dispatch!({ type: "UPDATE", payload: partialProps });
-      });
+    return client.updateFile(partialProps).then(() => {
+      if (partialProps.tags) addGlobalTags(partialProps.tags);
+      dispatch!({ type: "UPDATE", payload: partialProps });
+    });
   };
 
   const markAsOpened = (fileid: string) => {
@@ -93,28 +96,35 @@ export const useFileRepository = () => {
     }));
   };
 
-  const addPostprocessedFiles = (fs: CorganizeFile[]) => {
-    fs.forEach((newFile) => {
-      const localFilename = `${newFile.fileid}.dec`;
+  const addPostprocessedFiles = (files: CorganizeFile[]) => {
+    files.forEach((newFile) => {
       newFile.isnewfile = true;
-      newFile.streamingurl = `/${localFilename}`;
-      addOne(newFile.fileid, localFilename);
+      newFile.streamingurl = `/${newFile.fileid}.dec`;
     });
-    dispatch!({ type: "ADD", payload: fs });
-    return fs;
+    return addFiles(files);
   };
 
   const trim = (fileid: string, segments: Segment[]) =>
-    getCorganizeClient().trim(fileid, segments).then(addPostprocessedFiles);
+    client.trim(fileid, segments).then(addPostprocessedFiles);
 
   const cut = (fileid: string, segments: Segment[]) =>
-    getCorganizeClient().cut(fileid, segments).then(addPostprocessedFiles);
+    client.cut(fileid, segments).then(addPostprocessedFiles);
+
+  const startSession = (sessionInfo: SessionInfo) => {
+    populateGlobalTags();
+    retrieveFiles(sessionInfo, addFiles);
+  };
+
+  const loadFilesByTag = (tag: string) => {
+    retrieveFiles([tag], addFiles);
+  };
 
   return {
     files,
     isMostRecentFile,
     mostRecentFile,
-    addFiles,
+    startSession,
+    loadFilesByTag,
     createScrapedFiles,
     updateFile,
     markAsOpened,

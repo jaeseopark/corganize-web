@@ -1,7 +1,10 @@
 import { Badge as ChakraBadge, Wrap, WrapItem } from "@chakra-ui/react";
 import cls, { Argument as ClsArg } from "classnames";
+import { ReactNode } from "react";
 
 import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
+
+import { useFileRepository } from "providers/fileRepository/hook";
 
 import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
@@ -11,6 +14,18 @@ type BadgeKey = keyof CorganizeFile | keyof Multimedia;
 type Badge = {
   value: string;
   styleClasses?: ClsArg[];
+};
+
+const TagBadge = ({ tag }: { tag: string }) => {
+  const { loadFilesByTag } = useFileRepository();
+
+  const onClick = () => loadFilesByTag(tag);
+
+  return (
+    <ChakraBadge className="file-tag clickable" onClick={onClick}>
+      {tag}
+    </ChakraBadge>
+  );
 };
 
 const FileBadges = ({ f }: { f: CorganizeFile }) => {
@@ -25,7 +40,7 @@ const FileBadges = ({ f }: { f: CorganizeFile }) => {
       )}
       {(f.tags || []).map((t) => (
         <WrapItem key={`tag-${t}`}>
-          <ChakraBadge className="file-tag">{t}</ChakraBadge>
+          <TagBadge tag={t} />
         </WrapItem>
       ))}
     </Wrap>

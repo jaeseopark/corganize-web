@@ -1,13 +1,11 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { SessionInfo } from "typedefs/Session";
 
-import { getInstance } from "clients/corganize";
-
-import { addGlobalTags, getLocalFilename, initLocalFilenames } from "shared/globalstore";
+import client from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
-const NEW_FILE_THRESHOLD = getPosixSeconds() - 30 * 86400; // in the last 30 days
+const NEW_FILE_THRESHOLD = getPosixSeconds() - 14 * 86400; // in the last 14 days
 
 const isnewfile = (lastopened?: number) => {
   if (lastopened) {
@@ -16,33 +14,56 @@ const isnewfile = (lastopened?: number) => {
   return true; // never opened before
 };
 
-export const retrieveFiles = async (
-  sessionInfo: SessionInfo,
-  addToRedux: (moreFiles: CorganizeFile[]) => void
-) => {
-  const decorate = (f: CorganizeFile) => {
-    f.isnewfile = isnewfile(f.lastopened);
+const decorate = (localFileIndex: { [key: string]: string }) => (f: CorganizeFile) => {
+  f.isnewfile = isnewfile(f.lastopened);
 
-    const localFilename = getLocalFilename(f.fileid);
-    if (localFilename) {
-      f.streamingurl = `/${localFilename}`;
-    }
-  };
-
-  const decorateAndFilter = (files: CorganizeFile[]) => {
-    files.forEach(decorate);
-    if (sessionInfo.showLocalOnly) {
-      return files.filter((f: CorganizeFile) => f.streamingurl);
-    }
-    return files;
-  };
-
-  const client = getInstance();
-  const tags = await client.getTags();
-  const localFilenames = await client.getLocalFilenames();
-
-  addGlobalTags(tags);
-  initLocalFilenames(localFilenames);
-
-  client.getFilesBySessionInfo(sessionInfo, addToRedux, decorateAndFilter);
+  const localFilename = localFileIndex[f.fileid];
+  if (localFilename) {
+    f.streamingurl = `/${localFilename}`;
+  }
 };
+
+const toIndex = (localFilenames: string[]) =>
+  localFilenames.reduce((acc, next) => {
+    const [withoutExt] = next.split(".");
+    acc[withoutExt] = next;
+    return acc;
+  }, {} as { [key: string]: string });
+
+//////////////////////////////////////////////////////////////////
+
+export async function retrieveFiles(
+  sessionInfo: SessionInfo,
+  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
+): Promise<void>;
+
+export async function retrieveFiles(
+  tags: string[],
+  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
+): Promise<void>;
+
+export async function retrieveFiles(
+  arg: unknown,
+  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
+) {
+  const localFilenames = await client.getLocalFilenames();
+  const localFileIndex = toIndex(localFilenames);
+
+  const callback = (files: CorganizeFile[]) => {
+    files.forEach(decorate(localFileIndex));
+    const filtered = files.filter((f) => f.streamingurl);
+    return onLoad(filtered);
+  };
+
+  if (Array.isArray(arg)) {
+    client.getFilesByTags(arg as string[], callback);
+  } else if (typeof arg === "object") {
+    client.getFilesBySessionInfo(arg as SessionInfo, callback);
+  }
+}
+
+//////////////////////////////////////////////////////////////////
+
+export const globalTags = new Set<string>();
+export const addGlobalTags = (tags: string[]) => tags.forEach(globalTags.add, globalTags);
+export const populateGlobalTags = () => client.getGlobalTags().then(addGlobalTags);
