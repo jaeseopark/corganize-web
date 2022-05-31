@@ -5,22 +5,20 @@ import { SessionInfo } from "typedefs/Session";
 
 import "./LibrarySelector.scss";
 
-const FILE_COUNT_INCREMENT = 2500;
+const FILE_COUNT_INCREMENT = 500;
 const MIN_FILE_SIZE_INCREMENT = 50;
 const MB_TO_BYTES = 1000000;
 
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
-  const [fileCountLimit, setFileCountLimit] = useState(1000);
-  const [minFileSize, setMinFileSize] = useState(50);
+  const [fileCountLimit, setFileCountLimit] = useState(FILE_COUNT_INCREMENT);
+  const [minFileSize, setMinFileSize] = useState(MIN_FILE_SIZE_INCREMENT);
   const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
-  const [showLocalOnly, setLocalOnly] = useState(true);
 
   const onOK = () =>
     setInfo({
       limit: fileCountLimit,
       minSize: minFileSize * MB_TO_BYTES,
       endpoint,
-      showLocalOnly,
     });
 
   const renderFileCountLimiter = () => (
@@ -50,14 +48,6 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
     </select>
   );
 
-  const renderLocalCheckbox = () => (
-    <input
-      type="checkbox"
-      checked={showLocalOnly}
-      onChange={(e) => setLocalOnly(e.target.checked)}
-    />
-  );
-
   const renderConfigTable = () => (
     <div className="config-table">
       <table>
@@ -73,10 +63,6 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
           <tr>
             <td>Min File Size (MB)</td>
             <td>{renderFileSizeLimiter()}</td>
-          </tr>
-          <tr>
-            <td>Show Local Files Only</td>
-            <td>{renderLocalCheckbox()}</td>
           </tr>
         </tbody>
       </table>

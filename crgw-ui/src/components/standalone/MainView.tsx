@@ -1,7 +1,6 @@
 import { Divider } from "@chakra-ui/react";
 import cls from "classnames";
 import { useEffect, useState } from "react";
-import { NavLink, Route } from "react-router-dom";
 import styled from "styled-components";
 
 import { SessionInfo } from "typedefs/Session";
@@ -9,8 +8,6 @@ import { SessionInfo } from "typedefs/Session";
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
-
-import { retrieveFiles } from "clients/adapter";
 
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
@@ -21,7 +18,7 @@ import GridView from "components/standalone/grid/GridView";
 import PageControl from "components/standalone/grid/PageControl";
 
 const MainView = () => {
-  const { addFiles } = useFileRepository();
+  const { startSession } = useFileRepository();
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
@@ -31,7 +28,7 @@ const MainView = () => {
 
   useEffect(() => {
     if (sessionInfo) {
-      retrieveFiles(sessionInfo!, addFiles);
+      startSession(sessionInfo);
     }
   }, [sessionInfo]);
 

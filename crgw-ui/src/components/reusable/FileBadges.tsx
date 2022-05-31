@@ -3,6 +3,11 @@ import cls, { Argument as ClsArg } from "classnames";
 
 import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
 
+import { useFileRepository } from "providers/fileRepository/hook";
+import { useGrid } from "providers/grid/hook";
+
+import { useNavv } from "hooks/navv";
+
 import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
 import "./FileBadges.scss";
@@ -11,6 +16,26 @@ type BadgeKey = keyof CorganizeFile | keyof Multimedia;
 type Badge = {
   value: string;
   styleClasses?: ClsArg[];
+};
+
+const TagBadge = ({ tag }: { tag: string }) => {
+  const {
+    fieldProps: { setPrefilter },
+  } = useGrid();
+  const { loadFilesByTag } = useFileRepository();
+  const { navRoot } = useNavv();
+
+  const onClick = () => {
+    loadFilesByTag(tag);
+    setPrefilter(tag);
+    navRoot();
+  };
+
+  return (
+    <ChakraBadge className="file-tag clickable" onClick={onClick}>
+      {tag}
+    </ChakraBadge>
+  );
 };
 
 const FileBadges = ({ f }: { f: CorganizeFile }) => {
@@ -25,7 +50,7 @@ const FileBadges = ({ f }: { f: CorganizeFile }) => {
       )}
       {(f.tags || []).map((t) => (
         <WrapItem key={`tag-${t}`}>
-          <ChakraBadge className="file-tag">{t}</ChakraBadge>
+          <TagBadge tag={t} />
         </WrapItem>
       ))}
     </Wrap>
