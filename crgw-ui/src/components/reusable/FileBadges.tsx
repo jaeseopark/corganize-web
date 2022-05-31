@@ -1,10 +1,12 @@
 import { Badge as ChakraBadge, Wrap, WrapItem } from "@chakra-ui/react";
 import cls, { Argument as ClsArg } from "classnames";
-import { ReactNode } from "react";
 
 import { CorganizeFile, Multimedia, getActivationEmoji } from "typedefs/CorganizeFile";
 
 import { useFileRepository } from "providers/fileRepository/hook";
+import { useGrid } from "providers/grid/hook";
+
+import { useNavv } from "hooks/navv";
 
 import { closeEnough, toHumanDuration, toHumanFileSize } from "utils/numberUtils";
 
@@ -17,9 +19,17 @@ type Badge = {
 };
 
 const TagBadge = ({ tag }: { tag: string }) => {
+  const {
+    fieldProps: { setPrefilter },
+  } = useGrid();
   const { loadFilesByTag } = useFileRepository();
+  const { navRoot } = useNavv();
 
-  const onClick = () => loadFilesByTag(tag);
+  const onClick = () => {
+    loadFilesByTag(tag);
+    setPrefilter(tag);
+    navRoot();
+  };
 
   return (
     <ChakraBadge className="file-tag clickable" onClick={onClick}>
