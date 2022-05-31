@@ -71,24 +71,20 @@ export const getFilesBySessionInfo = (sessionInfo: SessionInfo, callback: Retrie
     params.minsize = String(sessionInfo.minSize);
   }
 
-  const fileGetter = createFileGetter(
-    `/api/remote/files/${sessionInfo.endpoint}`,
-    params,
-    callback
-  );
+  const npg = nextPageGetter(`/api/remote/files/${sessionInfo.endpoint}`, params, callback);
 
-  return getFilesWithPagination(fileGetter, sessionInfo.limit);
+  return getFilesWithPagination(npg, sessionInfo.limit);
 };
 
 export const getFilesByTags = (
   tags: string[],
   callback: (files: CorganizeFile[]) => CorganizeFile[]
 ) => {
-  const fileGetter = createFileGetter("/api/remote/files", { tags: tags.join("|") }, callback);
-  return getFilesWithPagination(fileGetter, 99999);
+  const npg = nextPageGetter("/api/remote/files", { tags: tags.join("|") }, callback);
+  return getFilesWithPagination(npg, 99999);
 };
 
-const createFileGetter = (
+const nextPageGetter = (
   path: string,
   params: { [key: string]: string },
   callback: RetrievalCallback
@@ -107,7 +103,7 @@ const createFileGetter = (
 };
 
 export const getFilesWithPagination = async (
-  getFiles: (token?: string) => Promise<FileResponse>,
+  getNextPage: (token?: string) => Promise<FileResponse>,
   remaining: number,
   paginationToken?: string
 ): Promise<void> => {
@@ -116,11 +112,11 @@ export const getFilesWithPagination = async (
   const {
     metadata: { nexttoken },
     files,
-  } = await getFiles(paginationToken);
+  } = await getNextPage(paginationToken);
 
   if (!nexttoken) return;
 
-  return getFilesWithPagination(getFiles, remaining - files.length, nexttoken);
+  return getFilesWithPagination(getNextPage, remaining - files.length, nexttoken);
 };
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
