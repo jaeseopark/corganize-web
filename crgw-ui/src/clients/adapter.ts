@@ -30,20 +30,8 @@ const toIndex = (localFilenames: string[]) =>
     return acc;
   }, {} as { [key: string]: string });
 
-//////////////////////////////////////////////////////////////////
-
 export async function retrieveFiles(
-  sessionInfo: SessionInfo,
-  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
-): Promise<void>;
-
-export async function retrieveFiles(
-  tags: string[],
-  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
-): Promise<void>;
-
-export async function retrieveFiles(
-  arg: unknown,
+  arg: string[] | SessionInfo,
   onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
 ) {
   const localFilenames = await client.getLocalFilenames();
@@ -61,8 +49,6 @@ export async function retrieveFiles(
     client.getFilesBySessionInfo(arg as SessionInfo, callback);
   }
 }
-
-//////////////////////////////////////////////////////////////////
 
 export const globalTags = new Set<string>();
 export const addGlobalTags = (tags: string[]) => tags.forEach(globalTags.add, globalTags);
