@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
+import { Dictionary } from "typedefs/common";
+
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
@@ -47,7 +49,7 @@ const buildAutocompleteIndex = () =>
     acc[next] = next;
     acc[normalizeForAutocomplete(next)] = next;
     return acc;
-  }, {} as { [key: string]: string });
+  }, {} as Dictionary<string>);
 
 type FileTagEditorProps = { fileid: string; autofocus?: boolean };
 

@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 
 import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
+import { Dictionary } from "typedefs/common";
 
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
@@ -19,7 +20,7 @@ import SegmentsView from "components/standalone/fileview/video/SegmentsView";
 import "./VideoView.scss";
 
 const DEFAULT_MIMETYPE = "video/mp4";
-const SEEK_HOTKEY_MAP: { [key: string]: number } = {
+const SEEK_HOTKEY_MAP: Dictionary<number> = {
   z: 3,
   x: 15,
   c: 30,

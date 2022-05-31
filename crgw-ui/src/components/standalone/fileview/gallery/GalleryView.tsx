@@ -2,6 +2,7 @@ import { ViewIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
+import { Dictionary } from "typedefs/common";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
@@ -17,7 +18,7 @@ import { GalleryRenderer, Mode, useGallery } from "components/standalone/filevie
 
 import "./GalleryView.scss";
 
-export const SEEK_HOTKEY_MAP: { [key: string]: number } = {
+export const SEEK_HOTKEY_MAP: Dictionary<number> = {
   "[": -10000,
   z: -10,
   x: -5,

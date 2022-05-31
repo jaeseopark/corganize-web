@@ -1,6 +1,7 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
 import { SessionInfo } from "typedefs/Session";
+import { Dictionary } from "typedefs/common";
 
 import { chunk } from "utils/arrayUtils";
 import { getPosixSeconds } from "utils/dateUtils";
@@ -66,7 +67,7 @@ const getFilesById = (fileIds: string[]) => {
 };
 
 export const getFilesBySessionInfo = (sessionInfo: SessionInfo, callback: RetrievalCallback) => {
-  const params = {} as { [key: string]: string };
+  const params = {} as Dictionary<string>;
   if (sessionInfo.minSize) {
     params.minsize = String(sessionInfo.minSize);
   }
@@ -84,11 +85,7 @@ export const getFilesByTags = (
   return getFilesWithPagination(npg, 99999);
 };
 
-const nextPageGetter = (
-  path: string,
-  params: { [key: string]: string },
-  callback: RetrievalCallback
-) => {
+const nextPageGetter = (path: string, params: Dictionary<string>, callback: RetrievalCallback) => {
   return async (nexttoken?: string): Promise<FileResponse> => {
     const clone = { ...params };
     if (nexttoken) {

@@ -1,5 +1,6 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { SessionInfo } from "typedefs/Session";
+import { Dictionary } from "typedefs/common";
 
 import * as client from "clients/corganize";
 
@@ -14,7 +15,7 @@ const isnewfile = (lastopened?: number) => {
   return true; // never opened before
 };
 
-const decorate = (localFileIndex: { [key: string]: string }) => (f: CorganizeFile) => {
+const decorate = (localFileIndex: Dictionary<string>) => (f: CorganizeFile) => {
   f.isnewfile = isnewfile(f.lastopened);
 
   const localFilename = localFileIndex[f.fileid];
@@ -28,7 +29,7 @@ const toIndex = (localFilenames: string[]) =>
     const [withoutExt] = next.split(".");
     acc[withoutExt] = next;
     return acc;
-  }, {} as { [key: string]: string });
+  }, {} as Dictionary<string>);
 
 export async function retrieveFiles(
   arg: string[] | SessionInfo,
