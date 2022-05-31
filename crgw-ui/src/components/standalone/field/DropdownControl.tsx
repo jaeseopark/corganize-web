@@ -1,6 +1,8 @@
 import { useGrid } from "providers/grid/hook";
 import { Filter } from "providers/grid/types";
 
+import "./DropdownControl.scss";
+
 const DropdownControl = ({ filter }: { filter: Filter }) => {
   const {
     fieldProps: { upsertFilter },
@@ -10,6 +12,7 @@ const DropdownControl = ({ filter }: { filter: Filter }) => {
 
   return (
     <select
+      className="dropdown"
       tabIndex={-1}
       value={value}
       onChange={(e) => {
