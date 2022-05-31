@@ -65,6 +65,8 @@ const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
   const upsertSort = (sort: Sort) => dispatch({ type: "UPSERT_SORTS", payload: [sort] });
   const removeSort = (sort: Sort) => dispatch({ type: "REMOVE_SORTS", payload: [sort] });
 
+  const setTagView = (tag: string) => dispatch({ type: "SET_TAG_VIEW", payload: tag });
+
   return {
     fields,
     getFilter,
@@ -77,6 +79,7 @@ const getFieldProps = (state: State, dispatch: Dispatch<Action>) => {
     upsertSort,
     removeSort,
     setPreset,
+    setTagView,
   };
 };
 

@@ -35,20 +35,26 @@ export async function retrieveFiles(
   arg: string[] | SessionInfo,
   onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
 ) {
+  let count = 0;
+
   const localFilenames = await client.getLocalFilenames();
   const localFileIndex = toIndex(localFilenames);
 
   const callback = (files: CorganizeFile[]) => {
     files.forEach(decorate(localFileIndex));
     const filtered = files.filter((f) => f.streamingurl);
-    return onLoad(filtered);
+    const added = onLoad(filtered);
+    count += added.length;
+    return added;
   };
 
   if (Array.isArray(arg)) {
-    client.getFilesByTags(arg as string[], callback);
+    await client.getFilesByTags(arg as string[], callback);
   } else if (typeof arg === "object") {
-    client.getFilesBySessionInfo(arg as SessionInfo, callback);
+    await client.getFilesBySessionInfo(arg as SessionInfo, callback);
   }
+
+  return { count };
 }
 
 export const globalTags = new Set<string>();

@@ -48,6 +48,13 @@ const PRESET_REVIEW: Preset = {
       },
     },
     {
+      field: fieldMimetype,
+      dropdown: {
+        value: "(All)",
+        options: [],
+      },
+    },
+    {
       field: fieldDateActivated,
       boolean: {
         value: "checked",
@@ -57,9 +64,40 @@ const PRESET_REVIEW: Preset = {
   sorts: [
     {
       field: fieldLastOpened,
-      direction: "asc",
+      direction: "desc",
     },
   ],
 };
 
-export const ALL_PRESETS: Preset[] = [PRESET_DEFAULT, PRESET_REVIEW];
+export const PRESET_TAG_VIEW: Preset = {
+  name: "tag",
+  filters: [
+    {
+      field: fieldNew,
+      boolean: {
+        value: "maybe",
+      },
+    },
+    {
+      field: fieldDateActivated,
+      boolean: {
+        value: "maybe",
+      },
+    },
+    {
+      field: fieldMimetype,
+      dropdown: {
+        value: "(All)",
+        options: [],
+      },
+    },
+  ],
+  sorts: [
+    {
+      field: fieldLastOpened,
+      direction: "desc",
+    },
+  ],
+};
+
+export const EXPOSED_PRESETS: Preset[] = [PRESET_DEFAULT, PRESET_REVIEW];
