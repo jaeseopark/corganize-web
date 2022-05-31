@@ -1,7 +1,7 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { SessionInfo } from "typedefs/Session";
 
-import client from "clients/corganize";
+import * as client from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
 

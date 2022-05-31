@@ -65,211 +65,199 @@ const getFilesById = (fileIds: string[]) => {
   );
 };
 
-class CorganizeClient {
-  getFilesBySessionInfo(sessionInfo: SessionInfo, callback: RetrievalCallback) {
-    const params = {} as { [key: string]: string };
-    if (sessionInfo.minSize) {
-      params.minsize = String(sessionInfo.minSize);
-    }
-
-    return this.getFilesWithPagination(
-      `/api/remote/files/${sessionInfo.endpoint}`,
-      params,
-      sessionInfo.limit,
-      callback
-    );
+export const getFilesBySessionInfo = (sessionInfo: SessionInfo, callback: RetrievalCallback) => {
+  const params = {} as { [key: string]: string };
+  if (sessionInfo.minSize) {
+    params.minsize = String(sessionInfo.minSize);
   }
 
-  getFilesByTags(tags: string[], callback: (files: CorganizeFile[]) => CorganizeFile[]) {
-    return this.getFilesWithPagination(
-      "/api/remote/files",
-      { tags: tags.join("|") },
-      99999,
-      callback
-    );
+  return getFilesWithPagination(
+    `/api/remote/files/${sessionInfo.endpoint}`,
+    params,
+    sessionInfo.limit,
+    callback
+  );
+};
+
+export const getFilesByTags = (
+  tags: string[],
+  callback: (files: CorganizeFile[]) => CorganizeFile[]
+) => {
+  return getFilesWithPagination("/api/remote/files", { tags: tags.join("|") }, 99999, callback);
+};
+
+const getFiles = (path: string, params: { [key: string]: string }, nexttoken?: string) => {
+  const clone = { ...params };
+  if (nexttoken) {
+    clone.nexttoken = nexttoken;
   }
-
-  _getFiles(path: string, params: { [key: string]: string }, nexttoken?: string) {
-    const clone = { ...params };
-    if (nexttoken) {
-      clone.nexttoken = nexttoken;
-    }
-    return fetch(path + "?" + new URLSearchParams(clone), { mode: "cors" }).then((r) => {
-      // @ts-ignore
-      return r.json() as FileResponse;
-    });
-  }
-
-  getFilesWithPagination(
-    path: string,
-    params: { [key: string]: string },
-    remaining: number,
-    callback: RetrievalCallback,
-    paginationToken?: string
-  ): Promise<null> {
-    if (remaining <= 0) return Promise.resolve(null);
-
-    return this._getFiles(path, params, paginationToken)
-      .then(({ metadata, files }) => ({ metadata, files: callback(files) }))
-      .then(({ metadata, files }: FileResponse) => {
-        const nexttoken = metadata?.nexttoken;
-        if (!nexttoken) return null;
-
-        return this.getFilesWithPagination(
-          path,
-          params,
-          remaining - files.length,
-          callback,
-          nexttoken
-        );
-      });
-  }
-
-  createFiles(files: CorganizeFile[]): Promise<CreateResponse> {
-    const findFileById = (fileid: string) =>
-      ({
-        ...files.find((f) => f.fileid === fileid),
-        lastupdated: getPosixSeconds(),
-        dateactivated: getPosixSeconds(),
-      } as CorganizeFile);
-
-    const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
-      proxyFetch("/api/remote/files", "POST", thisChunk)
-        .then(async (res) => {
-          if (res.status === 200) {
-            // @ts-ignore
-            return res.json() as RawCreateResponse;
-          }
-          throw new Error(`status ${res.status}`);
-        })
-        .then(({ created, skipped }: RawCreateResponse) => {
-          return {
-            created: created.map(findFileById),
-            skipped: skipped.map(findFileById),
-          };
-        })
-    );
-
-    return Promise.all(promises).then((responses) =>
-      responses.reduce(
-        (acc, next) => {
-          return {
-            created: [...acc.created, ...next.created],
-            skipped: [...acc.skipped, ...next.skipped],
-          };
-        },
-        { created: [], skipped: [] } as CreateResponse
-      )
-    );
-  }
-
-  updateFile(partialProps: Partial<CorganizeFile>): Promise<Partial<CorganizeFile>> {
-    return proxyFetch("/api/remote/files", "PATCH", partialProps).then((response) => {
-      if (response.status !== 200) {
-        throw new Error(`status ${response.status}`);
-      }
-      return {
-        ...partialProps,
-        lastupdated: getPosixSeconds(),
-      };
-    });
-  }
-
-  getLocalFilenames(): Promise<string[]> {
+  return fetch(path + "?" + new URLSearchParams(clone), { mode: "cors" }).then((r) => {
     // @ts-ignore
-    return fetch("/api/files")
-      .then((res) => res.json())
-      .then(({ files }) => files);
-  }
+    return r.json() as FileResponse;
+  });
+};
 
-  getGlobalTags(): Promise<string[]> {
-    return fetch("/api/remote/tags")
-      .then((res) => res.json())
-      .then(({ tags }) => tags);
-  }
+export const getFilesWithPagination = (
+  path: string,
+  params: { [key: string]: string },
+  remaining: number,
+  callback: RetrievalCallback,
+  paginationToken?: string
+): Promise<null> => {
+  if (remaining <= 0) return Promise.resolve(null);
 
-  scrapeAsync(
-    ...urls: string[]
-  ): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> {
-    const dedupFilesById = (files: CorganizeFile[]) =>
-      files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
+  return getFiles(path, params, paginationToken)
+    .then(({ metadata, files }) => ({ metadata, files: callback(files) }))
+    .then(({ metadata, files }: FileResponse) => {
+      const nexttoken = metadata?.nexttoken;
+      if (!nexttoken) return null;
 
-    const dedupAgainstDatabase = (files: CorganizeFile[]) =>
-      getFilesById(files.map((f) => f.fileid))
-        .then((files) => new Set((files as CorganizeFile[]).map((f) => f.fileid)))
-        .then((fileIds) => ({
-          available: files.filter((f) => !fileIds.has(f.fileid)),
-          discarded: files.filter((f) => fileIds.has(f.fileid)),
-        }));
+      return getFilesWithPagination(path, params, remaining - files.length, callback, nexttoken);
+    });
+};
 
-    const scrapeSingleUrl = (url: string) =>
-      fetch("/redir/scrape", {
-        method: "POST",
-        body: JSON.stringify({ url }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-      })
-        .then((res) => res.json())
-        .then(({ files }: { files: CorganizeFile[] }) =>
-          files.map((f) => ({ ...f, storageservice: "None" }))
-        );
+export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
+  const findFileById = (fileid: string) =>
+    ({
+      ...files.find((f) => f.fileid === fileid),
+      lastupdated: getPosixSeconds(),
+      dateactivated: getPosixSeconds(),
+    } as CorganizeFile);
 
-    return Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
-      .then((results) =>
-        results.reduce((acc, result) => {
-          if (result.status === "fulfilled") {
-            acc.push(...result.value);
-          }
-          return acc;
-        }, new Array<CorganizeFile>())
-      )
-      .then(dedupFilesById)
-      .then(dedupAgainstDatabase);
-  }
-
-  trim(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {
-    const url = `/api/files/${fileid}/trim`;
-    return fetch(url, {
-      method: "POST",
-      body: JSON.stringify({ segments: segmentsToTuples(segments) }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+  const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
+    proxyFetch("/api/remote/files", "POST", thisChunk)
       .then(async (res) => {
         if (res.status === 200) {
-          return res.json();
+          // @ts-ignore
+          return res.json() as RawCreateResponse;
         }
-
-        throw new Error(await res.text());
+        throw new Error(`status ${res.status}`);
       })
-      .then((f) => {
-        // The return type of the endpoint is CorganizeFile.
-        // Wrap it in an array to align with the function signature.
-        return [f];
-      });
-  }
+      .then(({ created, skipped }: RawCreateResponse) => {
+        return {
+          created: created.map(findFileById),
+          skipped: skipped.map(findFileById),
+        };
+      })
+  );
 
-  cut(fileid: string, segments: Segment[]): Promise<CorganizeFile[]> {
-    const url = `/api/files/${fileid}/cut`;
-    return fetch(url, {
+  return Promise.all(promises).then((responses) =>
+    responses.reduce(
+      (acc, next) => {
+        return {
+          created: [...acc.created, ...next.created],
+          skipped: [...acc.skipped, ...next.skipped],
+        };
+      },
+      { created: [], skipped: [] } as CreateResponse
+    )
+  );
+};
+
+export const updateFile = (
+  partialProps: Partial<CorganizeFile>
+): Promise<Partial<CorganizeFile>> => {
+  return proxyFetch("/api/remote/files", "PATCH", partialProps).then((response) => {
+    if (response.status !== 200) {
+      throw new Error(`status ${response.status}`);
+    }
+    return {
+      ...partialProps,
+      lastupdated: getPosixSeconds(),
+    };
+  });
+};
+
+export const getLocalFilenames = (): Promise<string[]> => {
+  // @ts-ignore
+  return fetch("/api/files")
+    .then((res) => res.json())
+    .then(({ files }) => files);
+};
+
+export const getGlobalTags = (): Promise<string[]> => {
+  return fetch("/api/remote/tags")
+    .then((res) => res.json())
+    .then(({ tags }) => tags);
+};
+
+export const scrapeAsync = (
+  ...urls: string[]
+): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> => {
+  const dedupFilesById = (files: CorganizeFile[]) =>
+    files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
+
+  const dedupAgainstDatabase = (files: CorganizeFile[]) =>
+    getFilesById(files.map((f) => f.fileid))
+      .then((files) => new Set((files as CorganizeFile[]).map((f) => f.fileid)))
+      .then((fileIds) => ({
+        available: files.filter((f) => !fileIds.has(f.fileid)),
+        discarded: files.filter((f) => fileIds.has(f.fileid)),
+      }));
+
+  const scrapeSingleUrl = (url: string) =>
+    fetch("/redir/scrape", {
       method: "POST",
-      body: JSON.stringify({ segments: segmentsToTuples(segments) }),
+      body: JSON.stringify({ url }),
       headers: {
         "Content-Type": "application/json",
       },
-    }).then(async (res) => {
+      mode: "cors",
+    })
+      .then((res) => res.json())
+      .then(({ files }: { files: CorganizeFile[] }) =>
+        files.map((f) => ({ ...f, storageservice: "None" }))
+      );
+
+  return Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
+    .then((results) =>
+      results.reduce((acc, result) => {
+        if (result.status === "fulfilled") {
+          acc.push(...result.value);
+        }
+        return acc;
+      }, new Array<CorganizeFile>())
+    )
+    .then(dedupFilesById)
+    .then(dedupAgainstDatabase);
+};
+
+export const trim = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
+  const url = `/api/files/${fileid}/trim`;
+  return fetch(url, {
+    method: "POST",
+    body: JSON.stringify({ segments: segmentsToTuples(segments) }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then(async (res) => {
       if (res.status === 200) {
         return res.json();
       }
 
       throw new Error(await res.text());
+    })
+    .then((f) => {
+      // The return type of the endpoint is CorganizeFile.
+      // Wrap it in an array to align with the function signature.
+      return [f];
     });
-  }
-}
+};
 
-const instance = new CorganizeClient();
+export const cut = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
+  const url = `/api/files/${fileid}/cut`;
+  return fetch(url, {
+    method: "POST",
+    body: JSON.stringify({ segments: segmentsToTuples(segments) }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then(async (res) => {
+    if (res.status === 200) {
+      return res.json();
+    }
 
-export default instance;
+    throw new Error(await res.text());
+  });
+};

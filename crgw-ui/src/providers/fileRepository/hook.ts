@@ -7,7 +7,7 @@ import { SessionInfo } from "typedefs/Session";
 import { FileRepository } from "providers/fileRepository/fileRepository";
 
 import { addGlobalTags, populateGlobalTags, retrieveFiles } from "clients/adapter";
-import client, { CreateResponse } from "clients/corganize";
+import * as client from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
@@ -35,7 +35,7 @@ export const useFileRepository = () => {
     return undiscoveredFiles;
   };
 
-  const createScrapedFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
+  const createScrapedFiles = (files: CorganizeFile[]): Promise<client.CreateResponse> => {
     return client.createFiles(files).then(({ created, skipped }) => {
       discover([...created, ...skipped]);
       return { created, skipped };

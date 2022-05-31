@@ -5,7 +5,7 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
-import client, { CreateResponse } from "clients/corganize";
+import * as client from "clients/corganize";
 
 import { madFocus } from "utils/elementUtils";
 
@@ -79,7 +79,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const createFilesFromCards = (cards: Card[]) => {
     const files = cards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
 
-    const displayToasts = (res: CreateResponse) => {
+    const displayToasts = (res: client.CreateResponse) => {
       if (files.length === 1) return res;
 
       const { created, skipped } = res;
@@ -94,7 +94,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
       return res;
     };
 
-    const updateCardStatus = ({ created, skipped }: CreateResponse) => {
+    const updateCardStatus = ({ created, skipped }: client.CreateResponse) => {
       const updateCardStatus = (f: CorganizeFile, status: string, errorString?: string) => {
         const card = cards.find((c) => c.file.fileid === f.fileid) as Card;
         card.status = status;
