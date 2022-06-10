@@ -1,9 +1,9 @@
-import { Box, Center, Flex, Heading, Spacer } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading } from "@chakra-ui/react";
 import { useState } from "react";
 
 import { SessionInfo } from "typedefs/Session";
 
-import "./LibrarySelector.scss";
+import "./SessionConfigurer.scss";
 
 const FILE_COUNT_INCREMENT = 500;
 const MIN_FILE_SIZE_INCREMENT = 50;
@@ -69,24 +69,16 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
     </div>
   );
 
-  const render = () => (
+  return (
     <Flex className="session-configurer" direction="column">
-      <Box>
-        <Center>
-          <Heading>Configure Session</Heading>
-        </Center>
-      </Box>
       {renderConfigTable()}
-      <Spacer />
       <Box>
-        <Center className="ok-container clickable" onClick={onOK}>
-          <label>OK</label>
+        <Center className="button clickable" onClick={onOK}>
+          <Heading size="md">Start a Session</Heading>
         </Center>
       </Box>
     </Flex>
   );
-
-  return <Center h="100vh">{render()}</Center>;
 };
 
 export default SessionConfigurer;

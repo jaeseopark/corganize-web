@@ -1,13 +1,10 @@
 .session-configurer {
-  min-width: 31em;
   background-color: aliceblue;
-  padding: 3em;
+  padding: 1.5em;
   border-radius: 0.5em;
 }
 
 .config-table {
-  margin-top: 2em;
-
   td {
     padding: 0.2em 0.5em 0.2em 0;
   }
@@ -27,10 +24,4 @@
   input[type="number"]::-webkit-outer-spin-button {
     opacity: 1;
   }
-}
-
-.ok-container {
-  margin-top: 1.5em;
-  padding: 1em;
-  background-color: rgb(201, 229, 254);
 }

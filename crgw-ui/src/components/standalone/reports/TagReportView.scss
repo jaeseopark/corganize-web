@@ -1,0 +1,13 @@
+.tag-container {
+  border-radius: 0.75em;
+  background-color: var(--chakra-colors-gray-100);
+  overflow: hidden;
+}
+
+.tag {
+  padding: 0.1em 0.5em;
+}
+
+.count {
+  background-color: var(--chakra-colors-blue-100);
+}

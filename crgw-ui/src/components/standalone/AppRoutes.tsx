@@ -9,6 +9,7 @@ import { useNavv } from "hooks/navv";
 import FileJsonEditor from "components/standalone/fileview/FileJsonEditor";
 import FileTagEditor from "components/standalone/fileview/FileTagEditor";
 import FileView from "components/standalone/fileview/FileView";
+import TagReportView from "components/standalone/reports/TagReportView";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
 
 type FileRenderer = ({ fileid }: { fileid: string }) => JSX.Element;
@@ -42,6 +43,22 @@ const ScrapeRouteHandler = () => {
   return <Fragment />;
 };
 
+const SimpleHandler = ({
+  title,
+  renderer: Renderer,
+}: {
+  title: string;
+  renderer: () => JSX.Element;
+}) => {
+  const { setBlanket } = useBlanket();
+
+  useEffect(() => {
+    setBlanket({ title, body: <Renderer /> });
+  }, []);
+
+  return <Fragment />;
+};
+
 const FileHandler = ({ renderer: Renderer }: { renderer: FileRenderer }) => {
   const { setBlanket } = useBlanket();
   const params = useParams();
@@ -68,6 +85,7 @@ const AppRoutes = () => (
     <Route path="*" element={<Navigate to="/" replace />} />
     <Route path="/" element={<BlanketResetter />} />
     <Route path="/scrape" element={<ScrapeRouteHandler />} />
+    <Route path="/reports/tags" element={<SimpleHandler title="Tags" renderer={TagReportView} />} />
     <Route path="/file/:fileid/content" element={<FileHandler renderer={FileView} />} />
     <Route path="/file/:fileid/json" element={<FileHandler renderer={FileJsonEditor} />} />
     <Route path="/file/:fileid/tags" element={<FileHandler renderer={FileTagEditor} />} />
