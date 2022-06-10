@@ -7,6 +7,7 @@ export const useNavv = () => {
 
   return {
     navRoot: () => navigate("/"),
+    navTagReport: () => navigate("/reports/tags"),
     navJson: (file: CorganizeFile) => navigate(`/file/${file.fileid}/json`),
     navContent: (file: CorganizeFile) => navigate(`/file/${file.fileid}/content`),
     navTags: (file: CorganizeFile) => navigate(`/file/${file.fileid}/tags`),

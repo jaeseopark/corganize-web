@@ -1,13 +1,12 @@
-import { Divider } from "@chakra-ui/react";
+import { Center, Divider, Flex, Heading } from "@chakra-ui/react";
 import cls from "classnames";
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-
-import { SessionInfo } from "typedefs/Session";
+import { useEffect } from "react";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
+
+import { useNavv } from "hooks/navv";
 
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
@@ -17,35 +16,40 @@ import GlobalSearch from "components/standalone/grid/GlobalSearch";
 import GridView from "components/standalone/grid/GridView";
 import PageControl from "components/standalone/grid/PageControl";
 
+import "./MainView.scss";
+
 const MainView = () => {
   const { startSession } = useFileRepository();
-  const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
+  const { navTagReport } = useNavv();
   const {
-    fileProps: { setFiles: setGridFiles },
+    fileProps: { files: gridFiles, setFiles: setGridFiles },
   } = useGrid();
+  const hasSessionStarted = gridFiles.length > 0;
 
   useEffect(() => {
-    if (sessionInfo) {
-      startSession(sessionInfo);
-    }
-  }, [sessionInfo]);
-
-  useEffect(() => {
-    if (files && files.length > 0) {
+    if (files.length > 0) {
       setGridFiles(files);
     }
   }, [files]);
 
-  if (!sessionInfo) {
-    return <SessionConfigurer setInfo={setSessionInfo} />;
-  }
+  const MainContent = () => {
+    if (!hasSessionStarted) {
+      return (
+        <Center className="presession">
+          <Flex direction="column">
+            <SessionConfigurer setInfo={startSession} />
+            <Center className="button clickable" onClick={navTagReport}>
+              <Heading size="md">Manage Tags</Heading>
+            </Center>
+          </Flex>
+        </Center>
+      );
+    }
 
-  return (
-    <>
-      <AppRoutes />
-      <StyledMainView className={cls("main-view", { hidden: isBlanketEnabled })}>
+    return (
+      <div className="session-wrapper">
         <PresetBar />
         <Divider marginY=".5em" />
         <FieldBar />
@@ -53,13 +57,18 @@ const MainView = () => {
         <PageControl />
         <GridView />
         <PageControl />
-      </StyledMainView>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <AppRoutes />
+      <div className={cls("main-view", { hidden: isBlanketEnabled })}>
+        <MainContent />
+      </div>
     </>
   );
 };
-
-const StyledMainView = styled.div`
-  margin: 1rem;
-`;
 
 export default MainView;

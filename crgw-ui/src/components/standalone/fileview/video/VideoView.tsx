@@ -140,11 +140,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }
 
     if (key === "e") {
-      if (highlightManager.isEmpty()) {
-        jumpTimeByDelta(vid.duration / 10); // jump by 10%
-      } else {
-        jumptToNextHighlight();
-      }
+      jumpTimeByDelta(vid.duration / 10); // jump by 10%
     } else if (key === "m") {
       vid.muted = !vid.muted;
     } else if (key === "b") {

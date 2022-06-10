@@ -175,11 +175,10 @@ export const getLocalFilenames = (): Promise<string[]> => {
     .then(({ files }) => files);
 };
 
-export const getGlobalTags = (): Promise<string[]> => {
-  return fetch("/api/remote/tags")
+export const getGlobalTags = (): Promise<string[]> =>
+  fetch("/api/remote/tags")
     .then((res) => res.json())
     .then(({ tags }) => tags);
-};
 
 export const scrapeAsync = (
   ...urls: string[]
@@ -261,3 +260,6 @@ export const cut = (fileid: string, segments: Segment[]): Promise<CorganizeFile[
     throw new Error(await res.text());
   });
 };
+
+export const getReport = (reportName: "tags") =>
+  fetch(`/api/remote/reports/${reportName}`).then((res) => res.json());
