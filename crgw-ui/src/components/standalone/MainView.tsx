@@ -37,13 +37,11 @@ const MainView = () => {
   const MainContent = () => {
     if (!hasSessionStarted) {
       return (
-        <Center className="presession">
-          <Flex direction="column">
-            <SessionConfigurer setInfo={startSession} />
-            <Center className="button clickable" onClick={navTagReport}>
-              <Heading size="md">Manage Tags</Heading>
-            </Center>
-          </Flex>
+        <Center flexDirection="column" className="presession">
+          <SessionConfigurer setInfo={startSession} />
+          <Center className="button clickable" onClick={navTagReport}>
+            <Heading size="md">Manage Tags</Heading>
+          </Center>
         </Center>
       );
     }
