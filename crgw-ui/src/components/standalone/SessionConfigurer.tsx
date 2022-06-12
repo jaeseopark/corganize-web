@@ -3,6 +3,8 @@ import { useState } from "react";
 
 import { SessionInfo } from "typedefs/Session";
 
+import { RetrievalEndpoint } from "clients/corganize";
+
 import "./SessionConfigurer.scss";
 
 const FILE_COUNT_INCREMENT = 500;
@@ -12,7 +14,7 @@ const MB_TO_BYTES = 1000000;
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
   const [fileCountLimit, setFileCountLimit] = useState(FILE_COUNT_INCREMENT);
   const [minFileSize, setMinFileSize] = useState(MIN_FILE_SIZE_INCREMENT);
-  const [endpoint, setEndpoint] = useState<"active" | "stale">("stale");
+  const [endpoint, setEndpoint] = useState<RetrievalEndpoint>("stale");
 
   const onOK = () =>
     setInfo({
@@ -42,9 +44,10 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   );
 
   const renderEndpointPicker = () => (
-    <select value={endpoint} onChange={(e) => setEndpoint(e.target.value as "stale" | "active")}>
+    <select value={endpoint} onChange={(e) => setEndpoint(e.target.value as RetrievalEndpoint)}>
       <option>stale</option>
       <option>active</option>
+      <option>recent</option>
     </select>
   );
 
