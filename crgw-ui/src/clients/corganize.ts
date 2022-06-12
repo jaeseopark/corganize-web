@@ -6,8 +6,6 @@ import { Dictionary } from "typedefs/common";
 import { chunk } from "utils/arrayUtils";
 import { getPosixSeconds } from "utils/dateUtils";
 
-export type FileEndpoint = "stale" | "active" | "recent";
-
 type FileResponse = {
   metadata: {
     nexttoken?: string;

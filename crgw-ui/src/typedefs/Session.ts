@@ -1,4 +1,4 @@
-import { FileEndpoint } from "clients/corganize";
+export type FileEndpoint = "stale" | "active" | "recent";
 
 export type SessionInfo = {
   endpoint: FileEndpoint;
