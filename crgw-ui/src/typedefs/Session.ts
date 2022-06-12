@@ -1,7 +1,7 @@
-import { RetrievalEndpoint } from "clients/corganize";
+import { FileEndpoint } from "clients/corganize";
 
 export type SessionInfo = {
-  endpoint: RetrievalEndpoint;
+  endpoint: FileEndpoint;
   limit: number;
   minSize: number; // in bytes
 };
