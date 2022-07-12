@@ -1,6 +1,8 @@
-import { Center, Divider, Flex, Heading } from "@chakra-ui/react";
+import { Center, Divider, Heading } from "@chakra-ui/react";
 import cls from "classnames";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import { SessionInfo } from "typedefs/Session";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
@@ -20,13 +22,19 @@ import "./MainView.scss";
 
 const MainView = () => {
   const { startSession } = useFileRepository();
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { navTagReport } = useNavv();
   const {
-    fileProps: { files: gridFiles, setFiles: setGridFiles },
+    fileProps: { setFiles: setGridFiles },
   } = useGrid();
-  const hasSessionStarted = gridFiles.length > 0;
+
+  useEffect(() => {
+    if (sessionInfo) {
+      startSession(sessionInfo);
+    }
+  }, [sessionInfo]);
 
   useEffect(() => {
     if (files.length > 0) {
@@ -35,10 +43,10 @@ const MainView = () => {
   }, [files]);
 
   const MainContent = () => {
-    if (!hasSessionStarted) {
+    if (!sessionInfo) {
       return (
         <Center flexDirection="column" className="presession">
-          <SessionConfigurer setInfo={startSession} />
+          <SessionConfigurer setInfo={setSessionInfo} />
           <Center className="button clickable" onClick={navTagReport}>
             <Heading size="md">Manage Tags</Heading>
           </Center>

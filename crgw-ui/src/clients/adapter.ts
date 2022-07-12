@@ -6,7 +6,7 @@ import * as client from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
-const NEW_FILE_THRESHOLD = getPosixSeconds() - 14 * 86400; // in the last 14 days
+const NEW_FILE_THRESHOLD = getPosixSeconds() - 5 * 86400; // in the last 5 days
 
 const isnewfile = (lastopened?: number) => {
   if (lastopened) {
