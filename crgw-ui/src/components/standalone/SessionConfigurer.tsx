@@ -1,9 +1,7 @@
 import { Box, Center, Flex, Heading } from "@chakra-ui/react";
 import { useState } from "react";
 
-import { SessionInfo } from "typedefs/Session";
-
-import { FileEndpoint } from "clients/corganize";
+import { FileEndpoint, SessionInfo } from "typedefs/Session";
 
 import "./SessionConfigurer.scss";
 

@@ -30,6 +30,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const mainDivRef = useRef<HTMLDivElement | null>(null);
 
   const [url, setUrl] = useState<string>(defaultUrls ? defaultUrls.join(",") : "");
+  const [localScrapeHost, setLocalScrapeHost] = useState(false);
 
   const scrape = useCallback(
     (event?: Event) => {
@@ -42,7 +43,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
       const urls = (url as string).split(",");
 
       client
-        .scrapeAsync(...urls)
+        .scrapeAsync(localScrapeHost ? "PROXY" : "DIRECT", ...urls)
         .then(({ available, discarded }) => {
           setRawScrapeCount(available.length + discarded.length);
 
@@ -61,7 +62,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         .catch(setError)
         .finally(() => setProcessing(false));
     },
-    [isProcessing, url]
+    [isProcessing, localScrapeHost, url]
   );
 
   useEffect(() => {
@@ -127,6 +128,8 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         setUrl={setUrl}
         rawScrapeCount={rawScrapeCount}
         scrape={scrape}
+        localScrapeHost={localScrapeHost}
+        setLocalScrapeHost={setLocalScrapeHost}
       />
       <ScrapeGrid
         disabled={isProcessing}

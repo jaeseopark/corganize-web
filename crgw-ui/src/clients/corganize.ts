@@ -6,8 +6,6 @@ import { Dictionary } from "typedefs/common";
 import { chunk } from "utils/arrayUtils";
 import { getPosixSeconds } from "utils/dateUtils";
 
-export type FileEndpoint = "stale" | "active" | "recent";
-
 type FileResponse = {
   metadata: {
     nexttoken?: string;
@@ -183,6 +181,7 @@ export const getGlobalTags = (): Promise<string[]> =>
     .then(({ tags }) => tags);
 
 export const scrapeAsync = (
+  scrapeHost: "DIRECT" | "PROXY",
   ...urls: string[]
 ): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> => {
   const dedupFilesById = (files: CorganizeFile[]) =>
@@ -196,15 +195,23 @@ export const scrapeAsync = (
         discarded: files.filter((f) => fileIds.has(f.fileid)),
       }));
 
-  const scrapeSingleUrl = (url: string) =>
-    fetch("/redir/scrape", {
+  const fetchDynamically = (url: string) => {
+    if (scrapeHost === "PROXY") {
+      return proxyFetch("/api/remote/scrape", "POST", { url });
+    }
+
+    return fetch("/redir/scrape", {
       method: "POST",
       body: JSON.stringify({ url }),
       headers: {
         "Content-Type": "application/json",
       },
       mode: "cors",
-    })
+    });
+  };
+
+  const scrapeSingleUrl = (url: string) =>
+    fetchDynamically(url)
       .then((res) => res.json())
       .then(({ files }: { files: CorganizeFile[] }) =>
         files.map((f) => ({ ...f, storageservice: "None" }))
