@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
-import { Dictionary } from "typedefs/common";
-
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
@@ -17,19 +15,22 @@ import { madFocusByClassName } from "utils/elementUtils";
 import "./FileTagEditor.scss";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
+const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
 
 const getTokens = (filename: string) => {
   const tokenizedFilename = filename
     .split(/[^A-Za-z0-9]/)
     .map((t) => t.trim().toLowerCase())
     .filter((t) => t);
-  const tokens = new Set(tokenizedFilename);
-  tokenizedFilename.forEach((token, i, ary) => {
-    if (i < ary.length - 1) {
-      const nextToken = ary[i + 1];
-      tokens.add([token, nextToken].join(" "));
-    }
-  });
+  const tokens = new Set(tokenizedFilename); // this line takes care of the case where tokenLength == 1
+  for (let tokenLength = 2; tokenLength <= AUTOCOMP_TOKEN_LENGTH_LIMIT; tokenLength++) {
+    tokenizedFilename.forEach((_, i, ary) => {
+      const j = i + tokenLength;
+      if (j <= ary.length) {
+        tokens.add(ary.slice(i, j).join(" "));
+      }
+    });
+  }
   return tokens;
 };
 
@@ -39,17 +40,18 @@ const generateSuggestions = (filename: string) => {
   return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
 };
 
-const normalizeForAutocomplete = (s: string) => {
-  // Note: can add more normalization later
-  return s.replace(" ", "");
-};
+const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
 
 const buildAutocompleteIndex = () =>
   Array.from(globalTags).reduce((acc, next) => {
-    acc[next] = next;
-    acc[normalizeForAutocomplete(next)] = next;
+    acc[next] = [next];
+    const normalized = normalizeForAutocomplete(next);
+    if (!(normalized in acc)) {
+      acc[normalized] = [];
+    }
+    acc[normalized].push(next);
     return acc;
-  }, {} as Dictionary<string>);
+  }, {} as { [key: string]: string[] });
 
 type FileTagEditorProps = { fileid: string; autofocus?: boolean };
 
@@ -83,7 +85,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
         .map((t) => autocompleteIndex[normalizeForAutocomplete(t)])
         .filter((t) => t);
       if (matches.length > 0) {
-        setCandidates(matches);
+        setCandidates(Array.from(new Set(matches.flat(2))));
       }
     }
   }, []);
