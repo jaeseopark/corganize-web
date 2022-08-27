@@ -5,7 +5,7 @@ from typing import List
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
 
-from crgw.postprocessing import cut_clip, trim_clip
+from crgw.postprocessing import cut_individually, cut_then_combine, reencode
 from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
@@ -29,11 +29,9 @@ def add_files():
 @app.post("/files/<path:fileid>/cut")
 def cut(fileid: str):
     try:
-        files: List[dict] = cut_clip(fileid, freq.get_json().get("segments"))
+        files: List[dict] = cut_individually(fileid, freq.get_json().get("segments"))
     except FileNotFoundError as e:
         return str(e), 404
-    except ValueError as e:
-        return str(e), 400
 
     res = Response(json.dumps(files))
     res.headers = {"Content-Type": "application/json"}
@@ -41,15 +39,22 @@ def cut(fileid: str):
     return res
 
 
-@app.post("/files/<path:fileid>/trim")
-def trim(fileid: str):
+@app.post("/files/<path:fileid>/cut-then-combine")
+def cut_then_combinee(fileid: str):
     try:
-        file: dict = trim_clip(fileid, freq.get_json().get("segments"))
+        file: dict = cut_then_combine(fileid, freq.get_json().get("segments"))
     except FileNotFoundError as e:
         return str(e), 404
-    except ValueError as e:
-        return str(e), 400
     return file, 200
+
+@app.post("/files/<path:fileid>/reencode")
+def reencodee(fileid: str):
+    # TODO: spin up a thread
+    try:
+        reencode(fileid)
+    except FileNotFoundError as e:
+        return str(e), 404
+    return "", 201
 
 
 @app.get("/health/ready")

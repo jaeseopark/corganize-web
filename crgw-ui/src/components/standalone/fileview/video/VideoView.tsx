@@ -101,9 +101,16 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }
   };
 
-  const trim = () => postprocessSegments("Trim", postprocesses.trim);
+  const cutThenCombine = () => postprocessSegments("Trim", postprocesses.cutThenCombine);
 
   const cut = () => postprocessSegments("Cut", postprocesses.cut);
+
+  const reencode = () => {
+    postprocesses.reencode(fileid);
+    enqueue({
+      message: "Reencode request submitted",
+    });
+  };
 
   const jumpTo = (time: number) => {
     if (vidRef.current) vidRef.current.currentTime = time;
@@ -126,20 +133,13 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
     const jumpTimeByDelta = (deltaInSeconds: number) => jumpTo(vid.currentTime + deltaInSeconds);
 
-    const jumptToNextHighlight = () => {
-      const nextHighlight = highlightManager.next(vid.currentTime);
-      if (nextHighlight !== null) jumpTo(nextHighlight);
-    };
-
     if (SEEK_HOTKEY_MAP[key]) {
       let delta = SEEK_HOTKEY_MAP[key];
       if (shiftKey) {
         delta *= -1;
       }
-      return jumpTimeByDelta(delta);
-    }
-
-    if (key === "e") {
+      jumpTimeByDelta(delta);
+    } else if (key === "e") {
       jumpTimeByDelta(vid.duration / 10); // jump by 10%
     } else if (key === "m") {
       vid.muted = !vid.muted;
@@ -161,10 +161,12 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       segmentActions.close(Math.floor(vid.currentTime));
     } else if (key === "t") {
       if (closedSegments.length === 1) {
-        enqueueWarning({ message: "Can't use trim for one segment" });
+        enqueueWarning({ message: "Need 2 or more segments" });
         return;
       }
-      trim();
+      cutThenCombine();
+    } else if (key === "|") {
+      reencode();
     } else if (key === "y") {
       cut();
     }
