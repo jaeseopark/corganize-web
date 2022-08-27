@@ -42,7 +42,7 @@ export async function retrieveFiles(
 
   const callback = (files: CorganizeFile[]) => {
     files.forEach(decorate(localFileIndex));
-    const filtered = files.filter((f) => f.streamingurl);
+    const filtered = files.filter((f) => f.streamingurl && f.filename);
     const added = onLoad(filtered);
     count += added.length;
     return added;
