@@ -46,6 +46,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
       <option>stale</option>
       <option>active</option>
       <option>recent</option>
+      <option>dense</option>
     </select>
   );
 
