@@ -157,15 +157,13 @@ const BADGE_GENERATION_MAP: Map<BadgeKey, (f: CorganizeFile) => Badge[]> = new M
           ],
         });
         if (f.size) {
-          const ADEQUATE_RANGE = [2500000, 5000000]; // 2.5-5Mbps
           const TOO_HIGH = 7000000; // 7Mbps
 
           const bitrate = (f.size / f.multimedia.duration) * 8;
-          const adequate = ADEQUATE_RANGE[0] <= bitrate && bitrate <= ADEQUATE_RANGE[1];
 
           badges.push({
             value: `${Math.ceil(bitrate / 1000 ** 2)}Mbps`,
-            styleClasses: ["bitrate", { adequate, inadequate: bitrate > TOO_HIGH }],
+            styleClasses: ["bitrate", { inadequate: bitrate > TOO_HIGH }],
           });
         }
       }
