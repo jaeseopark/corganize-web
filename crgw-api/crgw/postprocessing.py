@@ -9,7 +9,7 @@ from moviepy.tools import subprocess_call
 
 DATA_PATH = "/data"
 TRIMID_LENGTH = 6
-DEFAULT_CRF = 23
+DEFAULT_CRF = 25
 
 LOGGER = logging.getLogger("crgw-api")
 
