@@ -43,7 +43,7 @@ def _startup():
 
         _LOCAL_FILE_CACHE.running = True
         while _LOCAL_FILE_CACHE.should_run:
-            filenames = os.listdir(DATA_PATH)
+            filenames = [f for f in os.listdir(DATA_PATH) if f.endswith("dec")]
             _LOCAL_FILE_CACHE.files = filenames
             LOGGER.info(f"Updated cache {len(filenames)=}")
             sleep(CACHE_UPDATE_INTERVAL)
