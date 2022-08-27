@@ -7,9 +7,11 @@ from corganizeclient.client import CorganizeClient
 from moviepy.config import get_setting as get_moviepy_setting
 from moviepy.tools import subprocess_call
 
+from crgw.local_filesystem import add_local_files
+
 DATA_PATH = "/data"
 TRIMID_LENGTH = 6
-DEFAULT_CRF = 25
+DEFAULT_CRF = 28
 
 LOGGER = logging.getLogger("crgw-api")
 
@@ -183,4 +185,5 @@ def _process(fileid: str,
     ))
 
     crg_client.create_files([new_file])
+    add_local_files([target_path])
     return new_file
