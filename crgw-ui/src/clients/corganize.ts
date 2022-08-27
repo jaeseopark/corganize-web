@@ -230,8 +230,8 @@ export const scrapeAsync = (
     .then(dedupAgainstDatabase);
 };
 
-export const trim = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
-  const url = `/api/files/${fileid}/trim`;
+export const cutThenCombine = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
+  const url = `/api/files/${fileid}/cut-then-combine`;
   return fetch(url, {
     method: "POST",
     body: JSON.stringify({ segments: segmentsToTuples(segments) }),
@@ -269,6 +269,23 @@ export const cut = (fileid: string, segments: Segment[]): Promise<CorganizeFile[
     throw new Error(await res.text());
   });
 };
+
+export const reencode = (fileid: string): Promise<void> => {
+  const url = `/api/files/${fileid}/reencode`;
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then(async (res) => {
+    if (res.status === 201) {
+      return;
+    }
+
+    throw new Error(await res.text());
+  });
+};
+
 
 export const getReport = (reportName: "tags") =>
   fetch(`/api/remote/reports/${reportName}`).then((res) => res.json());

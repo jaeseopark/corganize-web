@@ -9,6 +9,7 @@ from moviepy.tools import subprocess_call
 
 DATA_PATH = "/data"
 TRIMID_LENGTH = 6
+DEFAULT_CRF = 23
 
 LOGGER = logging.getLogger("crgw-api")
 
@@ -61,7 +62,7 @@ def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]
     return segments
 
 
-def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
+def cut_individually(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
     """
     Splits the video into N files, where N = len(normalize_segments(segments)).
     The user needs to manually delete the original file afterwards.
@@ -79,7 +80,7 @@ def cut_clip(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
     return new_files
 
 
-def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
+def cut_then_combine(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     """
     Composes a new video by stitching the given segments.
     The user needs to manually delete the original file afterwards.
@@ -121,10 +122,24 @@ def trim_clip(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     return _process(fileid, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
+def reencode(fileid: str, crf: int=None) -> dict:
+    def ffmpeg_reencode(source_path: str, target_path: str):
+        tmp_path = target_path + ".mp4"
+        subprocess_call([
+            get_moviepy_setting("FFMPEG_BINARY"), "-y",
+            "-i", source_path,
+            "-crf", str(crf) if crf else str(DEFAULT_CRF),
+            tmp_path
+        ])
+        os.rename(tmp_path, target_path)
+
+    return _process(fileid, suffix="-reencode", process=ffmpeg_reencode)
+
+
 def _process(fileid: str,
              suffix: str,
-             new_duration: int,
-             process: Callable[[str, str], None]) -> dict:
+             process: Callable[[str, str], None],
+             new_duration: int=None) -> dict:
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
         message = f"file not found: {source_path=}"
@@ -147,10 +162,14 @@ def _process(fileid: str,
         storageservice="local",
         locationref="local",
         mimetype="video/mp4",
-        multimedia=merge(multimedia, dict(duration=new_duration)),
         dateactivated=now_seconds(),
         lastopened=0,
     )
+
+    if new_duration:
+        new_file.update(dict(
+            multimedia=merge(multimedia, dict(duration=new_duration)),
+        ))
 
     if source_file.get("tags"):
         new_file.update(dict(
