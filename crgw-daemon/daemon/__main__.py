@@ -44,10 +44,10 @@ class DaemonJob:
 DAEMON_JOBS = [
     DaemonJob(func=init_watcher),
     DaemonJob(func=init_cleaner),
-    DaemonJob(func=init_scraper),
+    # DaemonJob(func=init_scraper),
     DaemonJob(func=run_watcher, interval=60),
     DaemonJob(func=run_cleaner, interval=1800),
-    DaemonJob(func=run_scraper, interval=1800),
+    # DaemonJob(func=run_scraper, interval=1800),
 ]
 
 

@@ -101,7 +101,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }
   };
 
-  const cutThenCombine = () => postprocessSegments("Trim", postprocesses.cutThenCombine);
+  const cutMerge = () => postprocessSegments("Cut Merge", postprocesses.cutMerge);
 
   const cut = () => postprocessSegments("Cut", postprocesses.cut);
 
@@ -164,7 +164,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
         enqueueWarning({ message: "Need 2 or more segments" });
         return;
       }
-      cutThenCombine();
+      cutMerge();
     } else if (key === "|") {
       reencode();
     } else if (key === "y") {

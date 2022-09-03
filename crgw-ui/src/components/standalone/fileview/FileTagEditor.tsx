@@ -76,17 +76,17 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   }, []);
 
   /**
-   * Generates the autocomplete candidates, if applicable.
+   * Generates the autocomplete candidates when the component mounts.
    */
   useEffect(() => {
-    if (tags.length === 0) {
-      const autocompleteIndex = buildAutocompleteIndex();
-      const matches = Array.from(getTokens(file.filename))
-        .map((t) => autocompleteIndex[normalizeForAutocomplete(t)])
-        .filter((t) => t);
-      if (matches.length > 0) {
-        setCandidates(Array.from(new Set(matches.flat(2))));
-      }
+    const autocompleteIndex = buildAutocompleteIndex();
+    const matches = Array.from(getTokens(file.filename))
+      .map((t) => autocompleteIndex[normalizeForAutocomplete(t)])
+      .filter((t) => t);
+    if (matches.length > 0) {
+      const tags = (file.tags || []);
+      const isBrandNew = (t: string) => !tags.includes(t);
+      setCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
     }
   }, []);
 

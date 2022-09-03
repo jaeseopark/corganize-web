@@ -5,7 +5,7 @@ from typing import List
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
 
-from crgw.postprocessing import cut_individually, cut_then_combine, reencode
+from crgw.postprocessing import cut_individually, cut_merge, reencode
 from crgw.forwarder import forward_request
 from crgw.local_filesystem import get_local_files, teardown, add_local_files
 
@@ -39,10 +39,10 @@ def cut(fileid: str):
     return res
 
 
-@app.post("/files/<path:fileid>/cut-then-combine")
-def cut_then_combinee(fileid: str):
+@app.post("/files/<path:fileid>/cut-merge")
+def cut_mergee(fileid: str):
     try:
-        file: dict = cut_then_combine(fileid, freq.get_json().get("segments"))
+        file: dict = cut_merge(fileid, freq.get_json().get("segments"))
     except FileNotFoundError as e:
         return str(e), 404
     return file, 200

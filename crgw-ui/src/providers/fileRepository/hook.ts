@@ -104,8 +104,8 @@ export const useFileRepository = () => {
     return addFiles(files);
   };
 
-  const cutThenCombine = (fileid: string, segments: Segment[]) =>
-    client.cutThenCombine(fileid, segments).then(addPostprocessedFiles);
+  const cutMerge = (fileid: string, segments: Segment[]) =>
+    client.cutMerge(fileid, segments).then(addPostprocessedFiles);
 
   const cut = (fileid: string, segments: Segment[]) =>
     client.cut(fileid, segments).then(addPostprocessedFiles);
@@ -130,7 +130,7 @@ export const useFileRepository = () => {
     findById,
     toggleActivation,
     postprocesses: {
-      cutThenCombine,
+      cutMerge,
       cut,
       reencode: client.reencode
     },

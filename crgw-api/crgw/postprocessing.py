@@ -10,8 +10,9 @@ from moviepy.tools import subprocess_call
 from crgw.local_filesystem import add_local_files
 
 DATA_PATH = "/data"
-TRIMID_LENGTH = 6
-DEFAULT_CRF = 28
+TRIM_ID_LENGTH = 6
+DEFAULT_CRF = 25
+MAX_RESOLUTION = 1080
 
 LOGGER = logging.getLogger("crgw-api")
 
@@ -30,6 +31,57 @@ def _subclip(source_path, target_path, start, end):
         tmp_path
     ])
     os.rename(tmp_path, target_path)
+
+
+def _process(fileid: str,
+             suffix: str,
+             process: Callable[[str, str], None],
+             new_duration: int=None) -> dict:
+    source_path = os.path.join(DATA_PATH, fileid + ".dec")
+    if not os.path.exists(source_path):
+        message = f"file not found: {source_path=}"
+        LOGGER.info(message)
+        raise FileNotFoundError(message)
+
+    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
+    source_file = crg_client.get_file(fileid)
+
+    multimedia = source_file.get("multimedia") or dict()
+    if "highlights" in multimedia:
+        multimedia.pop("highlights")
+
+    new_fileid = fileid + suffix
+    target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
+    new_file = dict(
+        fileid=new_fileid,
+        filename=source_file["filename"] + suffix,
+        sourceurl=source_file["sourceurl"],
+        storageservice="local",
+        locationref="local",
+        mimetype="video/mp4",
+        dateactivated=now_seconds(),
+        lastopened=0,
+    )
+
+    if new_duration:
+        new_file.update(dict(
+            multimedia=merge(multimedia, dict(duration=new_duration)),
+        ))
+
+    if source_file.get("tags"):
+        new_file.update(dict(
+            tags=source_file.get("tags")
+        ))
+
+    process(source_path, target_path)
+
+    new_file.update(dict(
+        size=os.stat(target_path).st_size,
+    ))
+
+    crg_client.create_files([new_file])
+    add_local_files([target_path])
+    return new_file
 
 
 def intersects(s1: Tuple[int, int], s2: Tuple[int, int]) -> bool:
@@ -82,14 +134,14 @@ def cut_individually(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]
     return new_files
 
 
-def cut_then_combine(fileid: str, segments: List[Tuple[int, int]]) -> dict:
+def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     """
     Composes a new video by stitching the given segments.
     The user needs to manually delete the original file afterwards.
     """
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
-    trim_id = md5(str(segments))[:TRIMID_LENGTH]
+    trim_id = md5(str(segments))[:TRIM_ID_LENGTH]
 
     def ffmpeg_filter_trim(source_path: str, target_path: str):
         concat_specs_path = f"/tmp/{trim_id}.sources"
@@ -125,7 +177,27 @@ def cut_then_combine(fileid: str, segments: List[Tuple[int, int]]) -> dict:
 
 
 def reencode(fileid: str, crf: int=None) -> dict:
+    def get_dimensions(path: str) -> List[int]:
+        """
+        Returns video dimensions in ascending order
+        """
+        res = subprocess_call([
+            get_moviepy_setting("FFMPEG_BINARY"), "-y",
+            "-i", path,
+            "2>&1", "|", "grep", "Video:", "|", "grep", "-Po", "'\d{3,5}x\d{3,5}'"
+        ])
+
+        return sorted([int(x) for x in res.split("x")])
+
+
     def ffmpeg_reencode(source_path: str, target_path: str):
+        # short_side = get_dimensions(source_path)[0]
+        # resize_scale = short_side/MAX_RESOLUTION
+
+        # if resize_scale > 1:
+        #     # TODO: options
+        #     pass
+
         tmp_path = target_path + ".mp4"
         subprocess_call([
             get_moviepy_setting("FFMPEG_BINARY"), "-y",
@@ -137,53 +209,3 @@ def reencode(fileid: str, crf: int=None) -> dict:
 
     return _process(fileid, suffix="-reencode", process=ffmpeg_reencode)
 
-
-def _process(fileid: str,
-             suffix: str,
-             process: Callable[[str, str], None],
-             new_duration: int=None) -> dict:
-    source_path = os.path.join(DATA_PATH, fileid + ".dec")
-    if not os.path.exists(source_path):
-        message = f"file not found: {source_path=}"
-        LOGGER.info(message)
-        raise FileNotFoundError(message)
-
-    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
-    source_file = crg_client.get_file(fileid)
-
-    multimedia = source_file.get("multimedia") or dict()
-    if "highlights" in multimedia:
-        multimedia.pop("highlights")
-
-    new_fileid = fileid + suffix
-    target_path = os.path.join(DATA_PATH, new_fileid + ".dec")
-    new_file = dict(
-        fileid=new_fileid,
-        filename=source_file["filename"] + suffix,
-        sourceurl=source_file["sourceurl"],
-        storageservice="local",
-        locationref="local",
-        mimetype="video/mp4",
-        dateactivated=now_seconds(),
-        lastopened=0,
-    )
-
-    if new_duration:
-        new_file.update(dict(
-            multimedia=merge(multimedia, dict(duration=new_duration)),
-        ))
-
-    if source_file.get("tags"):
-        new_file.update(dict(
-            tags=source_file.get("tags")
-        ))
-
-    process(source_path, target_path)
-
-    new_file.update(dict(
-        size=os.stat(target_path).st_size,
-    ))
-
-    crg_client.create_files([new_file])
-    add_local_files([target_path])
-    return new_file

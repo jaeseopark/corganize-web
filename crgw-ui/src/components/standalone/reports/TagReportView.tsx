@@ -18,14 +18,16 @@ const TagReportView = () => {
 
   return (
     <Wrap>
-      {Object.entries(data).map(([tag, count]) => (
-        <WrapItem key={tag}>
-          <span className="tag-container">
-            <span className="tag clickable">{tag}</span>
-            <span className="tag count">{count}</span>
-          </span>
-        </WrapItem>
-      ))}
+      {Object.entries(data)
+        .sort((a, b) => b[1] - a[1])
+        .map(([tag, count]) => (
+          <WrapItem key={tag}>
+            <span className="tag-container">
+              <span className="tag clickable">{tag}</span>
+              <span className="tag count">{count}</span>
+            </span>
+          </WrapItem>
+        ))}
     </Wrap>
   );
 };

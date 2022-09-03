@@ -230,8 +230,8 @@ export const scrapeAsync = (
     .then(dedupAgainstDatabase);
 };
 
-export const cutThenCombine = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
-  const url = `/api/files/${fileid}/cut-then-combine`;
+export const cutMerge = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
+  const url = `/api/files/${fileid}/cut-merge`;
   return fetch(url, {
     method: "POST",
     body: JSON.stringify({ segments: segmentsToTuples(segments) }),
