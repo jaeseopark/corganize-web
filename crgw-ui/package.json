@@ -23,6 +23,7 @@
     "framer-motion": "6",
     "jszip": "^3.9.1",
     "jszip-utils": "^0.1.0",
+    "leet-decode": "^0.0.3",
     "prettier": "^2.6.2",
     "react": "^18.0.0",
     "react-burger-menu": "^3.0.6",

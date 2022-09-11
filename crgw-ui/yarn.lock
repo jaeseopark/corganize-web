@@ -6637,6 +6637,19 @@ language-tags@^1.0.5:
   dependencies:
     language-subtag-registry "~0.3.2"
 
+leet-decode@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/leet-decode/-/leet-decode-0.0.3.tgz#f3f5210395950c14c4de36df105ebef64ba45ea5"
+  integrity sha512-OpXNbkwqbHui86XgAx01UIIhnfp5xKXG3A27UJQV8lACFBol8A8OgI0T+VRKKLktZuNEHfPaHcwCHpzXLZEGNQ==
+  dependencies:
+    leetscript "^1.1.0"
+    lodash "^4.17.21"
+
+leetscript@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/leetscript/-/leetscript-1.1.0.tgz#25c2c48dce49b6742d1209a6929ab70715a57cee"
+  integrity sha512-dByM3m0UHUXpnyfnpbzSqbPs5XFwWkRG41F++2lLGR4Olhn8x5zqDh2wx8ny+x48yo7qzuvzalouIfoTVDPRag==
+
 leven@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/leven/-/leven-3.1.0.tgz#77891de834064cccba82ae7842bb6b14a13ed7f2"

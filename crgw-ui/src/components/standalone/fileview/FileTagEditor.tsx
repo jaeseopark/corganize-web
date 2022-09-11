@@ -1,6 +1,7 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { Badge, Center, Flex } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
+import { decode } from "leet-decode";
+import { useEffect, useState } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,26 +17,41 @@ import "./FileTagEditor.scss";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
+const SHOULD_DECODE_LEET_TEXT = false;
 
-const getTokens = (filename: string) => {
-  const tokenizedFilename = filename
-    .split(/[^A-Za-z0-9]/)
-    .map((t) => t.trim().toLowerCase())
-    .filter((t) => t);
-  const tokens = new Set(tokenizedFilename); // this line takes care of the case where tokenLength == 1
-  for (let tokenLength = 2; tokenLength <= AUTOCOMP_TOKEN_LENGTH_LIMIT; tokenLength++) {
-    tokenizedFilename.forEach((_, i, ary) => {
-      const j = i + tokenLength;
-      if (j <= ary.length) {
-        tokens.add(ary.slice(i, j).join(" "));
-      }
-    });
+const decodeLeetText = (text: string): string => {
+  // this lib is so slow?
+  return decode(text)[0];
+};
+
+const getTokens = (filename: string): Set<string> => {
+  const getTokensss = (filename: string) => {
+    const tokenizedFilename = filename
+      .split(/[^A-Za-z0-9]/)
+      .map((t) => t.trim().toLowerCase())
+      .filter((t) => t);
+    const tokens = new Set(tokenizedFilename); // this line takes care of the case where tokenLength == 1
+    for (let tokenLength = 2; tokenLength <= AUTOCOMP_TOKEN_LENGTH_LIMIT; tokenLength++) {
+      tokenizedFilename.forEach((_, i, ary) => {
+        const j = i + tokenLength;
+        if (j <= ary.length) {
+          tokens.add(ary.slice(i, j).join(" "));
+        }
+      });
+    }
+    return tokens;
+  };
+
+  const tokens = getTokensss(filename);
+  if (SHOULD_DECODE_LEET_TEXT) {
+    const leetTokens = getTokensss(decodeLeetText(filename));
+    leetTokens.forEach(tokens.add, tokens);
   }
+
   return tokens;
 };
 
-const generateSuggestions = (filename: string) => {
-  const tokens = getTokens(filename);
+const generateSuggestions = (tokens: Set<string>) => {
   globalTags.forEach(tokens.add, tokens);
   return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
 };
@@ -63,8 +79,8 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   const [candidates, setCandidates] = useState<string[]>([]);
 
   const file = findById(fileid);
-  const tags = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
-  const suggestions = useMemo(() => generateSuggestions(file.filename), [file.filename]);
+  const tags: Tag[] = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
+  const [suggestions, setSuggestions] = useState<Tag[]>([]);
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
@@ -76,18 +92,20 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   }, []);
 
   /**
-   * Generates the autocomplete candidates when the component mounts.
+   * Generates the autocomplete candidates and suggestions when the component mounts.
    */
   useEffect(() => {
+    const tokens = getTokens(file.filename);
     const autocompleteIndex = buildAutocompleteIndex();
-    const matches = Array.from(getTokens(file.filename))
+    const matches = Array.from(tokens)
       .map((t) => autocompleteIndex[normalizeForAutocomplete(t)])
       .filter((t) => t);
     if (matches.length > 0) {
-      const tags = (file.tags || []);
+      const tags = file.tags || [];
       const isBrandNew = (t: string) => !tags.includes(t);
       setCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
     }
+    setSuggestions(generateSuggestions(tokens));
   }, []);
 
   const assignTags = (tags: string[]) => {
@@ -181,6 +199,14 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
       </Flex>
     );
   };
+
+  if (suggestions.length === 0) {
+    return (
+      <Center className="spinner">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
 
   return (
     <div className="file-tag-editor" onKeyDown={onKeyDown}>
