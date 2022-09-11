@@ -1,6 +1,7 @@
 import logging
 import os
 from os.path import basename
+import shutil
 from threading import Thread
 from time import sleep
 from types import SimpleNamespace
@@ -20,6 +21,13 @@ CACHE_UPDATE_INTERVAL = 1800
 
 def get_local_files() -> List[str]:
     return _LOCAL_FILE_CACHE.files
+
+
+def get_remaining_space() -> int:
+    """
+    Remaining disk space in bytes
+    """
+    return shutil.disk_usage(DATA_PATH)[2]
 
 
 def add_local_files(paths: List[str]):

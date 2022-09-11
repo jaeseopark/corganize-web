@@ -10,6 +10,10 @@ import { useGrid } from "providers/grid/hook";
 
 import { useNavv } from "hooks/navv";
 
+import { getRemainingSpace } from "clients/corganize";
+
+import { toHumanFileSize } from "utils/numberUtils";
+
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
 import FieldBar from "components/standalone/field/FieldBar";
@@ -23,12 +27,17 @@ import "./MainView.scss";
 const MainView = () => {
   const { startSession } = useFileRepository();
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
+  const [remainingSpace, setRemainingSpace] = useState(0);
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { navTagReport } = useNavv();
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
+  
+  useEffect(() => {
+    getRemainingSpace().then(setRemainingSpace);
+  }, []);
 
   useEffect(() => {
     if (sessionInfo) {
@@ -50,6 +59,7 @@ const MainView = () => {
           <Center className="button clickable" onClick={navTagReport}>
             <Heading size="md">Manage Tags</Heading>
           </Center>
+          <Center>Remaining: {toHumanFileSize(remainingSpace)}</Center>
         </Center>
       );
     }

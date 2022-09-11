@@ -286,6 +286,11 @@ export const reencode = (fileid: string): Promise<void> => {
   });
 };
 
+export const getRemainingSpace = (): Promise<number> =>
+  fetch("/api/info")
+    .then((res) => res.json())
+    .then(({ remainingSpace }) => remainingSpace);
+
 
 export const getReport = (reportName: "tags") =>
   fetch(`/api/remote/reports/${reportName}`).then((res) => res.json());

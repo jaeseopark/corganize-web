@@ -7,7 +7,7 @@ from flask import Flask, request as freq, Response
 
 from crgw.postprocessing import cut_individually, cut_merge, reencode
 from crgw.forwarder import forward_request
-from crgw.local_filesystem import get_local_files, teardown, add_local_files
+from crgw.local_filesystem import get_local_files, get_remaining_space, teardown, add_local_files
 
 LOGGER = init_logger_with_handlers("crgw-api", logging.INFO, "/var/log/crgw-api/api.log")
 
@@ -64,6 +64,16 @@ def health_ready():
     return "", status
 
 
+@app.get("/info")
+def health_info():
+    # TODO: convert to ws:// and keep sending events to the clients.
+    res = dict(
+        remainingSpace=get_remaining_space(),
+        fileCount=len(get_local_files())
+    )
+    return res, 200
+
+
 @app.route("/remote/<path:subpath>")
 def fwd_remote(subpath: str):
     """
@@ -77,8 +87,13 @@ def fwd_remote(subpath: str):
       https://www.rfc-editor.org/rfc/rfc2616#section-10.3.3
     """
 
-    content, status_code, headers = forward_request(freq.data, dict(freq.headers), freq.method, subpath,
-                                                    dict(freq.args))
+    content, status_code, headers = forward_request(
+        freq.data,
+        dict(freq.headers),
+        freq.method,
+        subpath,
+        dict(freq.args)
+    )
 
     res = Response(content)
     res.headers = headers
