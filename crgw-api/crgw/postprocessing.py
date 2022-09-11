@@ -81,6 +81,12 @@ def _process(fileid: str,
 
     crg_client.create_files([new_file])
     add_local_files([target_path])
+
+    crg_client.update_file(dict(
+        fileid=fileid,
+        dateactivated=None
+    ))
+
     return new_file
 
 
@@ -119,7 +125,7 @@ def normalize_segments(segments: List[Tuple[int, int]]) -> List[Tuple[int, int]]
 def cut_individually(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]:
     """
     Splits the video into N files, where N = len(normalize_segments(segments)).
-    The user needs to manually delete the original file afterwards.
+    The original file gets deactivated when the processing is successfully finished.
     """
     segments = normalize_segments(segments)
 
@@ -137,7 +143,7 @@ def cut_individually(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]
 def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     """
     Composes a new video by stitching the given segments.
-    The user needs to manually delete the original file afterwards.
+    The original file gets deactivated when the processing is successfully finished.
     """
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
@@ -177,6 +183,9 @@ def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
 
 
 def reencode(fileid: str, crf: int=None) -> dict:
+    """
+    The original file gets deactivated when the processing is successfully finished.
+    """
     def get_dimensions(path: str) -> List[int]:
         """
         Returns video dimensions in ascending order
