@@ -20,7 +20,7 @@ type ScrapePanelProps = {
 };
 
 const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
-  const { createScrapedFiles } = useFileRepository();
+  const { createScrapedFiles, mostRecentFile } = useFileRepository();
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError } = useToast();
 
   const [isProcessing, setProcessing] = useState(false);
@@ -114,12 +114,18 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
       .finally(() => setProcessing(false));
   };
 
+  const onKeyDown = ({ key }: { key: string }) => {
+    if (key.toLowerCase() === "u" && mostRecentFile) {
+      window.open(mostRecentFile.sourceurl, "_blank");
+    }
+  };
+
   if (error) {
     return <pre>{JSON.stringify(error)}</pre>;
   }
 
   return (
-    <div className="scrape-panel" tabIndex={1} ref={mainDivRef}>
+    <div className="scrape-panel" tabIndex={1} ref={mainDivRef} onKeyDown={onKeyDown}>
       <ScrapeInputBar
         disabled={isProcessing}
         cards={cards}
