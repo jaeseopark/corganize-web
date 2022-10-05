@@ -98,8 +98,9 @@ export const useFileRepository = () => {
 
   const addPostprocessedFiles = (files: CorganizeFile[]) => {
     files.forEach((newFile) => {
+      const ext = newFile.mimetype === "video/mp4" ? "mp4" : "dec";
       newFile.isnewfile = true;
-      newFile.streamingurl = `/${newFile.fileid}.dec`;
+      newFile.streamingurl = `/${newFile.fileid}.${ext}`;
     });
     return addFiles(files);
   };

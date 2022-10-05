@@ -22,6 +22,10 @@ server {
         proxy_send_timeout 300;
     }
 
+    location ~* \.(mp4|mkv)$ {
+        rewrite ^(.*)\.(mp4|mkv)$ $1.dec last;
+    }
+
     location ~* \.(dec|zdec)$ {
         root /data;
     }

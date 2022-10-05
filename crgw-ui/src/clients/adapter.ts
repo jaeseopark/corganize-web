@@ -21,6 +21,9 @@ const decorate = (localFileIndex: Dictionary<string>) => (f: CorganizeFile) => {
   const localFilename = localFileIndex[f.fileid];
   if (localFilename) {
     f.streamingurl = `/${localFilename}`;
+    if (f.mimetype === "video/mp4") {
+      f.streamingurl = f.streamingurl.replace(".dec", ".mp4");
+    }
   }
 };
 
