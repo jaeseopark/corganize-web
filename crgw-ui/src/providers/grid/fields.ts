@@ -1,36 +1,52 @@
 import { Field } from "providers/grid/types";
 
-export const fieldDateActivated: Field = {
+const fieldDateActivated: Field = {
   displayName: "Active",
   key: "dateactivated",
   filterType: "boolean",
   sortType: "number",
 };
 
-export const fieldNew: Field = {
+const fieldNew: Field = {
   displayName: "New",
   key: "isnewfile",
   filterType: "boolean",
   sortType: "boolean",
 };
 
-export const fieldLastOpened: Field = {
+const fieldLastOpened: Field = {
   displayName: "Last Opened",
   key: "lastopened",
   sortType: "number",
   filterType: "number",
 };
 
-export const fieldMimetype: Field = {
+const fieldMimetype: Field = {
   displayName: "Mimetype",
   key: "mimetype",
   filterType: "dropdown",
   sortType: "string",
 };
 
-export const fieldSize: Field = {
+const fieldSize: Field = {
   displayName: "Size",
   key: "size",
   sortType: "number",
   filterType: "number",
+};
+
+const fieldTags: Field = {
+  displayName: "Tags",
+  key: "tags",
+  sortType: "boolean",
+  filterType: "boolean",
+};
+
+export default {
+  fieldDateActivated,
+  fieldNew,
+  fieldLastOpened,
+  fieldMimetype,
+  fieldSize,
+  fieldTags,
 };

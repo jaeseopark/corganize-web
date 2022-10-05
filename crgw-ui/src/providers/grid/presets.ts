@@ -1,38 +1,38 @@
-import {
-  fieldDateActivated,
-  fieldLastOpened,
-  fieldMimetype,
-  fieldNew,
-  fieldSize,
-} from "providers/grid/fields";
+import Fields from "providers/grid/fields";
 import { Preset } from "providers/grid/types";
 
 const PRESET_DEFAULT: Preset = {
   name: "Default",
   filters: [
     {
-      field: fieldNew,
+      field: Fields.fieldNew,
       boolean: {
         value: "checked",
       },
     },
     {
-      field: fieldMimetype,
+      field: Fields.fieldMimetype,
       dropdown: {
         value: "(All)",
         options: [],
       },
     },
     {
-      field: fieldDateActivated,
+      field: Fields.fieldDateActivated,
       boolean: {
         value: "checked",
+      },
+    },
+    {
+      field: Fields.fieldTags,
+      boolean: {
+        value: "maybe",
       },
     },
   ],
   sorts: [
     {
-      field: fieldSize,
+      field: Fields.fieldSize,
       direction: "desc",
     },
   ],
@@ -42,28 +42,34 @@ const PRESET_REVIEW: Preset = {
   name: "Review",
   filters: [
     {
-      field: fieldNew,
+      field: Fields.fieldNew,
       boolean: {
         value: "unchecked",
       },
     },
     {
-      field: fieldMimetype,
+      field: Fields.fieldMimetype,
       dropdown: {
         value: "(All)",
         options: [],
       },
     },
     {
-      field: fieldDateActivated,
+      field: Fields.fieldDateActivated,
       boolean: {
         value: "checked",
+      },
+    },
+    {
+      field: Fields.fieldTags,
+      boolean: {
+        value: "maybe",
       },
     },
   ],
   sorts: [
     {
-      field: fieldLastOpened,
+      field: Fields.fieldLastOpened,
       direction: "desc",
     },
   ],
@@ -73,19 +79,19 @@ export const PRESET_TAG_VIEW: Preset = {
   name: "tag",
   filters: [
     {
-      field: fieldNew,
+      field: Fields.fieldNew,
       boolean: {
         value: "maybe",
       },
     },
     {
-      field: fieldDateActivated,
+      field: Fields.fieldDateActivated,
       boolean: {
         value: "maybe",
       },
     },
     {
-      field: fieldMimetype,
+      field: Fields.fieldMimetype,
       dropdown: {
         value: "(All)",
         options: [],
@@ -94,7 +100,7 @@ export const PRESET_TAG_VIEW: Preset = {
   ],
   sorts: [
     {
-      field: fieldLastOpened,
+      field: Fields.fieldLastOpened,
       direction: "desc",
     },
   ],

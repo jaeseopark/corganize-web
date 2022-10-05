@@ -1,12 +1,6 @@
 import React, { Dispatch, useReducer } from "react";
 
-import {
-  fieldDateActivated,
-  fieldLastOpened,
-  fieldMimetype,
-  fieldNew,
-  fieldSize,
-} from "providers/grid/fields";
+import Fields from "providers/grid/fields";
 import { EXPOSED_PRESETS } from "providers/grid/presets";
 import { gridReducer } from "providers/grid/reducer";
 import { Action, State } from "providers/grid/types";
@@ -17,7 +11,7 @@ const initialState: State = {
   files: [],
   filteredAndSorted: [],
   filteredSortedAndPaginated: [],
-  fields: [fieldNew, fieldDateActivated, fieldLastOpened, fieldMimetype, fieldSize],
+  fields: Object.values(Fields),
   filters: defaultPreset.filters,
   sorts: defaultPreset.sorts,
   prefilter: "",
