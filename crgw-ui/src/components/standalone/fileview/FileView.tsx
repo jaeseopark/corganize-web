@@ -11,9 +11,23 @@ import { useNavv } from "hooks/navv";
 
 import { madFocus } from "utils/elementUtils";
 
-import RendererSelection, { getRenderer } from "components/standalone/fileview/RendererSelection";
+import GalleryView from "components/standalone/fileview/gallery/GalleryView";
+import VideoView from "components/standalone/fileview/video/VideoView";
 
 import "./FileView.scss";
+
+type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;
+
+const RENDERER_BY_MIMETYPE: Map<string, ContentRenderer> = new Map([
+  ["video/mp4", VideoView],
+  ["video/x-matroska", VideoView],
+  ["video/x-m4v", VideoView],
+  ["video/quicktime", VideoView],
+  ["application/zip", GalleryView],
+]);
+
+export const getRenderer = (mimetype?: string) =>
+  RENDERER_BY_MIMETYPE.get(mimetype || "") || VideoView;
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
@@ -45,10 +59,6 @@ const FileView = ({ fileid }: { fileid: string }) => {
 
     const getContent = () => {
       const Renderer = getRenderer(mimetype);
-      if (!Renderer) {
-        return <RendererSelection setContent={setContent} fileid={fileid} />;
-      }
-
       return <Renderer fileid={fileid} />;
     };
 
