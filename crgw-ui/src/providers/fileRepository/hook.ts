@@ -105,11 +105,12 @@ export const useFileRepository = () => {
     return addFiles(files);
   };
 
-  const cutMerge = (fileid: string, segments: Segment[]) =>
-    client.cutMerge(fileid, segments).then(addPostprocessedFiles);
-
-  const cut = (fileid: string, segments: Segment[]) =>
-    client.cut(fileid, segments).then(addPostprocessedFiles);
+  const processSegments =
+    (func: client.SegmentProcessor) => (fileid: string, segments: Segment[]) =>
+      func(fileid, segments).then((files) => {
+        addPostprocessedFiles(files);
+        dispatch!({ type: "UPDATE", payload: { fileid, dateactivated: undefined } });
+      });
 
   const startSession = (sessionInfo: SessionInfo) => {
     populateGlobalTags();
@@ -131,9 +132,9 @@ export const useFileRepository = () => {
     findById,
     toggleActivation,
     postprocesses: {
-      cutMerge,
-      cut,
-      reencode: client.reencode
+      cutMerge: processSegments(client.cutMerge),
+      cut: processSegments(client.cut),
+      reencode: client.reencode,
     },
   };
 };

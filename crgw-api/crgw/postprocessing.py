@@ -17,6 +17,14 @@ MAX_RESOLUTION = 1080
 LOGGER = logging.getLogger("crgw-api")
 
 
+def get_crg_client():
+    return CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
+
+
+def get_file(fileid: str) -> dict:
+    return get_crg_client().get_file(fileid)
+
+
 def _subclip(source_path, target_path, start, end):
     tmp_path = target_path + ".mp4"
     subprocess_call([
@@ -33,18 +41,18 @@ def _subclip(source_path, target_path, start, end):
     os.rename(tmp_path, target_path)
 
 
-def _process(fileid: str,
+def _process(source_file: dict,
              suffix: str,
              process: Callable[[str, str], None],
              new_duration: int=None) -> dict:
+    fileid = source_file["fileid"]
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
         message = f"file not found: {source_path=}"
         LOGGER.info(message)
         raise FileNotFoundError(message)
 
-    crg_client = CorganizeClient(os.environ["CRG_REMOTE_HOST"], os.environ["CRG_REMOTE_APIKEY"])
-    source_file = crg_client.get_file(fileid)
+    crg_client = get_crg_client()
 
     multimedia = source_file.get("multimedia") or dict()
     if "highlights" in multimedia:
@@ -128,13 +136,14 @@ def cut_individually(fileid: str, segments: List[Tuple[int, int]]) -> List[dict]
     The original file gets deactivated when the processing is successfully finished.
     """
     segments = normalize_segments(segments)
+    source_file = get_file(fileid)
 
     new_files = list()
     for start, end in segments:
         def ffmpeg_subclip(source_path: str, target_path: str):
             _subclip(source_path, target_path, start, end)
 
-        new_file = _process(fileid, suffix=f"-{start}-{end}", new_duration=end - start, process=ffmpeg_subclip)
+        new_file = _process(source_file, suffix=f"-{start}-{end}", new_duration=end - start, process=ffmpeg_subclip)
         new_files.append(new_file)
 
     return new_files
@@ -148,6 +157,7 @@ def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     segments = normalize_segments(segments)
     duration = sum([end - start for start, end in segments])
     trim_id = md5(str(segments))[:TRIM_ID_LENGTH]
+    source_file = get_file(fileid)
 
     def ffmpeg_filter_trim(source_path: str, target_path: str):
         concat_specs_path = f"/tmp/{trim_id}.sources"
@@ -179,13 +189,16 @@ def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
             os.remove(segment_path)
 
     suffix = f"-trim-{trim_id}"
-    return _process(fileid, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
+    return _process(source_file, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
 def reencode(fileid: str, crf: int=None) -> dict:
     """
     The original file gets deactivated when the processing is successfully finished.
     """
+
+    source_file = get_file(fileid)
+
     def get_dimensions(path: str) -> List[int]:
         """
         Returns video dimensions in ascending order
@@ -216,5 +229,5 @@ def reencode(fileid: str, crf: int=None) -> dict:
         ])
         os.rename(tmp_path, target_path)
 
-    return _process(fileid, suffix="-reencode", process=ffmpeg_reencode)
+    return _process(source_file, suffix="-reencode", process=ffmpeg_reencode)
 

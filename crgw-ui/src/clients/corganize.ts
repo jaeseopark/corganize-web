@@ -6,6 +6,9 @@ import { Dictionary } from "typedefs/common";
 import { chunk } from "utils/arrayUtils";
 import { getPosixSeconds } from "utils/dateUtils";
 
+const CREATE_FILE_CHUNK_SIZE = 10;
+const POST_SCRAPE_DEDUP_CHUNK_SIZE = 50;
+
 type FileResponse = {
   metadata: {
     nexttoken?: string;
@@ -13,8 +16,7 @@ type FileResponse = {
   files: CorganizeFile[];
 };
 
-const CREATE_FILE_CHUNK_SIZE = 10;
-const POST_SCRAPE_DEDUP_CHUNK_SIZE = 50;
+export type SegmentProcessor = (fileid: string, segments: Segment[]) => Promise<CorganizeFile[]>;
 
 export type CreateResponse = {
   created: CorganizeFile[];
@@ -230,7 +232,7 @@ export const scrapeAsync = (
     .then(dedupAgainstDatabase);
 };
 
-export const cutMerge = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
+export const cutMerge: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut-merge`;
   return fetch(url, {
     method: "POST",
@@ -253,7 +255,7 @@ export const cutMerge = (fileid: string, segments: Segment[]): Promise<Corganize
     });
 };
 
-export const cut = (fileid: string, segments: Segment[]): Promise<CorganizeFile[]> => {
+export const cut: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut`;
   return fetch(url, {
     method: "POST",
@@ -290,7 +292,6 @@ export const getRemainingSpace = (): Promise<number> =>
   fetch("/api/info")
     .then((res) => res.json())
     .then(({ remainingSpace }) => remainingSpace);
-
 
 export const getReport = (reportName: "tags") =>
   fetch(`/api/remote/reports/${reportName}`).then((res) => res.json());
