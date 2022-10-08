@@ -34,7 +34,7 @@ const MainView = () => {
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
-  
+
   useEffect(() => {
     getRemainingSpace().then(setRemainingSpace);
   }, []);
@@ -51,20 +51,20 @@ const MainView = () => {
     }
   }, [files]);
 
-  const MainContent = () => {
-    if (!sessionInfo) {
-      return (
-        <Center flexDirection="column" className="presession">
-          <SessionConfigurer setInfo={setSessionInfo} />
-          <Center className="button clickable" onClick={navTagReport}>
-            <Heading size="md">Manage Tags</Heading>
-          </Center>
-          <Center>Remaining: {toHumanFileSize(remainingSpace)}</Center>
-        </Center>
-      );
-    }
+  let mainContent;
 
-    return (
+  if (!sessionInfo) {
+    mainContent = (
+      <Center flexDirection="column" className="presession">
+        <SessionConfigurer setInfo={setSessionInfo} />
+        <Center className="button clickable" onClick={navTagReport}>
+          <Heading size="md">Manage Tags</Heading>
+        </Center>
+        <Center>Remaining: {toHumanFileSize(remainingSpace)}</Center>
+      </Center>
+    );
+  } else {
+    mainContent = (
       <div className="session-wrapper">
         <PresetBar />
         <Divider marginY=".5em" />
@@ -75,14 +75,12 @@ const MainView = () => {
         <PageControl />
       </div>
     );
-  };
+  }
 
   return (
     <>
       <AppRoutes />
-      <div className={cls("main-view", { hidden: isBlanketEnabled })}>
-        <MainContent />
-      </div>
+      <div className={cls("main-view", { hidden: isBlanketEnabled })}>{mainContent}</div>
     </>
   );
 };
