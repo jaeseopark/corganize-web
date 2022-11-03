@@ -197,7 +197,13 @@ export const scrapeAsync = (
       }));
 
   const scrapeSingleUrl = (url: string) =>
-    proxyFetch("/api/remote/scrape", "POST", { url })
+    fetch("/api/scrape", {
+      method: "POST",
+      body: JSON.stringify({ url }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((res) => res.json())
       .then(({ files }: { files: CorganizeFile[] }) =>
         files.map((f) => ({ ...f, storageservice: "None" }))
