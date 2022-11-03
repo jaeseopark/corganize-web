@@ -11,7 +11,6 @@ services:
       - "ui"
       - "api"
     environment:
-      SCRAPE_HOST: ${SCRAPE_HOST}
       TZ: ${TIMEZONE}
   ui:
     image: node:16.13.1

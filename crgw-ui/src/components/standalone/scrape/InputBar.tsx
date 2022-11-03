@@ -1,14 +1,4 @@
-import {
-  Badge,
-  Button,
-  ButtonGroup,
-  Checkbox,
-  Flex,
-  HStack,
-  Select,
-  Spacer,
-  VStack,
-} from "@chakra-ui/react";
+import { Badge, Button, ButtonGroup, Flex, HStack, Select, Spacer, VStack } from "@chakra-ui/react";
 import cls from "classnames";
 import { useRef } from "react";
 
@@ -28,8 +18,6 @@ type ScrapeInputBarProps = {
   setUrl: (url: string) => void;
   scrape: () => void;
   rawScrapeCount: number;
-  localScrapeHost: boolean;
-  setLocalScrapeHost: (b: boolean) => void;
 };
 
 const AddButtonGroup = ({
@@ -105,8 +93,6 @@ const ScrapeInputBar = ({
   setUrl,
   scrape,
   rawScrapeCount,
-  localScrapeHost,
-  setLocalScrapeHost,
 }: ScrapeInputBarProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
   const filterCards = (status: string) => cards.filter((c) => c.status === status);
@@ -137,13 +123,6 @@ const ScrapeInputBar = ({
               onFocus={protectHotkey}
               onBlur={exposeHotkey}
             />
-            <Checkbox
-              className="scrape-host"
-              checked={localScrapeHost}
-              onChange={() => setLocalScrapeHost(!localScrapeHost)}
-            >
-              Alt Scrape Host
-            </Checkbox>
             <Button className="scrape-button" type="submit" disabled={disabled || !url}>
               Scrape
             </Button>

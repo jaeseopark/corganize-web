@@ -29,10 +29,4 @@ server {
     location ~* \.(dec|zdec)$ {
         root /data;
     }
-
-    location /redir/scrape {
-        rewrite /redir/(.*) /$1 break;
-        proxy_pass ${SCRAPE_HOST};
-        proxy_set_header Host ${SCRAPE_HOST};
-    }
 }

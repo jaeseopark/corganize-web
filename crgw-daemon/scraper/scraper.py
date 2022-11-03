@@ -7,9 +7,6 @@ from corganizeclient.client import CorganizeClient
 
 logger = logging.getLogger("scraper")
 
-HOST_URL = "http://nginx/redir/scrape"
-
-
 def run_scraper(config: dict):
     cc = CorganizeClient(**config["server"])
     recent_files = cc.get_active_files(limit=config["scrape"]["quick_dedup"]["query_limit"])
@@ -24,7 +21,7 @@ def run_scraper(config: dict):
 
     def scrape() -> Iterable[dict]:
         for entry in config["scrape"]["entries"]:
-            r = requests.post(HOST_URL, json=entry)
+            r = requests.post("http://api/scrape", json=entry)
 
             if not r.ok:
                 logger.error(r.text)

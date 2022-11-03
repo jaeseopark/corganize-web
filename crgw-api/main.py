@@ -4,6 +4,7 @@ from typing import List
 
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
+from hypersquirrel.entry import create_watchlist, scrape
 
 from crgw.postprocessing import cut_individually, cut_merge, reencode
 from crgw.forwarder import forward_request
@@ -72,6 +73,14 @@ def health_info():
         fileCount=len(get_local_files())
     )
     return res, 200
+
+@app.post("/scrape")
+def scrapeee():
+    body = freq.get_json()
+    url = body.get("url").lstrip("vpr://")
+    max_items = body.get("max_items")
+    files = list(scrape(create_watchlist(url, max_items)))
+    return dict(files=files), 200
 
 
 @app.route("/remote/<path:subpath>")
