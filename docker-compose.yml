@@ -40,6 +40,7 @@ services:
       TZ: ${TIMEZONE}
       CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
       CRG_REMOTE_APIKEY: ${CRG_REMOTE_APIKEY}
+      YOUTUBE_APIKEY: ${YOUTUBE_APIKEY}
   daemon:
     container_name: daemon
     build:
