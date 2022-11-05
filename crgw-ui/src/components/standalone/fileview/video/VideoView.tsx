@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
@@ -10,10 +10,7 @@ import { useToast } from "providers/toast/hook";
 
 import { useSegments } from "hooks/segments";
 
-import HighlightManager from "bizlog/HighlightManager";
-
 import { madFocus } from "utils/elementUtils";
-import { toHumanDuration } from "utils/numberUtils";
 
 import SegmentsView from "components/standalone/fileview/video/SegmentsView";
 
@@ -37,10 +34,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   const vidRef = useRef<HTMLVideoElement | null>(null);
 
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError, dequeue } = useToast();
-  const highlightManager: HighlightManager = useMemo(
-    () => new HighlightManager(multimedia?.highlights),
-    [multimedia]
-  );
 
   const updateMultimedia = useCallback(
     (newProps: Partial<Multimedia>) => {
@@ -122,15 +115,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
 
     if (ctrlKey) return;
 
-    const addHighlight = () => {
-      highlightManager.add(Math.floor(vid.currentTime));
-      updateMultimedia({ highlights: highlightManager.toString() }).then(() =>
-        enqueueSuccess({
-          message: `Highlight added: ${toHumanDuration(vid.currentTime)}`,
-        })
-      );
-    };
-
     const jumpTimeByDelta = (deltaInSeconds: number) => jumpTo(vid.currentTime + deltaInSeconds);
 
     if (SEEK_HOTKEY_MAP[key]) {
@@ -143,8 +127,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       jumpTimeByDelta(vid.duration / 10); // jump by 10%
     } else if (key === "m") {
       vid.muted = !vid.muted;
-    } else if (key === "b") {
-      addHighlight();
     } else if (key >= "0" && key <= "9") {
       const percentage = parseInt(key) / 10;
       jumpTo(vid.duration * percentage);
@@ -179,7 +161,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
         closedSegments={closedSegments}
         currentTime={currentTime}
         multimedia={multimedia}
-        highlights={highlightManager.highlights}
         size={size}
         jumpToTime={jumpTo}
       />

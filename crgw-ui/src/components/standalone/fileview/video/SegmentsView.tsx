@@ -16,13 +16,11 @@ const SegmentsView = ({
   closedSegments,
   currentTime,
   multimedia,
-  highlights,
   jumpToTime,
 }: {
   openSegment?: Segment;
   closedSegments: Segment[];
   currentTime?: number;
-  highlights: number[];
   jumpToTime: (percent: number) => void;
 } & Partial<CorganizeFile>) => {
   const duration = multimedia?.duration;
@@ -31,7 +29,7 @@ const SegmentsView = ({
     return null;
   }
 
-  const OpenSegmentt = () => {
+  const getOpenSegment = () => {
     if (!openSegment || currentTime === undefined) {
       return null;
     }
@@ -44,7 +42,7 @@ const SegmentsView = ({
     return <OpenSegmentBlock start={start} currentTime={currentTime} duration={duration} />;
   };
 
-  const ClosedSegments = () => (
+  const getClosedSegments = () => (
     <>
       {closedSegments.map((s) => (
         <ClosedSegmentBlock key={s.start} segment={s} duration={duration} />
@@ -52,12 +50,12 @@ const SegmentsView = ({
     </>
   );
 
-  const Seekerr = () => {
+  const getSeeker = () => {
     if (currentTime === undefined) return null;
     return <Seeker currentTime={currentTime} duration={duration} />;
   };
 
-  const Markers = () => {
+  const getMarkers = () => {
     if (!duration) return null;
     return (
       <>
@@ -68,24 +66,12 @@ const SegmentsView = ({
     );
   };
 
-  const Highlights = () => {
-    if (!duration) return null;
-    return (
-      <>
-        {highlights.map((h) => (
-          <Highlight key={h} timestamp={h} duration={duration} />
-        ))}
-      </>
-    );
-  };
-
   return (
     <div className="segments-view">
-      <ClosedSegments />
-      <OpenSegmentt />
-      <Highlights />
-      <Markers />
-      <Seekerr />
+      {getClosedSegments()}
+      {getOpenSegment()}
+      {getMarkers()}
+      {getSeeker()}
     </div>
   );
 };
