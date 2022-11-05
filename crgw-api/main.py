@@ -78,6 +78,7 @@ def health_info():
 def scrapeee():
     body = freq.get_json()
     url = body.get("url").lstrip("vpr://")
+    LOGGER.info(f"scraping {url=}")
     max_items = body.get("max_items")
     files = list(scrape(create_watchlist(url, max_items)))
     return dict(files=files), 200

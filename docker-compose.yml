@@ -26,7 +26,7 @@ services:
     image: python:3.10-slim-bullseye
     working_dir: /app
     stop_signal: SIGINT # https://github.com/docker/compose/issues/4199#issuecomment-426109482
-    command: >
+    command: > # The use of venv helps with the container init times, but can cause occasional caching issues; purge the folder as needed.
       bash -c "python -m venv docker-venv &&
                source docker-venv/bin/activate &&
                pip install -r requirements.txt &&
