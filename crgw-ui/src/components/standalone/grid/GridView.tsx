@@ -55,7 +55,7 @@ const GridView = () => {
   };
 
   const onKeyDown = (e: any) => {
-    if (e.shiftKey || e.ctrlKey) return;
+    if (e.shiftKey || e.ctrlKey || e.metaKey) return;
 
     const key = e.key.toLowerCase();
     if (key === "e") {

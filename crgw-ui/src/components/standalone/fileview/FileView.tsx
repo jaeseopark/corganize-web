@@ -88,7 +88,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   }, []);
 
   const onKeyDown = (e: any) => {
-    if (e.shiftKey || e.ctrlKey) {
+    if (e.shiftKey || e.ctrlKey || e.metaKey) {
       return;
     }
 
