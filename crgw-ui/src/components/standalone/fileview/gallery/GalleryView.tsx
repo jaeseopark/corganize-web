@@ -2,7 +2,6 @@ import { ViewIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
-import { Dictionary } from "typedefs/common";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
@@ -18,15 +17,15 @@ import { GalleryRenderer, Mode, useGallery } from "components/standalone/filevie
 
 import "./GalleryView.scss";
 
-export const SEEK_HOTKEY_MAP: Dictionary<number> = {
-  "[": -10000,
-  z: -10,
-  x: -5,
-  arrowleft: -1,
-  arrowright: 1,
-  c: 5,
-  v: 10,
-  "]": 10000,
+const SEEK_HOTKEY_MAP: { [key: string]: { delta: number; isReversible?: boolean } } = {
+  z: { delta: 1, isReversible: true },
+  x: { delta: 3, isReversible: true },
+  c: { delta: 5, isReversible: true },
+  v: { delta: 10, isReversible: true },
+  arrowleft: { delta: -1 },
+  arrowright: { delta: 1 },
+  "[": { delta: -10000 },
+  "]": { delta: 10000 },
 };
 
 const RENDERER_BY_MODE: Map<Mode, GalleryRenderer> = new Map([
@@ -103,11 +102,15 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
     });
   }, [mode]);
 
-  const handleKey = (key: string) => {
+  const handleKey = (key: string, shiftKey: boolean) => {
     if (Object.keys(SEEK_HOTKEY_MAP).includes(key)) {
-      const delta = SEEK_HOTKEY_MAP[key];
-      return incrementIndex(delta);
-    } else if (key >= "0" && key <= "9") {
+      const { delta, isReversible } = SEEK_HOTKEY_MAP[key];
+      return incrementIndex(delta * (shiftKey && isReversible ? -1 : 1));
+    }
+
+    if (shiftKey) return;
+
+    if (key >= "0" && key <= "9") {
       const i = Math.floor((imageUrls.length * parseInt(key)) / 10);
       return setIndex(i);
     } else if (["a", "b"].includes(key)) {
@@ -132,8 +135,8 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
       className="zip-view"
       tabIndex={1}
       onKeyDown={(e) => {
-        if (e.shiftKey || e.ctrlKey) return;
-        handleKey(e.key.toLowerCase());
+        if (e.metaKey || e.ctrlKey) return;
+        handleKey(e.key.toLowerCase(), e.shiftKey);
       }}
       ref={mainref}
     >
