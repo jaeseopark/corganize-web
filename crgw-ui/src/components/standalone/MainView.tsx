@@ -7,10 +7,11 @@ import { SessionInfo } from "typedefs/Session";
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
+import { useToast } from "providers/toast/hook";
 
 import { useNavv } from "hooks/navv";
 
-import { getRemainingSpace } from "clients/corganize";
+import { backup, getRemainingSpace } from "clients/corganize";
 
 import { toHumanFileSize } from "utils/numberUtils";
 
@@ -34,6 +35,7 @@ const MainView = () => {
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
+  const { enqueueAsync, enqueueSuccess } = useToast();
 
   useEffect(() => {
     getRemainingSpace().then(setRemainingSpace);
@@ -51,14 +53,24 @@ const MainView = () => {
     }
   }, [files]);
 
+  const backupThenShowToast = () =>
+    enqueueAsync({ header: "Backup", message: "Initializing..." })
+      .then(backup)
+      .then(() => enqueueSuccess({ header: "Backup", message: "Done" }));
+
   let mainContent;
 
   if (!sessionInfo) {
     mainContent = (
       <Center flexDirection="column" className="presession">
         <SessionConfigurer setInfo={setSessionInfo} />
-        <Center className="button clickable" onClick={navTagReport}>
-          <Heading size="md">Manage Tags</Heading>
+        <Center>
+          <Heading className="button first clickable" onClick={navTagReport} size="md">
+            Manage Tags
+          </Heading>
+          <Heading className="button clickable" onClick={backupThenShowToast} size="md">
+            Backup
+          </Heading>
         </Center>
         <Center>Remaining: {toHumanFileSize(remainingSpace)}</Center>
       </Center>

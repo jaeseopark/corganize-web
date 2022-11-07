@@ -55,6 +55,7 @@ export const useToast = () => {
     toasts,
     dequeue,
     enqueue: enqueueInfo,
+    enqueueAsync: async (props: EnqueueProps) => enqueueInfo(props),
     enqueueSuccess,
     enqueueWarning,
     enqueueError,

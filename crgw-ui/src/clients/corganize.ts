@@ -293,3 +293,10 @@ export const getRemainingSpace = (): Promise<number> =>
 
 export const getReport = (reportName: "tags") =>
   fetch(`/api/remote/reports/${reportName}`).then((res) => res.json());
+
+export const backup = () =>
+  proxyFetch("/api/remote/backup", "POST", {}).then(({ status }) => {
+    if (status !== 200) {
+      throw new Error(`status ${status}`);
+    }
+  });
