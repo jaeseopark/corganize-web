@@ -8,6 +8,7 @@ import { getPosixSeconds } from "utils/dateUtils";
 
 const CREATE_FILE_CHUNK_SIZE = 10;
 const POST_SCRAPE_DEDUP_CHUNK_SIZE = 50;
+const DELETE_TAGS_CHUNK_SIZE = 30;
 
 type FileResponse = {
   metadata: {
@@ -34,7 +35,7 @@ function b64EncodeUnicode(str: string) {
   );
 }
 
-const proxyFetch = (url: string, method: "POST" | "PATCH", data: object) => {
+const proxyFetch = (url: string, method: "POST" | "PATCH" | "DELETE", data: object) => {
   const headers = {
     "crg-method": method,
     "crg-body": b64EncodeUnicode(JSON.stringify(data)),
@@ -181,6 +182,13 @@ export const getGlobalTags = (): Promise<string[]> =>
   fetch("/api/remote/tags")
     .then((res) => res.json())
     .then(({ tags }) => tags);
+
+export const deleteTags = (tags: string[]) => {
+  const chunks = chunk(tags, DELETE_TAGS_CHUNK_SIZE);
+  return Promise.all(
+    chunks.map((aChunk) => proxyFetch("/api/remote/tags", "DELETE", { tags: aChunk }))
+  );
+};
 
 export const scrapeAsync = (
   ...urls: string[]
