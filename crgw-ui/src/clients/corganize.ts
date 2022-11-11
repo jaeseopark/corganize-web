@@ -214,7 +214,7 @@ export const scrapeAsync = (
     })
       .then((res) => res.json())
       .then(({ files }: { files: CorganizeFile[] }) =>
-        files.map((f) => ({ ...f, storageservice: "None" }))
+        files.filter((f) => f.filename).map((f) => ({ ...f, storageservice: "None" }))
       );
 
   return Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
