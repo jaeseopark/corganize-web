@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Optional
 
 from commmons import now_seconds, md5, merge
 from corganizeclient.client import CorganizeClient
@@ -12,7 +12,7 @@ from crgw.local_filesystem import add_local_files
 DATA_PATH = "/data"
 TRIM_ID_LENGTH = 6
 DEFAULT_CRF = 25
-MAX_RESOLUTION = 1080
+MAX_RESOLUTION = 1080  # short side
 
 LOGGER = logging.getLogger("crgw-api")
 
@@ -44,7 +44,7 @@ def _subclip(source_path, target_path, start, end):
 def _process(source_file: dict,
              suffix: str,
              process: Callable[[str, str], None],
-             new_duration: int=None) -> dict:
+             new_duration: int = None) -> dict:
     fileid = source_file["fileid"]
     source_path = os.path.join(DATA_PATH, fileid + ".dec")
     if not os.path.exists(source_path):
@@ -192,42 +192,36 @@ def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     return _process(source_file, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
-def reencode(fileid: str, crf: int=None) -> dict:
+def reencode(fileid: str, crf: int = None) -> dict:
     """
     The original file gets deactivated when the processing is successfully finished.
     """
 
     source_file = get_file(fileid)
 
-    def get_dimensions(path: str) -> List[int]:
-        """
-        Returns video dimensions in ascending order
-        """
-        res = subprocess_call([
-            get_moviepy_setting("FFMPEG_BINARY"), "-y",
-            "-i", path,
-            "2>&1", "|", "grep", "Video:", "|", "grep", "-Po", "'\d{3,5}x\d{3,5}'"
-        ])
+    def get_resize_scale() -> int:
+        width = source_file.get("multimedia", {}).get("width")
+        height = source_file.get("multimedia", {}).get("height")
 
-        return sorted([int(x) for x in res.split("x")])
+        if width and height:
+            return MAX_RESOLUTION / min(width, height)
 
+        return 0
 
     def ffmpeg_reencode(source_path: str, target_path: str):
-        # short_side = get_dimensions(source_path)[0]
-        # resize_scale = short_side/MAX_RESOLUTION
+        additional_args = []
 
-        # if resize_scale > 1:
-        #     # TODO: options
-        #     pass
+        resize_scale = get_resize_scale()
+        if resize_scale > 1:
+            additional_args += ["-vf", f"scale=iw*{resize_scale}:-1"]
 
         tmp_path = target_path + ".mp4"
-        subprocess_call([
+        args = [
             get_moviepy_setting("FFMPEG_BINARY"), "-y",
             "-i", source_path,
             "-crf", str(crf) if crf else str(DEFAULT_CRF),
-            tmp_path
-        ])
+        ]
+        subprocess_call(args + additional_args + [tmp_path])
         os.rename(tmp_path, target_path)
 
     return _process(source_file, suffix="-reencode", process=ffmpeg_reencode)
-
