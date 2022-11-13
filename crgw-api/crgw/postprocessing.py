@@ -212,7 +212,7 @@ def reencode(fileid: str, crf: int = None) -> dict:
         additional_args = []
 
         resize_scale = get_resize_scale()
-        if resize_scale > 1:
+        if resize_scale < 1:
             additional_args += ["-vf", f"scale=iw*{resize_scale}:-1"]
 
         tmp_path = target_path + ".mp4"
