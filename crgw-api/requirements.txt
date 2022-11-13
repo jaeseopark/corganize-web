@@ -1,4 +1,4 @@
 moviepy==1.0.3
 Flask==2.1.1
 corganizeclient==0.0.16
-hypersquirrel==0.20
+hypersquirrel==0.21
