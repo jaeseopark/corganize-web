@@ -110,10 +110,10 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   };
 
   const onKeyDown = (e: any) => {
-    const { target: vid, shiftKey, ctrlKey } = e;
+    const { target: vid, shiftKey, ctrlKey, metaKey } = e;
     const key = e.key.toLowerCase();
 
-    if (ctrlKey) return;
+    if (ctrlKey || metaKey) return;
 
     const jumpTimeByDelta = (deltaInSeconds: number) => jumpTo(vid.currentTime + deltaInSeconds);
 
