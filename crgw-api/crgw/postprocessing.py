@@ -192,24 +192,29 @@ def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     return _process(source_file, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
-def reencode(fileid: str, crf: int = None) -> dict:
+def reencode(fileid: str, dimensions: List[int] = None, maxres:int = MAX_RESOLUTION, crf: int = DEFAULT_CRF, **kwargs) -> dict:
     """
     The original file gets deactivated when the processing is successfully finished.
     """
 
     source_file = get_file(fileid)
 
-    def get_resize_scale() -> int:
+    if dimensions:
+        width, height = dimensions
+    else:
         width = source_file.get("multimedia", {}).get("width")
         height = source_file.get("multimedia", {}).get("height")
 
+    def get_resize_scale() -> int:
         if width and height:
-            return MAX_RESOLUTION / min(width, height)
-
-        return 0
+            return maxres / min(width, height)
+        return 1
 
     def ffmpeg_reencode(source_path: str, target_path: str):
         additional_args = []
+
+        if dimensions:
+            additional_args += ["-vf", f"crop={width}:{height}"]
 
         resize_scale = get_resize_scale()
         if resize_scale < 1:
@@ -219,7 +224,7 @@ def reencode(fileid: str, crf: int = None) -> dict:
         args = [
             get_moviepy_setting("FFMPEG_BINARY"), "-y",
             "-i", source_path,
-            "-crf", str(crf) if crf else str(DEFAULT_CRF),
+            "-crf", str(crf),
         ]
         subprocess_call(args + additional_args + [tmp_path])
         os.rename(tmp_path, target_path)

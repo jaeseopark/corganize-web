@@ -52,7 +52,7 @@ def cut_mergee(fileid: str):
 def reencodee(fileid: str):
     # TODO: spin up a thread
     try:
-        reencode(fileid)
+        reencode(fileid, **freq.get_json())
     except FileNotFoundError as e:
         return str(e), 404
     return "", 201

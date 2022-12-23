@@ -3,7 +3,6 @@ import { Segment } from "typedefs/Segment";
 
 import {
   ClosedSegmentBlock,
-  Highlight,
   OpenSegmentBlock,
   Seeker,
   TimeMarker,
@@ -15,16 +14,15 @@ const SegmentsView = ({
   openSegment,
   closedSegments,
   currentTime,
-  multimedia,
+  duration,
   jumpToTime,
 }: {
   openSegment?: Segment;
   closedSegments: Segment[];
   currentTime?: number;
   jumpToTime: (percent: number) => void;
+  duration?: number;
 } & Partial<CorganizeFile>) => {
-  const duration = multimedia?.duration;
-
   if (!duration) {
     return null;
   }

@@ -121,11 +121,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-    ({
-      ...files.find((f) => f.fileid === fileid),
-      lastupdated: getPosixSeconds(),
-      dateactivated: getPosixSeconds(),
-    } as CorganizeFile);
+  ({
+    ...files.find((f) => f.fileid === fileid),
+    lastupdated: getPosixSeconds(),
+    dateactivated: getPosixSeconds(),
+  } as CorganizeFile);
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -270,13 +270,14 @@ export const cut: SegmentProcessor = (fileid, segments) => {
   });
 };
 
-export const reencode = (fileid: string): Promise<void> => {
+export const reencode = ({ fileid, crf, maxres, dimensions }: { fileid: string, crf: number, maxres: number, dimensions?: number[] }): Promise<void> => {
   const url = `/api/files/${fileid}/reencode`;
   return fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify({ crf, maxres, dimensions })
   }).then(async (res) => {
     if (res.status === 201) {
       return;

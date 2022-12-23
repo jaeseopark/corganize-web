@@ -1,7 +1,7 @@
-import { Flex } from "@chakra-ui/react";
-import { useCallback, useRef, useState } from "react";
+import { Flex, useDisclosure } from "@chakra-ui/react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
-import { CorganizeFile, Multimedia } from "typedefs/CorganizeFile";
+import { Multimedia } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
 import { Dictionary } from "typedefs/common";
 
@@ -12,6 +12,7 @@ import { useSegments } from "hooks/segments";
 
 import { madFocus } from "utils/elementUtils";
 
+import ReencodeModal from "components/standalone/fileview/video/ReencodeModal";
 import SegmentsView from "components/standalone/fileview/video/SegmentsView";
 
 import "./VideoView.scss";
@@ -28,12 +29,22 @@ const ONE_HOUR = 3600000;
 
 const VideoView = ({ fileid }: { fileid: string }) => {
   const { findById, updateFile, postprocesses } = useFileRepository();
-  const { multimedia, streamingurl, mimetype, size } = findById(fileid);
   const { openSegment, closedSegments, segmentActions } = useSegments();
   const [currentTime, setCurrentTime] = useState<number>();
   const vidRef = useRef<HTMLVideoElement | null>(null);
-
   const { enqueue, enqueueSuccess, enqueueWarning, enqueueError, dequeue } = useToast();
+  const {
+    isOpen: isReencodeModalOpen,
+    onOpen: openReencodeModal,
+    onClose: closeReencodeModal,
+  } = useDisclosure();
+  const { multimedia, streamingurl, mimetype, size } = findById(fileid);
+  const { width, height, duration } = useMemo(() => {
+    if (multimedia) {
+      return multimedia;
+    }
+    return { width: 0, height: 0, duration: 0 };
+  }, [multimedia]);
 
   const updateMultimedia = useCallback(
     (newProps: Partial<Multimedia>) => {
@@ -49,30 +60,28 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     [multimedia, updateFile, fileid]
   );
 
-  const onMetadata = (e: any) => {
-    const { videoWidth, videoHeight, duration } = e.target;
+  const onMetadata = ({ target }: any) => {
+    const { videoWidth: newWidth, videoHeight: newHeight, duration: newduration } = target;
 
-    madFocus(e.target);
+    madFocus(target);
 
     const isUpToDate =
-      videoWidth === multimedia?.width &&
-      videoHeight === multimedia?.height &&
-      duration === multimedia?.duration;
+      newWidth === width && newHeight === height && Math.ceil(newduration) === duration;
 
     if (isUpToDate) {
       return enqueue({ message: "Multimedia metadata already up to date" });
     }
 
     return updateMultimedia({
-      width: videoWidth,
-      height: videoHeight,
-      duration: Math.ceil(duration),
+      width: newWidth,
+      height: newHeight,
+      duration: Math.ceil(newduration),
     }).then(() => enqueueSuccess({ message: "Multimedia metadata updated" }));
   };
 
   const postprocessSegments = async (
     name: string,
-    func: (fileid: string, segments: Segment[]) => Promise<CorganizeFile[]>
+    func: (fileid: string, segments: Segment[]) => Promise<void>
   ) => {
     if (closedSegments.length === 0) {
       enqueueWarning({ message: "Need segments" });
@@ -97,13 +106,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
   const cutMerge = () => postprocessSegments("Cut Merge", postprocesses.cutMerge);
 
   const cut = () => postprocessSegments("Cut", postprocesses.cut);
-
-  const reencode = () => {
-    postprocesses.reencode(fileid);
-    enqueue({
-      message: "Reencode request submitted",
-    });
-  };
 
   const jumpTo = (time: number) => {
     if (vidRef.current) vidRef.current.currentTime = time;
@@ -148,42 +150,50 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       }
       cutMerge();
     } else if (key === "|") {
-      reencode();
+      openReencodeModal();
     } else if (key === "y") {
       cut();
     }
   };
 
   return (
-    <Flex className="video-view">
-      <SegmentsView
-        openSegment={openSegment}
-        closedSegments={closedSegments}
-        currentTime={currentTime}
-        multimedia={multimedia}
-        size={size}
-        jumpToTime={jumpTo}
-      />
-      <video
-        ref={vidRef}
-        onKeyDown={onKeyDown}
-        onLoadedMetadata={onMetadata}
-        onTimeUpdate={(e) => {
-          const newTime = (e.target as HTMLVideoElement).currentTime;
-          if (Math.abs((currentTime || 0) - newTime) > 1) {
-            // This if statement reduces the frequency of rerender.
-            setCurrentTime(newTime);
-          }
-        }}
-        muted
-        autoPlay
-        loop
-        controls
-        playsInline
-      >
-        <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
-      </video>
-    </Flex>
+    <>
+      <Flex className="video-view">
+        <SegmentsView
+          openSegment={openSegment}
+          closedSegments={closedSegments}
+          currentTime={currentTime}
+          duration={duration}
+          size={size}
+          jumpToTime={jumpTo}
+        />
+        <video
+          ref={vidRef}
+          onKeyDown={onKeyDown}
+          onLoadedMetadata={onMetadata}
+          onTimeUpdate={(e) => {
+            const newTime = (e.target as HTMLVideoElement).currentTime;
+            if (Math.abs((currentTime || 0) - newTime) > 1) {
+              // This if statement reduces the frequency of rerender.
+              setCurrentTime(newTime);
+            }
+          }}
+          muted
+          autoPlay
+          loop
+          controls
+          playsInline
+        >
+          <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
+        </video>
+      </Flex>
+      {width && height && <ReencodeModal
+        fileid={fileid}
+        initialDimensions={[width, height]}
+        isOpen={isReencodeModalOpen}
+        close={closeReencodeModal}
+      />}
+    </>
   );
 };
 
