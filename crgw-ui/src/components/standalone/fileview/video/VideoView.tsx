@@ -187,12 +187,14 @@ const VideoView = ({ fileid }: { fileid: string }) => {
           <source src={streamingurl} type={mimetype || DEFAULT_MIMETYPE} />
         </video>
       </Flex>
-      {width && height && <ReencodeModal
-        fileid={fileid}
-        initialDimensions={[width, height]}
-        isOpen={isReencodeModalOpen}
-        close={closeReencodeModal}
-      />}
+      {width && height && (
+        <ReencodeModal
+          fileid={fileid}
+          initialDimensions={[width, height]}
+          isOpen={isReencodeModalOpen}
+          close={closeReencodeModal}
+        />
+      )}
     </>
   );
 };

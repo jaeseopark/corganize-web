@@ -1,1 +1,1 @@
-declare module "leet-decode"
+declare module "leet-decode";
