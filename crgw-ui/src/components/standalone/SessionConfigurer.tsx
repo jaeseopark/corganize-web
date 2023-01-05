@@ -6,11 +6,12 @@ import { FileEndpoint, SessionInfo } from "typedefs/Session";
 import "./SessionConfigurer.scss";
 
 const FILE_COUNT_INCREMENT = 500;
+const DEFAULT_FILE_COUNT_LIMIT = 2500;
 const MIN_FILE_SIZE_INCREMENT = 50;
 const MB_TO_BYTES = 1000000;
 
 const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
-  const [fileCountLimit, setFileCountLimit] = useState(FILE_COUNT_INCREMENT);
+  const [fileCountLimit, setFileCountLimit] = useState(DEFAULT_FILE_COUNT_LIMIT);
   const [minFileSize, setMinFileSize] = useState(MIN_FILE_SIZE_INCREMENT);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");
 
