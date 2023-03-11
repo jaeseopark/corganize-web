@@ -5,6 +5,7 @@ from typing import List
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
 from hypersquirrel.entry import create_watchlist, scrape
+from ytdlwrapper.ytdlpscrape import scrape_ytdl
 
 from crgw.postprocessing import cut_individually, cut_merge, reencode
 from crgw.forwarder import forward_request
@@ -81,6 +82,9 @@ def scrapeee():
     LOGGER.info(f"scraping {url=}")
     max_items = body.get("max_items")
     files = list(scrape(create_watchlist(url, max_items)))
+    if len(files) == 0:
+        LOGGER.info("Scraped 0 files. Trying scrape_ytdl...")
+        files = list(scrape_ytdl(url))
     return dict(files=files), 200
 
 

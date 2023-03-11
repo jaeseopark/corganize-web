@@ -2,3 +2,4 @@ moviepy==1.0.3
 Flask==2.1.1
 corganizeclient==0.0.16
 hypersquirrel==0.21
+yt-dlp==2023.3.4
