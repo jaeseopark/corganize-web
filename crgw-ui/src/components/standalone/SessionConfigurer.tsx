@@ -14,12 +14,14 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   const [fileCountLimit, setFileCountLimit] = useState(DEFAULT_FILE_COUNT_LIMIT);
   const [minFileSize, setMinFileSize] = useState(MIN_FILE_SIZE_INCREMENT);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");
+  const [tag, setTag] = useState("");
 
   const onOK = () =>
     setInfo({
       limit: fileCountLimit,
       minSize: minFileSize * MB_TO_BYTES,
       endpoint,
+      tag,
     });
 
   const renderFileCountLimiter = () => (
@@ -29,6 +31,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
       value={fileCountLimit}
       step={FILE_COUNT_INCREMENT}
       min={FILE_COUNT_INCREMENT}
+      disabled={!!tag}
     />
   );
 
@@ -39,16 +42,32 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
       value={minFileSize}
       step={MIN_FILE_SIZE_INCREMENT}
       min={0}
+      disabled={!!tag}
     />
   );
 
   const renderEndpointPicker = () => (
-    <select value={endpoint} onChange={(e) => setEndpoint(e.target.value as FileEndpoint)}>
+    <select
+      value={endpoint}
+      onChange={(e) => setEndpoint(e.target.value as FileEndpoint)}
+      disabled={!!tag}
+    >
       <option>stale</option>
       <option>active</option>
       <option>recent</option>
       <option>dense</option>
     </select>
+  );
+
+  const renderTagInput = () => (
+    <input
+      type="text"
+      defaultValue={tag}
+      onChange={(e) => setTag(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onOK();
+      }}
+    />
   );
 
   const renderConfigTable = () => (
@@ -67,17 +86,26 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
             <td>Min File Size (MB)</td>
             <td>{renderFileSizeLimiter()}</td>
           </tr>
+          <tr>
+            <td>Tag</td>
+            <td>{renderTagInput()}</td>
+          </tr>
         </tbody>
       </table>
     </div>
   );
+
+  let buttonLabel = "Start a Session";
+  if (tag) {
+    buttonLabel += " (w/ tag)";
+  }
 
   return (
     <Flex className="session-configurer" direction="column">
       {renderConfigTable()}
       <Box>
         <Center className="button clickable" onClick={onOK}>
-          <Heading size="md">Start a Session</Heading>
+          <Heading size="md">{buttonLabel}</Heading>
         </Center>
       </Box>
     </Flex>

@@ -54,7 +54,12 @@ export async function retrieveFiles(
   if (Array.isArray(arg)) {
     await client.getFilesByTags(arg as string[], callback);
   } else if (typeof arg === "object") {
-    await client.getFilesBySessionInfo(arg as SessionInfo, callback);
+    const castedSessionInfo = arg as SessionInfo;
+    if (castedSessionInfo.tag) {
+      await client.getFilesByTags([castedSessionInfo.tag], callback);
+    } else {
+      await client.getFilesBySessionInfo(castedSessionInfo, callback);
+    }
   }
 
   return { count };
