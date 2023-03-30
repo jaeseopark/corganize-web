@@ -11,6 +11,7 @@ import FileTagEditor from "components/standalone/fileview/FileTagEditor";
 import FileView from "components/standalone/fileview/FileView";
 import TagReportView from "components/standalone/reports/TagReportView";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
+import LiteralScrapePanel from "components/standalone/scrape/LiteralScrapePanel";
 
 type FileRenderer = ({ fileid }: { fileid: string }) => JSX.Element;
 
@@ -86,6 +87,7 @@ const AppRoutes = () => (
     <Route path="/" element={<BlanketResetter />} />
     <Route path="/scrape" element={<ScrapeRouteHandler />} />
     <Route path="/reports/tags" element={<SimpleHandler title="Tags" renderer={TagReportView} />} />
+    <Route path="/scrape/literal" element={<SimpleHandler title="Literal Scrape" renderer={LiteralScrapePanel} />} />
     <Route path="/file/:fileid/content" element={<FileHandler renderer={FileView} />} />
     <Route path="/file/:fileid/json" element={<FileHandler renderer={FileJsonEditor} />} />
     <Route path="/file/:fileid/tags" element={<FileHandler renderer={FileTagEditor} />} />

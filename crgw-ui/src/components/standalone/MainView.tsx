@@ -31,7 +31,7 @@ const MainView = () => {
   const [remainingSpace, setRemainingSpace] = useState(0);
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
-  const { navTagReport } = useNavv();
+  const { navTagReport, navToLiteralScrape } = useNavv();
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
@@ -70,6 +70,9 @@ const MainView = () => {
           </Heading>
           <Heading className="button clickable" onClick={backupThenShowToast} size="md">
             Backup
+          </Heading>
+          <Heading className="button clickable" onClick={navToLiteralScrape} size="md">
+            Scrape Literal URLs
           </Heading>
         </Center>
         <Center>Remaining: {toHumanFileSize(remainingSpace)}</Center>

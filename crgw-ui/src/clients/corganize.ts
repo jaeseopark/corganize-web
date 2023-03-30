@@ -121,11 +121,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-    ({
-      ...files.find((f) => f.fileid === fileid),
-      lastupdated: getPosixSeconds(),
-      dateactivated: getPosixSeconds(),
-    } as CorganizeFile);
+  ({
+    ...files.find((f) => f.fileid === fileid),
+    lastupdated: getPosixSeconds(),
+    dateactivated: getPosixSeconds(),
+  } as CorganizeFile);
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -229,6 +229,17 @@ export const scrapeAsync = (
     .then(dedupFilesById)
     .then(dedupAgainstDatabase);
 };
+
+export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]> =>
+  fetch("/api/scrape/literal", {
+    method: "POST",
+    body: JSON.stringify({ urls }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => res.json())
+    .then((json) => json.files);
 
 export const cutMerge: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut-merge`;

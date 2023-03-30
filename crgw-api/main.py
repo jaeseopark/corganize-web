@@ -4,7 +4,7 @@ from typing import List
 
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
-from hypersquirrel.entry import create_watchlist, scrape
+from hypersquirrel.entry import create_watchlist, scrape, scrape_literal_urls
 from ytdlwrapper.ytdlpscrape import scrape_ytdl
 
 from crgw.postprocessing import cut_individually, cut_merge, reencode
@@ -87,6 +87,14 @@ def scrapeee():
         files = list(scrape_ytdl(url))
     return dict(files=files), 200
 
+@app.post("/scrape/literal")
+def scrape_literal():
+    body = freq.get_json()
+    urls = body.get("urls")
+    LOGGER.info(f"scraping literal urls {urls=}")
+    files = list(scrape_literal_urls(urls))
+
+    return dict(files=files), 200
 
 @app.route("/remote/<path:subpath>")
 def fwd_remote(subpath: str):
