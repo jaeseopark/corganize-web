@@ -1,4 +1,5 @@
 import { SearchIcon, StarIcon } from "@chakra-ui/icons";
+import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
@@ -14,6 +15,7 @@ import { madFocus } from "utils/elementUtils";
 import GalleryView from "components/standalone/fileview/gallery/GalleryView";
 import VideoView from "components/standalone/fileview/video/VideoView";
 
+import FileTagEditor from "./FileTagEditor";
 import "./FileView.scss";
 
 type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;
@@ -36,7 +38,12 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const { navScrape, navJson, navTags } = useNavv();
+  const { navScrape, navJson } = useNavv();
+  const {
+    isOpen: isTagPopoverOpen,
+    onToggle: onTagPopoverToggle,
+    onClose: onTagPopoverClose,
+  } = useDisclosure();
 
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
@@ -100,7 +107,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
     } else if (key === "j") {
       navJson(file);
     } else if (key === "l") {
-      navTags(file);
+      onTagPopoverToggle();
     } else if (key === "u") {
       window.open(file.sourceurl, "_blank");
     } else if (key === "f") {
@@ -113,13 +120,36 @@ const FileView = ({ fileid }: { fileid: string }) => {
   };
 
   return (
-    // @ts-ignore
-    <FullScreen className="fullscreen-portal" handle={handle}>
-      <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
-        {handle.active && <ToastPortal />}
-        {content}
-      </div>
-    </FullScreen>
+    <>
+      <Popover
+        placement="bottom"
+        closeOnBlur={true}
+        isOpen={isTagPopoverOpen}
+        onClose={() => {
+          onTagPopoverClose();
+          madFocus(contentRef?.current, true);
+        }}
+      >
+        {
+          // @ts-ignore
+          <PopoverTrigger>
+            <Button onClick={onTagPopoverToggle}>Tag Editor</Button>
+          </PopoverTrigger>
+        }
+        <PopoverContent>
+          <FileTagEditor fileid={fileid} mini={true} />
+        </PopoverContent>
+      </Popover>
+      {
+        // @ts-ignore
+        <FullScreen className="fullscreen-portal" handle={handle}>
+          <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
+            {handle.active && <ToastPortal />}
+            {content}
+          </div>
+        </FullScreen>
+      }
+    </>
   );
 };
 

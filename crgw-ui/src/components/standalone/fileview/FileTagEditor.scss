@@ -1,5 +1,9 @@
 .file-tag-editor {
   padding: 0 20em 0 20em;
+
+  &.mini {
+    padding: 0;
+  }
 }
 
 .autocomplete-candidates {

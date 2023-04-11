@@ -1,5 +1,6 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
+import cls from "classnames";
 import { decode } from "leet-decode";
 import { useEffect, useState } from "react";
 import ReactTags, { Tag } from "react-tag-autocomplete";
@@ -69,9 +70,9 @@ const buildAutocompleteIndex = () =>
     return acc;
   }, {} as { [key: string]: string[] });
 
-type FileTagEditorProps = { fileid: string; autofocus?: boolean };
+type FileTagEditorProps = { fileid: string; mini?: boolean };
 
-const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
+const FileTagEditorr = ({ fileid, mini }: FileTagEditorProps) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
@@ -86,7 +87,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
    */
   useEffect(() => {
-    if (autofocus !== undefined) {
+    if (mini !== undefined) {
       madFocusByClassName("react-tags__search-input");
     }
   }, []);
@@ -209,7 +210,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   }
 
   return (
-    <div className="file-tag-editor" onKeyDown={onKeyDown}>
+    <div className={cls("file-tag-editor", { mini })} onKeyDown={onKeyDown}>
       <ReactTags
         delimiters={["Enter", "Tab", ","]}
         tags={tags}
@@ -227,9 +228,7 @@ const FileTagEditorr = ({ fileid, autofocus }: FileTagEditorProps) => {
   );
 };
 
-const FileTagEditor = ({ fileid }: FileTagEditorProps) => (
-  <FileTagEditorr fileid={fileid} autofocus />
-);
+const FileTagEditor = ({ fileid }: FileTagEditorProps) => <FileTagEditorr fileid={fileid} mini />;
 
 export const EmbeddableFileTagEditor = ({ fileid }: FileTagEditorProps) => (
   <FileTagEditorr fileid={fileid} />
