@@ -70,9 +70,12 @@ const buildAutocompleteIndex = () =>
     return acc;
   }, {} as { [key: string]: string[] });
 
-type FileTagEditorProps = { fileid: string; mini?: boolean };
+type FileTagEditorProps = {
+  fileid: string;
+  mini?: boolean;
+};
 
-const FileTagEditorr = ({ fileid, mini }: FileTagEditorProps) => {
+const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   const { findById, updateFile } = useFileRepository();
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
@@ -87,9 +90,7 @@ const FileTagEditorr = ({ fileid, mini }: FileTagEditorProps) => {
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
    */
   useEffect(() => {
-    if (mini !== undefined) {
-      madFocusByClassName("react-tags__search-input");
-    }
+    madFocusByClassName("react-tags__search-input");
   }, []);
 
   /**
@@ -227,11 +228,5 @@ const FileTagEditorr = ({ fileid, mini }: FileTagEditorProps) => {
     </div>
   );
 };
-
-const FileTagEditor = ({ fileid }: FileTagEditorProps) => <FileTagEditorr fileid={fileid} mini />;
-
-export const EmbeddableFileTagEditor = ({ fileid }: FileTagEditorProps) => (
-  <FileTagEditorr fileid={fileid} />
-);
 
 export default FileTagEditor;

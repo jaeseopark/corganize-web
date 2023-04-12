@@ -1,6 +1,7 @@
 import { Button, HStack } from "@chakra-ui/react";
+import { ForwardRefExoticComponent, Ref, forwardRef } from "react";
 
-import { GalleryProps, GalleryRenderer } from "components/standalone/fileview/gallery/hook";
+import { GalleryProps } from "components/standalone/fileview/gallery/hook";
 
 const EditControls = ({
   basicProps: { imageUrls },
@@ -26,30 +27,31 @@ const EditControls = ({
   );
 };
 
-const EditViewHOC = (Inner: GalleryRenderer) => (props: GalleryProps) => {
-  const {
-    highlightProps: { toggleHighlightOnCurrentIndex, toggleAllHighlights },
-  } = props;
+const EditViewHOC = (Inner: ForwardRefExoticComponent<any>) =>
+  forwardRef((props: GalleryProps, ref: Ref<HTMLDivElement>) => {
+    const {
+      highlightProps: { toggleHighlightOnCurrentIndex, toggleAllHighlights },
+    } = props;
 
-  const handleKey = (key: string) => {
-    if (key === "b") {
-      toggleHighlightOnCurrentIndex();
-    } else if (key === "a") {
-      toggleAllHighlights();
-    }
-  };
+    const handleKey = (key: string) => {
+      if (key === "b") {
+        toggleHighlightOnCurrentIndex();
+      } else if (key === "a") {
+        toggleAllHighlights();
+      }
+    };
 
-  return (
-    <div
-      onKeyDown={(e) => {
-        if (e.shiftKey || e.ctrlKey) return;
-        handleKey(e.key.toLowerCase());
-      }}
-    >
-      <EditControls {...props} />
-      <Inner {...props} />
-    </div>
-  );
-};
+    return (
+      <div
+        onKeyDown={(e) => {
+          if (e.shiftKey || e.ctrlKey) return;
+          handleKey(e.key.toLowerCase());
+        }}
+      >
+        <EditControls {...props} />
+        <Inner {...props} ref={ref} />
+      </div>
+    );
+  });
 
 export default EditViewHOC;

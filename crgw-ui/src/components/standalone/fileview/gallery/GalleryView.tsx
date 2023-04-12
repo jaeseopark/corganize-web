@@ -1,5 +1,5 @@
 import { ViewIcon } from "@chakra-ui/icons";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Ref, forwardRef, useCallback, useEffect, useState } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 
@@ -13,7 +13,7 @@ import EditViewHOC from "components/standalone/fileview/gallery/EditView";
 import Lightbox from "components/standalone/fileview/gallery/Lightbox";
 import SummaryViewHOC from "components/standalone/fileview/gallery/SummaryView";
 import Thumbnails from "components/standalone/fileview/gallery/Thumbnails";
-import { GalleryRenderer, Mode, useGallery } from "components/standalone/fileview/gallery/hook";
+import { Mode, useGallery } from "components/standalone/fileview/gallery/hook";
 
 import "./GalleryView.scss";
 
@@ -28,14 +28,22 @@ const SEEK_HOTKEY_MAP: { [key: string]: { delta: number; isReversible?: boolean 
   "]": { delta: 10000 },
 };
 
-const RENDERER_BY_MODE: Map<Mode, GalleryRenderer> = new Map([
-  ["lightbox", Lightbox],
-  ["thumbnail", Thumbnails],
-  ["edit", EditViewHOC(Thumbnails)],
-  ["summary", SummaryViewHOC(Thumbnails)],
-]);
+const getRendererByMode = (mode: Mode) => {
+  switch (mode) {
+    case "lightbox":
+      return Lightbox;
+    case "thumbnail":
+      return Thumbnails;
+    case "edit":
+      return EditViewHOC(Thumbnails);
+    case "summary":
+      return SummaryViewHOC(Thumbnails);
+    default:
+      throw new Error("Unsupported");
+  }
+};
 
-const GalleryView = ({ fileid }: { fileid: string }) => {
+const GalleryView = forwardRef(({ fileid }: { fileid: string }, ref: Ref<HTMLDivElement>) => {
   const { findById, updateFile } = useFileRepository();
   const { multimedia, streamingurl } = findById(fileid);
 
@@ -43,7 +51,6 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
   const [unzippedUrls, setUnzippedUrls] = useState<string[]>([]);
   const [error, setError] = useState<Error>();
   const { upsertUserAction } = useBlanket();
-  const mainref = useRef<HTMLDivElement | null>(null);
 
   const updateMultimedia = useCallback(
     (newProps: Partial<Multimedia>) => {
@@ -125,10 +132,10 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
   };
 
   if (error) {
-    return <div ref={mainref}>{error.message}</div>;
+    return <div ref={ref}>{error.message}</div>;
   }
 
-  const ChildComponent = RENDERER_BY_MODE.get(mode)!;
+  const ChildComponent = getRendererByMode(mode)!;
 
   return (
     <div
@@ -138,11 +145,10 @@ const GalleryView = ({ fileid }: { fileid: string }) => {
         if (e.metaKey || e.ctrlKey) return;
         handleKey(e.key.toLowerCase(), e.shiftKey);
       }}
-      ref={mainref}
     >
-      <ChildComponent {...galleryProps} />
+      <ChildComponent {...galleryProps} ref={ref} />
     </div>
   );
-};
+});
 
 export default GalleryView;

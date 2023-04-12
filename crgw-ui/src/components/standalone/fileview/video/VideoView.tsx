@@ -1,5 +1,5 @@
-import { Flex, useDisclosure } from "@chakra-ui/react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { Flex, useDisclosure, useMergeRefs } from "@chakra-ui/react";
+import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
 
 import { Multimedia } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
@@ -27,7 +27,7 @@ const SEEK_HOTKEY_MAP: Dictionary<number> = {
 
 const ONE_HOUR = 3600000;
 
-const VideoView = ({ fileid }: { fileid: string }) => {
+const VideoView = forwardRef(({ fileid }: { fileid: string }, ref) => {
   const { findById, updateFile, postprocesses } = useFileRepository();
   const { openSegment, closedSegments, segmentActions } = useSegments();
   const [currentTime, setCurrentTime] = useState<number>();
@@ -45,6 +45,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
     }
     return { width: 0, height: 0, duration: 0 };
   }, [multimedia]);
+  const multiRef = useMergeRefs(ref, vidRef);
 
   const updateMultimedia = useCallback(
     (newProps: Partial<Multimedia>) => {
@@ -168,7 +169,7 @@ const VideoView = ({ fileid }: { fileid: string }) => {
           jumpToTime={jumpTo}
         />
         <video
-          ref={vidRef}
+          ref={multiRef}
           onKeyDown={onKeyDown}
           onLoadedMetadata={onMetadata}
           onTimeUpdate={(e) => {
@@ -197,6 +198,6 @@ const VideoView = ({ fileid }: { fileid: string }) => {
       )}
     </>
   );
-};
+});
 
 export default VideoView;

@@ -1,11 +1,14 @@
-import { GalleryProps, GalleryRenderer } from "components/standalone/fileview/gallery/hook";
+import { ForwardRefExoticComponent, Ref, forwardRef } from "react";
 
-const SummaryViewHOC = (Inner: GalleryRenderer) => (props: GalleryProps) => {
-  return (
-    <div className="summary-view">
-      <Inner {...props} />
-    </div>
-  );
-};
+import { GalleryProps } from "components/standalone/fileview/gallery/hook";
+
+const SummaryViewHOC = (Inner: ForwardRefExoticComponent<any>) =>
+  forwardRef((props: GalleryProps, ref: Ref<HTMLDivElement>) => {
+    return (
+      <div className="summary-view">
+        <Inner {...props} />
+      </div>
+    );
+  });
 
 export default SummaryViewHOC;

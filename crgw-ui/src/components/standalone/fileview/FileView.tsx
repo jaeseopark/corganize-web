@@ -1,7 +1,8 @@
 import { SearchIcon, StarIcon } from "@chakra-ui/icons";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import styled from "styled-components";
 
 import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
@@ -18,18 +19,23 @@ import VideoView from "components/standalone/fileview/video/VideoView";
 import FileTagEditor from "./FileTagEditor";
 import "./FileView.scss";
 
-type ContentRenderer = ({ fileid }: { fileid: string }) => JSX.Element | null;
+const InvisibleButton = styled(Button)`
+  height: 0;
+  overflow: hidden;
+`;
 
-const RENDERER_BY_MIMETYPE: Map<string, ContentRenderer> = new Map([
-  ["video/mp4", VideoView],
-  ["video/x-matroska", VideoView],
-  ["video/x-m4v", VideoView],
-  ["video/quicktime", VideoView],
-  ["application/zip", GalleryView],
-]);
-
-export const getRenderer = (mimetype?: string) =>
-  RENDERER_BY_MIMETYPE.get(mimetype || "") || VideoView;
+const getRendererByMimetype = (mimetype?: string) => {
+  switch (mimetype) {
+    case "application/zip":
+      return GalleryView;
+    case "video/mp4":
+    case "video/x-matroska":
+    case "video/x-m4v":
+    case "video/quicktime":
+    default:
+      return VideoView;
+  }
+};
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
@@ -37,7 +43,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<any>(null);
   const { navScrape, navJson } = useNavv();
   const {
     isOpen: isTagPopoverOpen,
@@ -48,14 +54,23 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const file = findById(fileid);
   const { mimetype, streamingurl } = file;
 
-  const toggleActivationWithToast = () =>
-    toggleActivation(fileid)
-      .then(({ message, emoji }) =>
-        enqueueSuccess({
-          message: `${message} ${emoji}`,
-        })
-      )
-      .catch((error: Error) => enqueueError({ message: error.message }));
+  const toggleActivationWithToast = useCallback(
+    () =>
+      toggleActivation(fileid)
+        .then(({ message, emoji }) =>
+          enqueueSuccess({
+            message: `${message} ${emoji}`,
+          })
+        )
+        .catch((error: Error) => enqueueError({ message: error.message })),
+    [toggleActivation]
+  );
+
+  const madFocusContent = useCallback(() => {
+    if (content && contentRef?.current && !isTagPopoverOpen) {
+      madFocus(contentRef.current);
+    }
+  }, [isTagPopoverOpen, content, contentRef]);
 
   useEffect(() => {
     if (!streamingurl) {
@@ -64,22 +79,16 @@ const FileView = ({ fileid }: { fileid: string }) => {
       return;
     }
 
-    const getContent = () => {
-      const Renderer = getRenderer(mimetype);
-      return <Renderer fileid={fileid} />;
-    };
-
-    setContent(getContent());
+    const Renderer = getRendererByMimetype(mimetype);
+    setContent(<Renderer fileid={fileid} ref={contentRef} />);
     markAsOpened(fileid)
       .then(() => enqueueSuccess({ message: "File marked as open" }))
       .catch((error: Error) => enqueueError({ message: error.message }));
   }, []);
 
   useEffect(() => {
-    if (content) {
-      madFocus(contentRef?.current, true);
-    }
-  }, [content]);
+    madFocusContent();
+  }, [madFocusContent]);
 
   useEffect(() => {
     upsertUserAction({
@@ -125,25 +134,22 @@ const FileView = ({ fileid }: { fileid: string }) => {
         placement="bottom"
         closeOnBlur={true}
         isOpen={isTagPopoverOpen}
-        onClose={() => {
-          onTagPopoverClose();
-          madFocus(contentRef?.current, true);
-        }}
+        onClose={onTagPopoverClose}
       >
         {
           // @ts-ignore
           <PopoverTrigger>
-            <Button onClick={onTagPopoverToggle}>Tag Editor</Button>
+            <InvisibleButton onClick={onTagPopoverToggle}>Tag Editor</InvisibleButton>
           </PopoverTrigger>
         }
         <PopoverContent>
-          <FileTagEditor fileid={fileid} mini={true} />
+          {isTagPopoverOpen && <FileTagEditor fileid={fileid} mini={true} />}
         </PopoverContent>
       </Popover>
       {
         // @ts-ignore
         <FullScreen className="fullscreen-portal" handle={handle}>
-          <div className="file-view-content" onKeyDown={onKeyDown} ref={contentRef}>
+          <div className="file-view-content" onKeyDown={onKeyDown}>
             {handle.active && <ToastPortal />}
             {content}
           </div>

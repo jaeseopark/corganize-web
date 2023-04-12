@@ -160,4 +160,3 @@ export const useGallery = (
 };
 
 export type GalleryProps = ReturnType<typeof useGallery>;
-export type GalleryRenderer = (props: GalleryProps) => JSX.Element | null;
