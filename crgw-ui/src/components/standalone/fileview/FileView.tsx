@@ -17,6 +17,7 @@ import GalleryView from "components/standalone/fileview/gallery/GalleryView";
 import VideoView from "components/standalone/fileview/video/VideoView";
 
 import FileTagEditor from "./FileTagEditor";
+
 import "./FileView.scss";
 
 const InvisibleButton = styled(Button)`

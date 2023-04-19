@@ -88,9 +88,7 @@ export const getFilesByTags = (
   return getFilesWithPagination(npg, 99999);
 };
 
-export const getFilesByTagsWithoutPagination = (
-  tags: string[]
-) => {
+export const getFilesByTagsWithoutPagination = (tags: string[]) => {
   const files: CorganizeFile[] = [];
 
   const npg = nextPageGetter("/api/remote/files", { tags: tags.join("|") }, (moreFiles) => {
@@ -133,11 +131,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-  ({
-    ...files.find((f) => f.fileid === fileid),
-    lastupdated: getPosixSeconds(),
-    dateactivated: getPosixSeconds(),
-  } as CorganizeFile);
+    ({
+      ...files.find((f) => f.fileid === fileid),
+      lastupdated: getPosixSeconds(),
+      dateactivated: getPosixSeconds(),
+    } as CorganizeFile);
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -318,8 +316,7 @@ export const getRemainingSpace = (): Promise<number> =>
     .then((res) => res.json())
     .then(({ remainingSpace }) => remainingSpace);
 
-export const cleanupRemoteFiles = () =>
-  proxyFetch("/api/remote/files/cleanup", "POST", {});
+export const cleanupRemoteFiles = () => proxyFetch("/api/remote/files/cleanup", "POST", {});
 
 export const backup = () =>
   proxyFetch("/api/remote/backup", "POST", {}).then(({ status }) => {

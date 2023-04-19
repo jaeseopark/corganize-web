@@ -11,8 +11,8 @@ module.exports = {
     "^utils\\/.*",
     "^components\\/.*",
     "^assets\\/.*",
-    "^[.]\\/.*",
-    ".*css$",
+    "^[.].*(?<!css)$", // local dependencies (except css)
+    "^[.].*css$", // local CSS files
   ],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
