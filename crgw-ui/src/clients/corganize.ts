@@ -88,6 +88,18 @@ export const getFilesByTags = (
   return getFilesWithPagination(npg, 99999);
 };
 
+export const getFilesByTagsWithoutPagination = (
+  tags: string[]
+) => {
+  const files: CorganizeFile[] = [];
+
+  const npg = nextPageGetter("/api/remote/files", { tags: tags.join("|") }, (moreFiles) => {
+    files.push(...moreFiles);
+    return moreFiles;
+  });
+  return getFilesWithPagination(npg, 99999).then(() => files);
+};
+
 const nextPageGetter = (path: string, params: Dictionary<string>, callback: RetrievalCallback) => {
   return async (nexttoken?: string): Promise<FileResponse> => {
     const clone = { ...params };
@@ -182,13 +194,6 @@ export const getGlobalTags = (): Promise<string[]> =>
   fetch("/api/remote/tags")
     .then((res) => res.json())
     .then(({ tags }) => tags);
-
-export const deleteTags = (tags: string[]) => {
-  const chunks = chunk(tags, DELETE_TAGS_CHUNK_SIZE);
-  return Promise.all(
-    chunks.map((aChunk) => proxyFetch("/api/remote/tags", "DELETE", { tags: aChunk }))
-  );
-};
 
 export const scrapeAsync = (
   ...urls: string[]
@@ -313,8 +318,8 @@ export const getRemainingSpace = (): Promise<number> =>
     .then((res) => res.json())
     .then(({ remainingSpace }) => remainingSpace);
 
-export const getReport = (reportName: "tags") =>
-  fetch(`/api/remote/reports/${reportName}`).then((res) => res.json());
+export const cleanupRemoteFiles = () =>
+  proxyFetch("/api/remote/files/cleanup", "POST", {});
 
 export const backup = () =>
   proxyFetch("/api/remote/backup", "POST", {}).then(({ status }) => {

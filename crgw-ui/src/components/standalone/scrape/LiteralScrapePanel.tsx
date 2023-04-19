@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Flex, Textarea } from "@chakra-ui/react";
 import { useState } from "react";
 import styled from "styled-components";
 
@@ -6,17 +6,12 @@ import { useToast } from "providers/toast/hook";
 
 import { createFiles, scrapeLiteralUrlsAsync } from "clients/corganize";
 
-const Container = styled.div`
-  height: 100%;
-`;
-
-const Textarea = styled.textarea`
+const Textareaa = styled(Textarea)`
   width: 100%;
-  height: 50%;
-  border: solid;
+  margin-bottom: 1em;
 `;
 
-const ScrapePanelBulk = () => {
+const LiteralScrapePanel = () => {
   const [lineSeparatedUrls, setLineSeparatedUrls] = useState<string>("");
   const { enqueue } = useToast();
 
@@ -35,14 +30,15 @@ const ScrapePanelBulk = () => {
   };
 
   return (
-    <Container>
-      <Textarea value={lineSeparatedUrls} onChange={(e) => setLineSeparatedUrls(e.target.value)} />
-      <div className="response" />
-      <div className="scrape-button">
-        <Button onClick={scrape}>Scrape</Button>
-      </div>
-    </Container>
+    <Flex height="100%" flexDirection="column">
+      <Textareaa
+        flex="1"
+        value={lineSeparatedUrls}
+        onChange={(e: any) => setLineSeparatedUrls(e.target.value)}
+      />
+      <Button onClick={scrape}>Scrape</Button>
+    </Flex>
   );
 };
 
-export default ScrapePanelBulk;
+export default LiteralScrapePanel;

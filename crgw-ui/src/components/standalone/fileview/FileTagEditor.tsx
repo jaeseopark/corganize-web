@@ -122,9 +122,12 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   };
 
   const onAddition = (newTag: Tag) => {
+    const tagss = file.tags || [];
     newTag.name = newTag.name.trim();
     if (newTag.name) {
-      assignTags([...(file.tags || []), newTag.name.toLowerCase()]);
+      if (!tagss.includes(newTag.name)) {
+        assignTags([...tagss, newTag.name.toLowerCase()]);
+      }
     }
     setAutocompEnabled(true);
   };
