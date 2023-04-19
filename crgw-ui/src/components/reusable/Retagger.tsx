@@ -145,10 +145,9 @@ const Retagger = () => {
         enqueueSuccess({ message: `${files.length} Files loaded; applying operators...` });
         return files.map(consolidatedOperator);
       })
-      .then((mappedFiles) => {
-        console.log(mappedFiles);
-        mappedFiles.forEach((file) => updateFile({ fileid: file.fileid, tags: file.tags }));
-      })
+      .then((mappedFiles) =>
+        Promise.all(mappedFiles.map((file) => updateFile({ fileid: file.fileid, tags: file.tags })))
+      )
       .then(() => enqueueSuccess({ message: "Done" }));
   };
 
