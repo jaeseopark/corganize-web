@@ -2,6 +2,7 @@ import { Button, Flex, Textarea } from "@chakra-ui/react";
 import { useState } from "react";
 import styled from "styled-components";
 
+import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
 
 import { createFiles, scrapeLiteralUrlsAsync } from "clients/corganize";
@@ -14,6 +15,7 @@ const Textareaa = styled(Textarea)`
 const LiteralScrapePanel = () => {
   const [lineSeparatedUrls, setLineSeparatedUrls] = useState<string>("");
   const { enqueue } = useToast();
+  const { protectHotkey, exposeHotkey } = useBlanket();
 
   const scrape = () => {
     const uniqueUrls = lineSeparatedUrls
@@ -35,6 +37,8 @@ const LiteralScrapePanel = () => {
         flex="1"
         value={lineSeparatedUrls}
         onChange={(e: any) => setLineSeparatedUrls(e.target.value)}
+        onFocus={protectHotkey}
+        onBlur={exposeHotkey}
       />
       <Button onClick={scrape}>Scrape</Button>
     </Flex>
