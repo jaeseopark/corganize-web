@@ -1,10 +1,12 @@
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Button, HStack, IconButton, Input, Select, Table, Tbody, Td, Tr } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ReactTags, { Tag } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
+import { useBlanket } from "providers/blanket/hook";
 import { useToast } from "providers/toast/hook";
 
 import { getFilesByTagsWithoutPagination, getGlobalTags, updateFile } from "clients/corganize";
@@ -29,6 +31,7 @@ const OperatorComponent = ({
   onUpdate: (updated: TagOperatorWithoutId) => void;
   onDelete: () => void;
 }) => {
+  const { protectHotkey, exposeHotkey } = useBlanket();
   return (
     <>
       <Td>
@@ -47,6 +50,8 @@ const OperatorComponent = ({
           onChange={({ target: { value } }) =>
             onUpdate({ ...operator, value: value.toLowerCase() })
           }
+          onFocus={protectHotkey}
+          onBlur={exposeHotkey}
         />
       </Td>
       <Td>
@@ -92,6 +97,12 @@ const Retagger = () => {
   const [operators, setOperators] = useState<TagOperator[]>([]);
   const [tag, setTag] = useState("");
   const { enqueueWarning, enqueueSuccess, enqueueAsync } = useToast();
+  const { protectHotkey, exposeHotkey } = useBlanket();
+  const [suggestions, setSuggestions] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    getGlobalTags().then((tags) => setSuggestions(tags.map((tag) => ({ id: tag, name: tag }))));
+  }, []);
 
   const getFirstInputViolation = () => {
     if (tag.length === 0) {
@@ -161,11 +172,15 @@ const Retagger = () => {
       <Tbody>
         <Tr>
           <Td colSpan={2}>
-            <Input
-              placeholder="Target Tag"
-              type="text"
-              value={tag}
-              onChange={({ target: { value } }) => setTag(value.toLowerCase())}
+            <ReactTags
+              delimiters={["Enter", "Tab", ","]}
+              tags={tag ? [{ id: tag, name: tag }] : []}
+              suggestions={suggestions}
+              suggestionsFilter={(a, b) => tag.length === 0 && a.name.startsWith(b.toLowerCase())}
+              onAddition={({ name: value }) => setTag(value)}
+              onDelete={() => setTag("")}
+              onFocus={protectHotkey}
+              onBlur={exposeHotkey}
             />
           </Td>
           <Td>
@@ -174,8 +189,8 @@ const Retagger = () => {
               icon={<AddIcon />}
               aria-label="Add a row"
               onClick={() =>
-                setOperators((prev) => [
-                  ...prev,
+                setOperators([
+                  ...operators,
                   { id: uuidv4(), type: "rename", originalTag: "", value: "" },
                 ])
               }
@@ -186,14 +201,8 @@ const Retagger = () => {
           <Tr key={operator.id}>
             <OperatorComponent
               operator={operator}
-              onUpdate={(updated) => {
-                setOperators(substitute(operator.id, updated));
-              }}
-              onDelete={() => {
-                // setOperators((prev) =>
-                //   prev.filter((prevOperator) => prevOperator.id !== operator.id)
-                // );
-              }}
+              onUpdate={(updated) => setOperators(substitute(operator.id, updated))}
+              onDelete={() => setOperators(operators.filter((o) => o.id !== operator.id))}
             />
           </Tr>
         ))}

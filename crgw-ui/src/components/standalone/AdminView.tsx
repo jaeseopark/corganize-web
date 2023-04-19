@@ -21,6 +21,8 @@ import Retagger from "components/reusable/Retagger";
 import LocalFileReport from "./LocalFileReport";
 import LiteralScrapePanel from "./scrape/LiteralScrapePanel";
 
+import "./AdminView.scss";
+
 const AdminView = () => {
   const { enqueueSuccess, enqueueAsync } = useToast();
   const { navRoot } = useNavv();
@@ -46,7 +48,7 @@ const AdminView = () => {
       .then(() => enqueueSuccess({ header: "Remote Files", message: "Done" }));
 
   return (
-    <div>
+    <div className="admin-view">
       <VStack>
         <HStack borderWidth="1px" borderRadius="lg" padding="2em" width="100%">
           <Button onClick={navRoot}>Back to Root</Button>
@@ -64,7 +66,7 @@ const AdminView = () => {
               </PopoverBody>
             </PopoverContent>
           </Popover>
-          <Popover isOpen={isRetaggerOpen} onClose={onRetaggerClose}>
+          <Popover isOpen={isRetaggerOpen} onClose={onRetaggerClose} closeOnBlur={false}>
             <PopoverTrigger>
               <Button onClick={onRetaggerOpen}>Retagger</Button>
             </PopoverTrigger>
