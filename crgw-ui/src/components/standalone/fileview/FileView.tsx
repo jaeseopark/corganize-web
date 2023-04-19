@@ -13,10 +13,9 @@ import { useNavv } from "hooks/navv";
 
 import { madFocus } from "utils/elementUtils";
 
+import FileTagEditor from "components/reusable/FileTagEditor";
 import GalleryView from "components/standalone/fileview/gallery/GalleryView";
 import VideoView from "components/standalone/fileview/video/VideoView";
-
-import FileTagEditor from "./FileTagEditor";
 
 import "./FileView.scss";
 

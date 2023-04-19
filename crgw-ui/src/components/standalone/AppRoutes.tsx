@@ -6,12 +6,11 @@ import { useFileRepository } from "providers/fileRepository/hook";
 
 import { useNavv } from "hooks/navv";
 
+import FileTagEditor from "components/reusable/FileTagEditor";
+import AdminView from "components/standalone/AdminView";
 import FileJsonEditor from "components/standalone/fileview/FileJsonEditor";
-import FileTagEditor from "components/standalone/fileview/FileTagEditor";
 import FileView from "components/standalone/fileview/FileView";
 import ScrapePanel from "components/standalone/scrape/ScrapePanel";
-
-import AdminView from "./AdminView";
 
 type FileRenderer = ({ fileid }: { fileid: string }) => JSX.Element;
 

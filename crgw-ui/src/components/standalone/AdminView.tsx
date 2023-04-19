@@ -17,9 +17,8 @@ import { useNavv } from "hooks/navv";
 import { backup } from "clients/corganize";
 
 import Retagger from "components/reusable/Retagger";
-
-import LocalFileReport from "./LocalFileReport";
-import LiteralScrapePanel from "./scrape/LiteralScrapePanel";
+import LocalFileReport from "components/standalone/LocalFileReport";
+import LiteralScrapePanel from "components/standalone/scrape/LiteralScrapePanel";
 
 import "./AdminView.scss";
 
