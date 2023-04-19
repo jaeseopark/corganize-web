@@ -14,7 +14,7 @@ import { useToast } from "providers/toast/hook";
 
 import { useNavv } from "hooks/navv";
 
-import { backup, cleanupRemoteFiles } from "clients/corganize";
+import { backup } from "clients/corganize";
 
 import Retagger from "components/reusable/Retagger";
 
@@ -42,18 +42,12 @@ const AdminView = () => {
       .then(backup)
       .then(() => enqueueSuccess({ header: "Backup", message: "Done" }));
 
-  const cleanupRemoteFilesThenShowToast = () =>
-    enqueueAsync({ header: "Remote Files", message: "Cleaning up..." })
-      .then(cleanupRemoteFiles)
-      .then(() => enqueueSuccess({ header: "Remote Files", message: "Done" }));
-
   return (
     <div className="admin-view">
       <VStack>
         <HStack borderWidth="1px" borderRadius="lg" padding="2em" width="100%">
           <Button onClick={navRoot}>Back to Root</Button>
           <Button onClick={backupThenShowToast}>Backup</Button>
-          <Button onClick={cleanupRemoteFilesThenShowToast}>Cleanup Remote Files</Button>
           <Popover isOpen={isLocalFileReportOpen} onClose={onLocalFileReportClose}>
             <PopoverTrigger>
               <Button onClick={onLocalFileReportOpen}>Local File Report</Button>

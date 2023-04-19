@@ -131,11 +131,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-    ({
-      ...files.find((f) => f.fileid === fileid),
-      lastupdated: getPosixSeconds(),
-      dateactivated: getPosixSeconds(),
-    } as CorganizeFile);
+  ({
+    ...files.find((f) => f.fileid === fileid),
+    lastupdated: getPosixSeconds(),
+    dateactivated: getPosixSeconds(),
+  } as CorganizeFile);
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -315,8 +315,6 @@ export const getRemainingSpace = (): Promise<number> =>
   fetch("/api/info")
     .then((res) => res.json())
     .then(({ remainingSpace }) => remainingSpace);
-
-export const cleanupRemoteFiles = () => proxyFetch("/api/remote/files/cleanup", "POST", {});
 
 export const backup = () =>
   proxyFetch("/api/remote/backup", "POST", {}).then(({ status }) => {

@@ -1,6 +1,8 @@
 import logging
 import os
 
+import requests
+
 from commmons import init_logger_with_handlers
 from corganizeclient.client import CorganizeClient
 
@@ -35,8 +37,17 @@ def cleanup_local_files(data_path: str, cc: CorganizeClientWrapper):
 
 
 def run_cleaner(config: dict):
-    cc = CorganizeClientWrapper(**config["server"])
+    host = config["server"]["host"]
+    apikey = config["server"]["apikey"]
+
+    cc = CorganizeClientWrapper(host=host, apikey=apikey)
     cleanup_local_files(config["data"]["path"], cc)
+    
+    r = requests.post(f"{host}/files/cleanup", headers=dict(apikey=apikey))
+    logger.info(f"file cleanup {r.status_code=} {r.text=}")
+
+    r = requests.post(f"{host}/tags/cleanup", headers=dict(apikey=apikey))
+    logger.info(f"tag cleanup {r.status_code=} {r.text=}")
 
 
 def init_cleaner(config: dict):
