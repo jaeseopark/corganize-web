@@ -1,4 +1,5 @@
-import { Box, Center, Flex, Heading } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
+import { Button, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 
 import { FileEndpoint, SessionInfo } from "typedefs/Session";
@@ -101,14 +102,18 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   }
 
   return (
-    <Flex className="session-configurer" direction="column">
+    <VStack className="session-configurer">
       {renderConfigTable()}
-      <Box>
-        <Center className="button clickable" onClick={onOK}>
-          <Heading size="md">{buttonLabel}</Heading>
-        </Center>
-      </Box>
-    </Flex>
+      <Button
+        leftIcon={<CheckCircleIcon />}
+        onClick={onOK}
+        colorScheme="teal"
+        variant="solid"
+        aria-label="Start Session"
+      >
+        {buttonLabel}
+      </Button>
+    </VStack>
   );
 };
 

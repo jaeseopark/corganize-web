@@ -1,4 +1,5 @@
-import { Center, Divider, Heading } from "@chakra-ui/react";
+import { SettingsIcon } from "@chakra-ui/icons";
+import { Box, Button, Center, Divider } from "@chakra-ui/react";
 import cls from "classnames";
 import { useEffect, useState } from "react";
 
@@ -10,10 +11,6 @@ import { useGrid } from "providers/grid/hook";
 
 import { useNavv } from "hooks/navv";
 
-import { getRemainingSpace } from "clients/corganize";
-
-import { toHumanFileSize } from "utils/numberUtils";
-
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
 import FieldBar from "components/standalone/field/FieldBar";
@@ -22,22 +19,15 @@ import GlobalSearch from "components/standalone/grid/GlobalSearch";
 import GridView from "components/standalone/grid/GridView";
 import PageControl from "components/standalone/grid/PageControl";
 
-import "./MainView.scss";
-
 const MainView = () => {
   const { startSession } = useFileRepository();
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
-  const [remainingSpace, setRemainingSpace] = useState(0);
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { navToAdmin } = useNavv();
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
-
-  useEffect(() => {
-    getRemainingSpace().then(setRemainingSpace);
-  }, []);
 
   useEffect(() => {
     if (sessionInfo) {
@@ -55,19 +45,16 @@ const MainView = () => {
 
   if (!sessionInfo) {
     mainContent = (
-      <Center flexDirection="column" className="presession">
+      <Center height="100vh" flexDir="column">
         <SessionConfigurer setInfo={setSessionInfo} />
-        <Center>
-          <Heading className="button first clickable" onClick={navToAdmin} size="md">
-            Admin
-          </Heading>
-        </Center>
-        <Center>Remaining: {toHumanFileSize(remainingSpace)}</Center>
+        <Button leftIcon={<SettingsIcon />} onClick={navToAdmin} marginTop="1em">
+          Admin
+        </Button>
       </Center>
     );
   } else {
     mainContent = (
-      <div className="session-wrapper">
+      <Box margin="1rem">
         <PresetBar />
         <Divider marginY=".5em" />
         <FieldBar />
@@ -75,14 +62,14 @@ const MainView = () => {
         <PageControl />
         <GridView />
         <PageControl />
-      </div>
+      </Box>
     );
   }
 
   return (
     <>
       <AppRoutes />
-      <div className={cls("main-view", { hidden: isBlanketEnabled })}>{mainContent}</div>
+      <div className={cls({ hidden: isBlanketEnabled })}>{mainContent}</div>
     </>
   );
 };

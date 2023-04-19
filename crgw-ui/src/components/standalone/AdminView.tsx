@@ -1,3 +1,4 @@
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -16,8 +17,9 @@ import { useNavv } from "hooks/navv";
 
 import { backup } from "clients/corganize";
 
+import LocalFileReport from "components/reusable/LocalFileReport";
+import RemoteFileReport from "components/reusable/RemoteFileReport";
 import Retagger from "components/reusable/Retagger";
-import LocalFileReport from "components/standalone/LocalFileReport";
 import LiteralScrapePanel from "components/standalone/scrape/LiteralScrapePanel";
 
 import "./AdminView.scss";
@@ -29,6 +31,11 @@ const AdminView = () => {
     isOpen: isLocalFileReportOpen,
     onOpen: onLocalFileReportOpen,
     onClose: onLocalFileReportClose,
+  } = useDisclosure();
+  const {
+    isOpen: isRemoteFileReportOpen,
+    onOpen: onRemoteFileReportOpen,
+    onClose: onRemoteFileReportClose,
   } = useDisclosure();
   const {
     isOpen: isRetaggerOpen,
@@ -44,8 +51,10 @@ const AdminView = () => {
   return (
     <div className="admin-view">
       <VStack>
+        <Button onClick={navRoot} leftIcon={<ArrowBackIcon />}>
+          Back to Root
+        </Button>
         <HStack borderWidth="1px" borderRadius="lg" padding="2em" width="100%">
-          <Button onClick={navRoot}>Back to Root</Button>
           <Button onClick={backupThenShowToast}>Backup</Button>
           <Popover isOpen={isLocalFileReportOpen} onClose={onLocalFileReportClose}>
             <PopoverTrigger>
@@ -56,6 +65,18 @@ const AdminView = () => {
               <PopoverCloseButton />
               <PopoverBody>
                 <LocalFileReport />
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+          <Popover isOpen={isRemoteFileReportOpen} onClose={onRemoteFileReportClose}>
+            <PopoverTrigger>
+              <Button onClick={onRemoteFileReportOpen}>Remote File Report</Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverBody>
+                <RemoteFileReport />
               </PopoverBody>
             </PopoverContent>
           </Popover>

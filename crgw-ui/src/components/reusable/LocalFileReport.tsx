@@ -1,15 +1,19 @@
 import { Button, List, ListItem } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import { getLocalFilenames } from "clients/corganize";
+import { getLocalFilenames, getRemainingSpace } from "clients/corganize";
+
+import { toHumanFileSize } from "utils/numberUtils";
 
 const LocalFileReport = () => {
   const [localFilenames, setLocalFilenames] = useState<string[]>([]);
   const [unregistered, setUnregistered] = useState<string[]>([]);
   const [isProcessing, setProcessing] = useState(false);
+  const [remainingSpace, setRemainingSpace] = useState(0);
 
   useEffect(() => {
     getLocalFilenames().then(setLocalFilenames);
+    getRemainingSpace().then(setRemainingSpace);
   }, []);
 
   const onClick = () => {
@@ -27,6 +31,10 @@ const LocalFileReport = () => {
 
   return (
     <div>
+      <div>
+        <span>Remaining Space:</span>
+        <span>{toHumanFileSize(remainingSpace)}</span>
+      </div>
       <div>
         <span>Total local files:</span>
         <span>{localFilenames.length}</span>

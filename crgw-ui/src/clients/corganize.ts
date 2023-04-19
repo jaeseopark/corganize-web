@@ -8,7 +8,6 @@ import { getPosixSeconds } from "utils/dateUtils";
 
 const CREATE_FILE_CHUNK_SIZE = 10;
 const POST_SCRAPE_DEDUP_CHUNK_SIZE = 50;
-const DELETE_TAGS_CHUNK_SIZE = 30;
 
 type FileResponse = {
   metadata: {
@@ -322,3 +321,10 @@ export const backup = () =>
       throw new Error(`status ${status}`);
     }
   });
+
+export const getIncompleteFileCount = () => fetch("/api/remote/files/incomplete")
+  .then((res) => res.json())
+  .then(({ files, metadata }: FileResponse) => ({
+    count: files.length,
+    isExhausted: !!metadata.nexttoken
+  }));
