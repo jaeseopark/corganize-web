@@ -34,12 +34,26 @@ function b64EncodeUnicode(str: string) {
   );
 }
 
-const proxyFetch = (url: string, method: "POST" | "PATCH" | "DELETE", data: object) => {
+let bearerToken = "";
+
+const fetchWithBearerToken = (url: RequestInfo, init?: RequestInit) => {
+  const initt = init || { headers: {} };
+  const { headers, ...rest } = initt;
+  return fetch(url, {
+    ...rest,
+    headers: {
+      ...headers,
+      Authorization: `Bearer ${bearerToken}`
+    }
+  });
+}
+
+const proxyFetch = (url: RequestInfo, method: "POST" | "PATCH" | "DELETE", data: object) => {
   const headers = {
     "crg-method": method,
     "crg-body": b64EncodeUnicode(JSON.stringify(data)),
   };
-  return fetch(url, {
+  return fetchWithBearerToken(url, {
     mode: "cors",
     method: "GET",
     headers,
@@ -53,7 +67,7 @@ const getFilesById = (fileIds: string[]) => {
 
   const getByChunk = (fileIds: string[]) => {
     const params = new URLSearchParams({ fileIds: fileIds.join("|") });
-    return fetch("/api/remote/files?" + params)
+    return fetchWithBearerToken("/api/remote/files?" + params)
       .then((r) => r.json())
       .then(({ files }) => files);
   };
@@ -105,7 +119,7 @@ const nextPageGetter = (path: string, params: Dictionary<string>, callback: Retr
     }
     const finalPath = path + "?" + new URLSearchParams(clone);
 
-    const res = await fetch(finalPath, { mode: "cors" });
+    const res = await fetchWithBearerToken(finalPath, { mode: "cors" });
     const { metadata, files } = await res.json();
     return { metadata: metadata || {}, files: callback(files) };
   };
@@ -182,13 +196,13 @@ export const updateFile = (
 
 export const getLocalFilenames = (): Promise<string[]> => {
   // @ts-ignore
-  return fetch("/api/files")
+  return fetchWithBearerToken("/api/files")
     .then((res) => res.json())
     .then(({ files }) => files);
 };
 
 export const getGlobalTags = (): Promise<string[]> =>
-  fetch("/api/remote/tags")
+  fetchWithBearerToken("/api/remote/tags")
     .then((res) => res.json())
     .then(({ tags }) => tags);
 
@@ -207,7 +221,7 @@ export const scrapeAsync = (
       }));
 
   const scrapeSingleUrl = (url: string) =>
-    fetch("/api/scrape", {
+    fetchWithBearerToken("/api/scrape", {
       method: "POST",
       body: JSON.stringify({ url }),
       headers: {
@@ -233,7 +247,7 @@ export const scrapeAsync = (
 };
 
 export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]> =>
-  fetch("/api/scrape/literal", {
+  fetchWithBearerToken("/api/scrape/literal", {
     method: "POST",
     body: JSON.stringify({ urls }),
     headers: {
@@ -245,7 +259,7 @@ export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]>
 
 export const cutMerge: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut-merge`;
-  return fetch(url, {
+  return fetchWithBearerToken(url, {
     method: "POST",
     body: JSON.stringify({ segments: segmentsToTuples(segments) }),
     headers: {
@@ -268,7 +282,7 @@ export const cutMerge: SegmentProcessor = (fileid, segments) => {
 
 export const cut: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut`;
-  return fetch(url, {
+  return fetchWithBearerToken(url, {
     method: "POST",
     body: JSON.stringify({ segments: segmentsToTuples(segments) }),
     headers: {
@@ -295,7 +309,7 @@ export const reencode = ({
   dimensions?: number[];
 }): Promise<void> => {
   const url = `/api/files/${fileid}/reencode`;
-  return fetch(url, {
+  return fetchWithBearerToken(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -311,7 +325,7 @@ export const reencode = ({
 };
 
 export const getRemainingSpace = (): Promise<number> =>
-  fetch("/api/info")
+  fetchWithBearerToken("/api/info")
     .then((res) => res.json())
     .then(({ remainingSpace }) => remainingSpace);
 
@@ -322,9 +336,14 @@ export const backup = () =>
     }
   });
 
-export const getIncompleteFileCount = () => fetch("/api/remote/files/incomplete")
+export const getIncompleteFileCount = () => fetchWithBearerToken("/api/remote/files/incomplete")
   .then((res) => res.json())
   .then(({ files, metadata }: FileResponse) => ({
     count: files.length,
     isExhausted: !!metadata.nexttoken
   }));
+
+
+export const setBearerToken = (token: string) => {
+  bearerToken = token;
+};

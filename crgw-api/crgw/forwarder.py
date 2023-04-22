@@ -5,17 +5,15 @@ import os
 import requests
 from pydash import url as pydash_url
 
-ALLOWED_FWD_HEADERS = ("content-type", "order", "nexttoken", "crg-method", "crg-body")
+ALLOWED_FWD_HEADERS = ("content-type", "order", "nexttoken", "crg-method", "crg-body", "authorization")
 LOGGER = logging.getLogger("crgw-api")
 
 
 def forward_request(data, headers: dict, method: str, subpath: str, params: dict):
     assert "CRG_REMOTE_HOST" in os.environ
-    assert "CRG_REMOTE_APIKEY" in os.environ
 
     url = pydash_url(os.environ["CRG_REMOTE_HOST"], subpath)
     headers = {k.lower(): v for k, v in headers.items() if k.lower() in ALLOWED_FWD_HEADERS}
-    headers["apikey"] = os.environ["CRG_REMOTE_APIKEY"]
 
     if "crg-method" in headers:
         assert "crg-body" in headers

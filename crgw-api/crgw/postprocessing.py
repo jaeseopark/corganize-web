@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import List, Tuple, Callable, Optional
+from typing import List, Tuple, Callable
 
 from commmons import now_seconds, md5, merge
 from corganizeclient.client import CorganizeClient

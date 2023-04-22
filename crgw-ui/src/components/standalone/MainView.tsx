@@ -1,5 +1,6 @@
 import { SettingsIcon } from "@chakra-ui/icons";
 import { Box, Button, Center, Divider } from "@chakra-ui/react";
+import { GoogleLogin } from "@react-oauth/google";
 import cls from "classnames";
 import { useEffect, useState } from "react";
 
@@ -11,6 +12,8 @@ import { useGrid } from "providers/grid/hook";
 
 import { useNavv } from "hooks/navv";
 
+import { setBearerToken } from "clients/corganize";
+
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
 import FieldBar from "components/standalone/field/FieldBar";
@@ -21,6 +24,7 @@ import PageControl from "components/standalone/grid/PageControl";
 
 const MainView = () => {
   const { startSession } = useFileRepository();
+  const [authenticated, setAuthenticated] = useState(false);
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
@@ -43,7 +47,18 @@ const MainView = () => {
 
   let mainContent;
 
-  if (!sessionInfo) {
+  if (!authenticated) {
+    mainContent = (
+      <Center height="100vh" flexDir="column">
+        <GoogleLogin
+          onSuccess={({ credential }) => {
+            setBearerToken(credential!);
+            setAuthenticated(true);
+          }}
+        />
+      </Center>
+    );
+  } else if (!sessionInfo) {
     mainContent = (
       <Center height="100vh" flexDir="column">
         <SessionConfigurer setInfo={setSessionInfo} />

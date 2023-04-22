@@ -1,4 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import BlanketProvider from "providers/blanket/blanket";
 import BlanketPortal from "providers/blanket/portal";
@@ -10,6 +11,8 @@ import ToastProvider from "providers/toast/toast";
 import MainView from "components/standalone/MainView";
 
 import "./App.scss";
+
+const OAUTH_CLIENT_ID = "688638489712-l06b3q32dbrpv6m5uo170l4c4u5gmk7j.apps.googleusercontent.com";
 
 const App = () => (
   <div>
@@ -25,7 +28,9 @@ const AppWithProviders = () => (
       <ToastProvider>
         <BlanketProvider>
           <GridProvider>
-            <App />
+            <GoogleOAuthProvider clientId={OAUTH_CLIENT_ID}>
+              <App />
+            </GoogleOAuthProvider>
           </GridProvider>
         </BlanketProvider>
       </ToastProvider>

@@ -2172,6 +2172,11 @@
     prop-types "^15.7.2"
     tslib "^2.1.0"
 
+"@react-oauth/google@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@react-oauth/google/-/google-0.10.0.tgz#a06b1ac8877b623538d11111ec2792ab8017b794"
+  integrity sha512-uyMFAv3i3PdYeAuuyL8wJuzbKi5sxRuz+68DKPKvonK1IinIeEW1UibkipxHiaSEZxubQUSwcVuMgj8dbWw4+g==
+
 "@rollup/plugin-babel@^5.2.0":
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-babel/-/plugin-babel-5.3.1.tgz#04bc0608f4aa4b2e4b1aebf284344d0f68fda283"
