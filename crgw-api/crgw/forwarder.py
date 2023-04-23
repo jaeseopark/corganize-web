@@ -9,7 +9,7 @@ ALLOWED_FWD_HEADERS = ("content-type", "order", "nexttoken", "crg-method", "crg-
 LOGGER = logging.getLogger("crgw-api")
 
 
-def forward_request(data, headers: dict, method: str, subpath: str, params: dict):
+def forward_request(data, headers: dict, method: str, subpath: str, params: dict, cookies: dict):
     assert "CRG_REMOTE_HOST" in os.environ
 
     url = pydash_url(os.environ["CRG_REMOTE_HOST"], subpath)
@@ -23,5 +23,8 @@ def forward_request(data, headers: dict, method: str, subpath: str, params: dict
 
     LOGGER.info(f"{url=} {method=} {headers=} {params=}")
 
-    r = requests.request(url=url, method=method, data=data, headers=headers, params=params)
-    return r.content, r.status_code, dict(r.headers)
+    with requests.session() as s:
+        if cookies:
+            s.cookies.update(cookies)
+        r = s.request(url=url, method=method, data=data, headers=headers, params=params)
+        return r.content, r.status_code, dict(r.headers)

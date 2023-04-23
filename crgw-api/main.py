@@ -114,7 +114,8 @@ def fwd_remote(subpath: str):
         dict(freq.headers),
         freq.method,
         subpath,
-        dict(freq.args)
+        dict(freq.args),
+        freq.cookies
     )
 
     res = Response(content)
