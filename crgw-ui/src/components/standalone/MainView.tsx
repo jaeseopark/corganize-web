@@ -10,9 +10,10 @@ import { useBlanket } from "providers/blanket/hook";
 import { useFileRepository } from "providers/fileRepository/hook";
 import { useGrid } from "providers/grid/hook";
 
+import useAthentication from "hooks/authentication";
 import { useNavv } from "hooks/navv";
 
-import { setBearerToken } from "clients/corganize";
+import { login } from "clients/corganize";
 
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
@@ -24,11 +25,11 @@ import PageControl from "components/standalone/grid/PageControl";
 
 const MainView = () => {
   const { startSession } = useFileRepository();
-  const [authenticated, setAuthenticated] = useState(false);
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { navToAdmin } = useNavv();
+  const isAuthenticated = useAthentication();
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
@@ -47,15 +48,10 @@ const MainView = () => {
 
   let mainContent;
 
-  if (!authenticated) {
+  if (!isAuthenticated) {
     mainContent = (
       <Center height="100vh" flexDir="column">
-        <GoogleLogin
-          onSuccess={({ credential }) => {
-            setBearerToken(credential!);
-            setAuthenticated(true);
-          }}
-        />
+        <GoogleLogin onSuccess={({ credential }) => login(credential!)} />
       </Center>
     );
   } else if (!sessionInfo) {

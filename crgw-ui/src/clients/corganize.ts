@@ -34,29 +34,23 @@ function b64EncodeUnicode(str: string) {
   );
 }
 
-let bearerToken = "";
-
-const fetchWithBearerToken = (url: RequestInfo, init?: RequestInit) => {
-  const initt = init || { headers: {} };
-  const { headers, ...rest } = initt;
+const fetchWithCreds = (url: RequestInfo, init?: RequestInit) => {
   return fetch(url, {
-    ...rest,
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${bearerToken}`
-    }
+    ...init,
+    credentials: "same-origin"
   });
 }
 
-const proxyFetch = (url: RequestInfo, method: "POST" | "PATCH" | "DELETE", data: object) => {
-  const headers = {
+const proxyFetch = (url: RequestInfo, method: "GET" | "POST" | "PATCH" | "DELETE" = "GET", data: object = {}, init?: RequestInit) => {
+  let headers = {
     "crg-method": method,
     "crg-body": b64EncodeUnicode(JSON.stringify(data)),
   };
-  return fetchWithBearerToken(url, {
+  return fetchWithCreds(url, {
+    ...init,
     mode: "cors",
     method: "GET",
-    headers,
+    headers: { ...headers, ...init?.headers }
   });
 };
 
@@ -67,7 +61,7 @@ const getFilesById = (fileIds: string[]) => {
 
   const getByChunk = (fileIds: string[]) => {
     const params = new URLSearchParams({ fileIds: fileIds.join("|") });
-    return fetchWithBearerToken("/api/remote/files?" + params)
+    return fetchWithCreds("/api/remote/files?" + params)
       .then((r) => r.json())
       .then(({ files }) => files);
   };
@@ -119,7 +113,7 @@ const nextPageGetter = (path: string, params: Dictionary<string>, callback: Retr
     }
     const finalPath = path + "?" + new URLSearchParams(clone);
 
-    const res = await fetchWithBearerToken(finalPath, { mode: "cors" });
+    const res = await fetchWithCreds(finalPath, { mode: "cors" });
     const { metadata, files } = await res.json();
     return { metadata: metadata || {}, files: callback(files) };
   };
@@ -196,13 +190,13 @@ export const updateFile = (
 
 export const getLocalFilenames = (): Promise<string[]> => {
   // @ts-ignore
-  return fetchWithBearerToken("/api/files")
+  return fetchWithCreds("/api/files")
     .then((res) => res.json())
     .then(({ files }) => files);
 };
 
 export const getGlobalTags = (): Promise<string[]> =>
-  fetchWithBearerToken("/api/remote/tags")
+  fetchWithCreds("/api/remote/tags")
     .then((res) => res.json())
     .then(({ tags }) => tags);
 
@@ -221,7 +215,7 @@ export const scrapeAsync = (
       }));
 
   const scrapeSingleUrl = (url: string) =>
-    fetchWithBearerToken("/api/scrape", {
+    fetchWithCreds("/api/scrape", {
       method: "POST",
       body: JSON.stringify({ url }),
       headers: {
@@ -247,7 +241,7 @@ export const scrapeAsync = (
 };
 
 export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]> =>
-  fetchWithBearerToken("/api/scrape/literal", {
+  fetchWithCreds("/api/scrape/literal", {
     method: "POST",
     body: JSON.stringify({ urls }),
     headers: {
@@ -259,7 +253,7 @@ export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]>
 
 export const cutMerge: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut-merge`;
-  return fetchWithBearerToken(url, {
+  return fetchWithCreds(url, {
     method: "POST",
     body: JSON.stringify({ segments: segmentsToTuples(segments) }),
     headers: {
@@ -282,7 +276,7 @@ export const cutMerge: SegmentProcessor = (fileid, segments) => {
 
 export const cut: SegmentProcessor = (fileid, segments) => {
   const url = `/api/files/${fileid}/cut`;
-  return fetchWithBearerToken(url, {
+  return fetchWithCreds(url, {
     method: "POST",
     body: JSON.stringify({ segments: segmentsToTuples(segments) }),
     headers: {
@@ -309,7 +303,7 @@ export const reencode = ({
   dimensions?: number[];
 }): Promise<void> => {
   const url = `/api/files/${fileid}/reencode`;
-  return fetchWithBearerToken(url, {
+  return fetchWithCreds(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -325,7 +319,7 @@ export const reencode = ({
 };
 
 export const getRemainingSpace = (): Promise<number> =>
-  fetchWithBearerToken("/api/info")
+  fetchWithCreds("/api/info")
     .then((res) => res.json())
     .then(({ remainingSpace }) => remainingSpace);
 
@@ -336,14 +330,15 @@ export const backup = () =>
     }
   });
 
-export const getIncompleteFileCount = () => fetchWithBearerToken("/api/remote/files/incomplete")
+export const getIncompleteFileCount = () => proxyFetch("/api/remote/files/incomplete")
   .then((res) => res.json())
   .then(({ files, metadata }: FileResponse) => ({
     count: files.length,
     isExhausted: !!metadata.nexttoken
   }));
 
-
-export const setBearerToken = (token: string) => {
-  bearerToken = token;
-};
+export const login = (bearerToken: string) => fetchWithCreds("/api/remote/login", {
+  headers: {
+    Authorization: `Bearer ${bearerToken}`
+  }
+})
