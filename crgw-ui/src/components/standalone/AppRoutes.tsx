@@ -1,4 +1,5 @@
 import { Fragment, useEffect } from "react";
+import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { useBlanket } from "providers/blanket/hook";
@@ -16,8 +17,14 @@ type FileRenderer = ({ fileid }: { fileid: string }) => JSX.Element;
 
 const BlanketResetter = () => {
   const { exitBlanket } = useBlanket();
+  const [searchParams] = useSearchParams();
+  const [_, setCookies] = useCookies();
 
   useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      setCookies("crg-token", token);
+    }
     exitBlanket();
   }, []);
 
