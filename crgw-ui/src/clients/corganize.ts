@@ -37,11 +37,16 @@ function b64EncodeUnicode(str: string) {
 const fetchWithCreds = (url: RequestInfo, init?: RequestInit) => {
   return fetch(url, {
     ...init,
-    credentials: "same-origin"
+    credentials: "same-origin",
   });
-}
+};
 
-const proxyFetch = (url: RequestInfo, method: "GET" | "POST" | "PATCH" | "DELETE" = "GET", data: object = {}, init?: RequestInit) => {
+const proxyFetch = (
+  url: RequestInfo,
+  method: "GET" | "POST" | "PATCH" | "DELETE" = "GET",
+  data: object = {},
+  init?: RequestInit
+) => {
   let headers = {
     "crg-method": method,
     "crg-body": b64EncodeUnicode(JSON.stringify(data)),
@@ -50,7 +55,7 @@ const proxyFetch = (url: RequestInfo, method: "GET" | "POST" | "PATCH" | "DELETE
     ...init,
     mode: "cors",
     method: "GET",
-    headers: { ...headers, ...init?.headers }
+    headers: { ...headers, ...init?.headers },
   });
 };
 
@@ -138,11 +143,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-  ({
-    ...files.find((f) => f.fileid === fileid),
-    lastupdated: getPosixSeconds(),
-    dateactivated: getPosixSeconds(),
-  } as CorganizeFile);
+    ({
+      ...files.find((f) => f.fileid === fileid),
+      lastupdated: getPosixSeconds(),
+      dateactivated: getPosixSeconds(),
+    } as CorganizeFile);
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -330,15 +335,17 @@ export const backup = () =>
     }
   });
 
-export const getIncompleteFileCount = () => proxyFetch("/api/remote/files/incomplete")
-  .then((res) => res.json())
-  .then(({ files, metadata }: FileResponse) => ({
-    count: files.length,
-    isExhausted: !!metadata.nexttoken
-  }));
+export const getIncompleteFileCount = () =>
+  proxyFetch("/api/remote/files/incomplete")
+    .then((res) => res.json())
+    .then(({ files, metadata }: FileResponse) => ({
+      count: files.length,
+      isExhausted: !!metadata.nexttoken,
+    }));
 
-export const login = (bearerToken: string) => fetchWithCreds("/api/remote/login", {
-  headers: {
-    Authorization: `Bearer ${bearerToken}`
-  }
-})
+export const login = (bearerToken: string) =>
+  fetchWithCreds("/api/remote/login", {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  });

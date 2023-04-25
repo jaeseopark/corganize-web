@@ -1,4 +1,4 @@
-import { useCookies } from "react-cookie"
+import { useCookies } from "react-cookie";
 
 /**
  * Usage:
@@ -6,8 +6,8 @@ import { useCookies } from "react-cookie"
  * @returns whether or not the user is authenticated
  */
 const useAthentication = () => {
-    const [cookies] = useCookies(["crg-token"]);
-    return !!cookies["crg-token"];
+  const [cookies] = useCookies(["crg-token"]);
+  return !!cookies["crg-token"];
 };
 
 export default useAthentication;
