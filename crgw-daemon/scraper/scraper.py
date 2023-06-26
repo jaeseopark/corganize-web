@@ -4,8 +4,11 @@ from typing import Iterable
 import requests
 from commmons import init_logger_with_handlers
 from corganizeclient.client import CorganizeClient
+from pydash import chunk
 
+CHUNK_SIZE = 100
 logger = logging.getLogger("scraper")
+
 
 def run_scraper(config: dict):
     cc = CorganizeClient(**config["server"])
@@ -35,8 +38,9 @@ def run_scraper(config: dict):
     unfiltered = scrape()
     filtered = filt(unfiltered)
 
-    result = cc.create_files(list(filtered))
-    logger.info(f"{len(result['created'])=} {len(result['skipped'])=}")
+    for i, page in enumerate(chunk(list(filtered), CHUNK_SIZE)):
+        result = cc.create_files(list(page))
+        logger.info(f"{i=} {len(result['created'])=} {len(result['skipped'])=}")
 
 
 def init_scraper(config: dict):
