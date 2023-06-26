@@ -17,7 +17,7 @@ services:
       context: ./crgw-ui
       dockerfile: Dockerfile
     working_dir: /app
-    command: nginx -g daemon off;
+    command: nginx -g 'daemon off';
     environment:
       TZ: ${TIMEZONE}
   api:
