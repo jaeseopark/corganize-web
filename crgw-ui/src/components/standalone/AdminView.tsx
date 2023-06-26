@@ -3,13 +3,15 @@ import {
   Box,
   Button,
   HStack,
+  PopoverTrigger as OrigPopoverTrigger,
   Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
   PopoverContent,
-  PopoverTrigger,
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { PopoverArrow, PopoverBody, PopoverCloseButton } from "@chakra-ui/react";
 
 import { useToast } from "providers/toast/hook";
 
@@ -23,6 +25,8 @@ import Retagger from "components/reusable/Retagger";
 import LiteralScrapePanel from "components/standalone/scrape/LiteralScrapePanel";
 
 import "./AdminView.scss";
+
+const PopoverTrigger: React.FC<{ children: React.ReactNode }> = OrigPopoverTrigger;
 
 const AdminView = () => {
   const { enqueueSuccess, enqueueAsync } = useToast();
