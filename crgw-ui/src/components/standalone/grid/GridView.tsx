@@ -18,7 +18,7 @@ const GridView = () => {
   const {
     fileProps: { files },
   } = useGrid();
-  const { mostRecentFile, toggleActivation } = useFileRepository();
+  const { mostRecentFile, toggleActivation, toggleSessionBookmark } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { enqueueSuccess } = useToast();
   const gridRef: any = useRef<HTMLDivElement | null>(null);
@@ -80,6 +80,11 @@ const GridView = () => {
       if (fileAtIndex) {
         openFile(fileAtIndex);
       }
+    } else if (key === "`") {
+      toggleSessionBookmark(mostRecentFile).then((bookmarked) => {
+        const message = `Bookmark ${bookmarked ? "set" : "removed"}`;
+        enqueueSuccess({ message });
+      });
     }
   };
 

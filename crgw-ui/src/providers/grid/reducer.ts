@@ -1,7 +1,6 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { applyPrefilter, createMegaFilter } from "providers/grid/filter";
-import { PRESET_TAG_VIEW } from "providers/grid/presets";
 import { createMegaComparer } from "providers/grid/sort";
 import { Action, Page, State } from "providers/grid/types";
 
@@ -106,15 +105,6 @@ export const gridReducer = (state: State, action: Action): State => {
         ...state,
         filters: action.payload.filters,
         sorts: action.payload.sorts,
-      });
-    }
-    case "SET_TAG_VIEW": {
-      const { filters, sorts } = PRESET_TAG_VIEW;
-      return recompute({
-        ...state,
-        prefilter: action.payload,
-        filters,
-        sorts,
       });
     }
     default:

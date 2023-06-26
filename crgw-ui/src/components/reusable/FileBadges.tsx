@@ -73,9 +73,21 @@ const BADGE_GENERATION_MAP: Map<BadgeKey, (f: CorganizeFile) => Badge[]> = new M
     (f) => [
       {
         value: getActivationEmoji(f),
-        styleClasses: [{ active: !!f.dateactivated, inactive: !f.dateactivated }],
+        styleClasses: ["emoji", { active: !!f.dateactivated, inactive: !f.dateactivated }],
       },
     ],
+  ],
+  [
+    "bookmarked",
+    (f) => {
+      if (!f.bookmarked) return [];
+      return [
+        {
+          value: "📌",
+          styleClasses: ["emoji"],
+        },
+      ];
+    },
   ],
   [
     "highlights",
@@ -84,7 +96,7 @@ const BADGE_GENERATION_MAP: Map<BadgeKey, (f: CorganizeFile) => Badge[]> = new M
       return [
         {
           value: "⭐",
-          styleClasses: ["highlighted"],
+          styleClasses: ["emoji"],
         },
       ];
     },

@@ -119,6 +119,12 @@ export const useFileRepository = () => {
 
   const loadFilesByTag = (tag: string) => retrieveFiles([tag], addFiles);
 
+  const toggleSessionBookmark = (file: CorganizeFile) => new Promise<boolean>((resolve) => {
+    const bookmarked: boolean = !file.bookmarked;
+    dispatch!({ type: "UPDATE", payload: { ...file, bookmarked } });
+    resolve(bookmarked);
+  })
+
   return {
     files,
     isMostRecentFile,
@@ -136,5 +142,6 @@ export const useFileRepository = () => {
       cut: processSegments(client.cut),
       reencode: client.reencode,
     },
+    toggleSessionBookmark
   };
 };

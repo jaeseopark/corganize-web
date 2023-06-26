@@ -75,19 +75,13 @@ const PRESET_REVIEW: Preset = {
   ],
 };
 
-export const PRESET_TAG_VIEW: Preset = {
-  name: "tag",
+const PRESET_BOOKMARKED: Preset = {
+  name: "Bookmarked",
   filters: [
     {
       field: Fields.fieldNew,
       boolean: {
-        value: "maybe",
-      },
-    },
-    {
-      field: Fields.fieldDateActivated,
-      boolean: {
-        value: "maybe",
+        value: "unchecked",
       },
     },
     {
@@ -97,13 +91,31 @@ export const PRESET_TAG_VIEW: Preset = {
         options: [],
       },
     },
+    {
+      field: Fields.fieldDateActivated,
+      boolean: {
+        value: "checked",
+      },
+    },
+    {
+      field: Fields.fieldTags,
+      boolean: {
+        value: "maybe",
+      },
+    },
+    {
+      field: Fields.fieldBookmark,
+      boolean: {
+        value: "checked"
+      }
+    }
   ],
   sorts: [
     {
       field: Fields.fieldLastOpened,
-      direction: "desc",
+      direction: "asc",
     },
   ],
 };
 
-export const EXPOSED_PRESETS: Preset[] = [PRESET_DEFAULT, PRESET_REVIEW];
+export const EXPOSED_PRESETS: Preset[] = [PRESET_DEFAULT, PRESET_REVIEW, PRESET_BOOKMARKED];

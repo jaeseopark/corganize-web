@@ -27,6 +27,7 @@ export type CorganizeFile = {
   isnewfile: boolean;
   streamingurl?: string;
   thumbnailurl?: string;
+  bookmarked: boolean;
 };
 
 export const getActivationEmoji = (f: CorganizeFile) => (!!f.dateactivated ? "👍" : "👎");

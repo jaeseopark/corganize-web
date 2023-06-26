@@ -39,7 +39,7 @@ const getRendererByMimetype = (mimetype?: string) => {
 
 const FileView = ({ fileid }: { fileid: string }) => {
   const { upsertUserAction } = useBlanket();
-  const { findById, markAsOpened, toggleActivation } = useFileRepository();
+  const { findById, markAsOpened, toggleActivation, toggleSessionBookmark } = useFileRepository();
   const [content, setContent] = useState<JSX.Element>();
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
@@ -125,6 +125,11 @@ const FileView = ({ fileid }: { fileid: string }) => {
       } else {
         handle.enter();
       }
+    } else if (key === "`") {
+      toggleSessionBookmark(file).then((bookmarked) => {
+        const message = `Bookmark ${bookmarked ? "set" : "removed"}`;
+        enqueueSuccess({ message });
+      });
     }
   };
 

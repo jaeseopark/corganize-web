@@ -42,6 +42,13 @@ const fieldTags: Field = {
   filterType: "boolean",
 };
 
+const fieldBookmark: Field = {
+  displayName: "Bookmark",
+  key: "bookmarked",
+  "sortType": "boolean",
+  filterType: "boolean"
+}
+
 export default {
   fieldDateActivated,
   fieldNew,
@@ -49,4 +56,5 @@ export default {
   fieldMimetype,
   fieldSize,
   fieldTags,
+  fieldBookmark,
 };
