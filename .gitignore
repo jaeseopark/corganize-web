@@ -114,3 +114,8 @@ runner.py
 crgwatch/
 watch/
 config.yml
+crgw-daemon/daemon.egg-info/top_level.txt
+crgw-daemon/daemon.egg-info/SOURCES.txt
+crgw-daemon/daemon.egg-info/requires.txt
+crgw-daemon/daemon.egg-info/PKG-INFO
+crgw-daemon/daemon.egg-info/dependency_links.txt

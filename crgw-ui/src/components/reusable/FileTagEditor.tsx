@@ -91,6 +91,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
    */
   useEffect(() => {
     madFocusByClassName("react-tags__search-input");
+    return exposeHotkey; // expose the hot key when the component gets unmounted.
   }, []);
 
   /**
