@@ -13,13 +13,11 @@ services:
     environment:
       TZ: ${TIMEZONE}
   ui:
-    image: node:16.13.1
+    build:
+      context: ./crgw-ui
+      dockerfile: Dockerfile
     working_dir: /app
-    command: >
-      sh -c "yarn install &&
-             yarn start-port80"
-    volumes:
-      - ./crgw-ui:/app
+    command: nginx -g 'daemon off';
     environment:
       TZ: ${TIMEZONE}
   api:
