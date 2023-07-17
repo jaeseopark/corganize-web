@@ -68,6 +68,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
       <option>active</option>
       <option>recent</option>
       <option>dense</option>
+      <option>bookmarked</option>
     </select>
   );
 
