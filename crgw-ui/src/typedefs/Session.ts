@@ -1,4 +1,4 @@
-export type FileEndpoint = "stale" | "active" | "recent" | "dense";
+export type FileEndpoint = "stale" | "active" | "recent" | "dense" | "bookmarked";
 
 export type SessionInfo = {
   endpoint: FileEndpoint;

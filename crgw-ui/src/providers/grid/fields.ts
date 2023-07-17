@@ -44,7 +44,7 @@ const fieldTags: Field = {
 
 const fieldBookmark: Field = {
   displayName: "Bookmark",
-  key: "bookmarked",
+  key: "bookmarkexpiry",
   "sortType": "boolean",
   filterType: "boolean"
 }

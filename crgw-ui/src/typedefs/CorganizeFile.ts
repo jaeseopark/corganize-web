@@ -22,12 +22,12 @@ export type CorganizeFile = {
   lastopened?: number;
   multimedia?: Multimedia;
   tags?: string[];
+  bookmarkexpiry?: number;
 
   // UI-only fields
   isnewfile: boolean;
   streamingurl?: string;
   thumbnailurl?: string;
-  bookmarked: boolean;
 };
 
 export const getActivationEmoji = (f: CorganizeFile) => (!!f.dateactivated ? "👍" : "👎");

@@ -126,7 +126,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
         handle.enter();
       }
     } else if (key === "`") {
-      toggleSessionBookmark(file).then((bookmarked) => {
+      toggleSessionBookmark(fileid).then((bookmarked) => {
         const message = `Bookmark ${bookmarked ? "set" : "removed"}`;
         enqueueSuccess({ message });
       });
