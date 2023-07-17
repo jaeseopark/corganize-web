@@ -78,7 +78,7 @@ const BADGE_GENERATION_MAP: Map<BadgeKey, (f: CorganizeFile) => Badge[]> = new M
     ],
   ],
   [
-    "bookmarked",
+    "bookmarkexpiry",
     (f) => {
       if (!f.bookmarkexpiry) return [];
       return [
