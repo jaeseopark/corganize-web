@@ -81,7 +81,7 @@ const GridView = () => {
         openFile(fileAtIndex);
       }
     } else if (key === "`") {
-      toggleSessionBookmark(mostRecentFile).then((bookmarked) => {
+      toggleSessionBookmark(mostRecentFile.fileid).then((bookmarked) => {
         const message = `Bookmark ${bookmarked ? "set" : "removed"}`;
         enqueueSuccess({ message });
       });

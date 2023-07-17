@@ -11,6 +11,8 @@ import * as client from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
 
+const ONE_DAY = 86400;
+
 const discoveredFileids = new Set<string>();
 
 const discover = (files: CorganizeFile[]) =>
@@ -119,11 +121,19 @@ export const useFileRepository = () => {
 
   const loadFilesByTag = (tag: string) => retrieveFiles([tag], addFiles);
 
-  const toggleSessionBookmark = (file: CorganizeFile) => new Promise<boolean>((resolve) => {
-    const bookmarked: boolean = !file.bookmarked;
-    dispatch!({ type: "UPDATE", payload: { ...file, bookmarked } });
-    resolve(bookmarked);
-  })
+  const toggleBookmark = (fileid: string) => {
+    const file = findById(fileid);
+    const isExpired = !file.bookmarkexpiry;
+    const newBookmarkExpiry = isExpired ? getPosixSeconds() + ONE_DAY : 0;
+
+    // Note: Toggling is one use case where the entire file has to be sent to the server.
+    const updatePayload = {
+      ...file,
+      bookmarkexpiry: newBookmarkExpiry,
+    };
+
+    return updateFile(updatePayload).then(() => newBookmarkExpiry > getPosixSeconds());
+  };
 
   return {
     files,
@@ -142,6 +152,6 @@ export const useFileRepository = () => {
       cut: processSegments(client.cut),
       reencode: client.reencode,
     },
-    toggleSessionBookmark
+    toggleSessionBookmark: toggleBookmark
   };
 };
