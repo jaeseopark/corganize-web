@@ -240,6 +240,7 @@ export const scrapeAsync = (
       },
     })
       .then((res) => res.json())
+      .then(({ files }) => files);
 
   const selttled = Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
     .then((results) =>
@@ -262,7 +263,8 @@ export const scrapeHtmlAsync = (html: string) => {
       "Content-Type": "application/json",
     },
   })
-    .then((res) => res.json());
+    .then((res) => res.json())
+    .then(({ files }) => files);
 
   return postprocessScarpePromise(promise);
 }
