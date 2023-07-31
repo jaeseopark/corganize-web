@@ -143,11 +143,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-    ({
-      ...files.find((f) => f.fileid === fileid),
-      lastupdated: getPosixSeconds(),
-      dateactivated: getPosixSeconds(),
-    } as CorganizeFile);
+  ({
+    ...files.find((f) => f.fileid === fileid),
+    lastupdated: getPosixSeconds(),
+    dateactivated: getPosixSeconds(),
+  } as CorganizeFile);
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -205,9 +205,11 @@ export const getGlobalTags = (): Promise<string[]> =>
     .then((res) => res.json())
     .then(({ tags }) => tags);
 
-export const scrapeAsync = (
-  ...urls: string[]
-): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> => {
+const postprocessScarpePromise = (promise: Promise<CorganizeFile[]>): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> => {
+  const ignoreFilesWithoutNames = (files: CorganizeFile[]): CorganizeFile[] => files.filter(f => f.filename);
+
+  const populateMissingFields = (files: CorganizeFile[]): CorganizeFile[] => files.map(f => ({ ...f, storageservice: "None" }));
+
   const dedupFilesById = (files: CorganizeFile[]) =>
     files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
 
@@ -219,6 +221,16 @@ export const scrapeAsync = (
         discarded: files.filter((f) => fileIds.has(f.fileid)),
       }));
 
+  return promise
+    .then(ignoreFilesWithoutNames)
+    .then(populateMissingFields)
+    .then(dedupFilesById)
+    .then(dedupAgainstDatabase);
+};
+
+export const scrapeAsync = (
+  ...urls: string[]
+) => {
   const scrapeSingleUrl = (url: string) =>
     fetchWithCreds("/api/scrape", {
       method: "POST",
@@ -228,11 +240,8 @@ export const scrapeAsync = (
       },
     })
       .then((res) => res.json())
-      .then(({ files }: { files: CorganizeFile[] }) =>
-        files.filter((f) => f.filename).map((f) => ({ ...f, storageservice: "None" }))
-      );
 
-  return Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
+  const selttled = Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
     .then((results) =>
       results.reduce((acc, result) => {
         if (result.status === "fulfilled") {
@@ -241,9 +250,22 @@ export const scrapeAsync = (
         return acc;
       }, new Array<CorganizeFile>())
     )
-    .then(dedupFilesById)
-    .then(dedupAgainstDatabase);
-};
+
+  return postprocessScarpePromise(selttled);
+}
+
+export const scrapeHtmlAsync = (html: string) => {
+  const promise = fetchWithCreds("/api/scrape", {
+    method: "POST",
+    body: JSON.stringify({ html }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => res.json());
+
+  return postprocessScarpePromise(promise);
+}
 
 export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]> =>
   fetchWithCreds("/api/scrape/literal", {

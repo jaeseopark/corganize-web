@@ -81,7 +81,7 @@ def scrapeee():
     body = freq.get_json()
     if "html" in body:
         LOGGER.info(f"scraping html")
-        files = list(scrape(Watchlist(html=body.get("html"))))
+        files = list(scrape(Watchlist(url="", html=body.get("html"))))
     else:
         url = body.get("url").lstrip("vpr://")
         LOGGER.info(f"scraping {url=}")
