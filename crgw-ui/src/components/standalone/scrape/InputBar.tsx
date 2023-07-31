@@ -159,7 +159,7 @@ const ScrapeInputBar = ({
           </RadioGroup>
           <Flex direction="row" className="form-row">
             {getTextInputElement()}
-            <Button className="scrape-button" type="submit" disabled={disabled || !url}>
+            <Button className="scrape-button" type="submit" disabled={disabled || (!url && !html)}>
               Scrape
             </Button>
             <AddButtonGroup
