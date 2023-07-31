@@ -4,6 +4,7 @@ from typing import List
 
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
+from hypersquirrel.core import Watchlist
 from hypersquirrel.entry import create_watchlist, scrape, scrape_literal_urls
 from ytdlwrapper.ytdlpscrape import scrape_ytdl
 
@@ -78,13 +79,17 @@ def health_info():
 @app.post("/scrape")
 def scrapeee():
     body = freq.get_json()
-    url = body.get("url").lstrip("vpr://")
-    LOGGER.info(f"scraping {url=}")
-    max_items = body.get("max_items")
-    files = list(scrape(create_watchlist(url, max_items)))
-    if len(files) == 0:
-        LOGGER.info("Scraped 0 files. Trying scrape_ytdl...")
-        files = list(scrape_ytdl(url))
+    if "html" in body:
+        LOGGER.info(f"scraping html")
+        files = list(scrape(Watchlist(url="", html=body.get("html"))))
+    else:
+        url = body.get("url").lstrip("vpr://")
+        LOGGER.info(f"scraping {url=}")
+        max_items = body.get("max_items")
+        files = list(scrape(create_watchlist(url, max_items)))
+        if len(files) == 0:
+            LOGGER.info("Scraped 0 files. Trying scrape_ytdl...")
+            files = list(scrape_ytdl(url))
     return dict(files=files), 200
 
 @app.post("/scrape/literal")

@@ -30,6 +30,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   const mainDivRef = useRef<HTMLDivElement | null>(null);
 
   const [url, setUrl] = useState<string>(defaultUrls ? defaultUrls.join(",") : "");
+  const [html, setHtml] = useState<string>();
 
   const scrape = useCallback(
     (event?: Event) => {
@@ -39,10 +40,15 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
 
       setProcessing(true);
 
-      const urls = (url as string).split(",");
+      let scrapePromise;
+      if (html) {
+        scrapePromise = client.scrapeHtmlAsync(html);
+      } else {
+        const urls = (url as string).split(",");
+        scrapePromise = client.scrapeAsync(...urls);
+      }
 
-      client
-        .scrapeAsync(...urls)
+      scrapePromise
         .then(({ available, discarded }) => {
           setRawScrapeCount(available.length + discarded.length);
 
@@ -61,7 +67,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         .catch(setError)
         .finally(() => setProcessing(false));
     },
-    [isProcessing, url]
+    [isProcessing, url, html]
   );
 
   useEffect(() => {
@@ -131,6 +137,8 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         createFilesFromCards={createFilesFromCards}
         url={url}
         setUrl={setUrl}
+        html={html}
+        setHtml={setHtml}
         rawScrapeCount={rawScrapeCount}
         scrape={scrape}
       />

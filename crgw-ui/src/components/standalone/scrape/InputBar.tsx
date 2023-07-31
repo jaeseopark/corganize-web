@@ -1,6 +1,19 @@
-import { Badge, Button, ButtonGroup, Flex, HStack, Select, Spacer, VStack } from "@chakra-ui/react";
+import {
+  Badge,
+  Button,
+  ButtonGroup,
+  Flex,
+  HStack,
+  Radio,
+  RadioGroup,
+  Select,
+  Spacer,
+  Stack,
+  Textarea,
+  VStack,
+} from "@chakra-ui/react";
 import cls from "classnames";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { useBlanket } from "providers/blanket/hook";
 
@@ -9,6 +22,7 @@ import { sample } from "utils/arrayUtils";
 import { CARD_STATUS, Card } from "components/standalone/scrape/ScrapePanelCardView";
 
 const BULK_ADD_OPTIONS = [10, 25, 50, 9999];
+type ScrapeMode = "URL" | "HTML";
 
 type ScrapeInputBarProps = {
   disabled: boolean;
@@ -16,6 +30,8 @@ type ScrapeInputBarProps = {
   createFilesFromCards: (cards: Card[]) => void;
   url: string | undefined | null;
   setUrl: (url: string) => void;
+  html: string | undefined | null;
+  setHtml: (url: string) => void;
   scrape: () => void;
   rawScrapeCount: number;
 };
@@ -91,11 +107,14 @@ const ScrapeInputBar = ({
   createFilesFromCards,
   url,
   setUrl,
+  html,
+  setHtml,
   scrape,
   rawScrapeCount,
 }: ScrapeInputBarProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
   const filterCards = (status: string) => cards.filter((c) => c.status === status);
+  const [mode, setMode] = useState<ScrapeMode>("URL");
 
   const countByStatus = Array.from(new Set(cards.map((c) => c.status)))
     .sort()
@@ -108,22 +127,39 @@ const ScrapeInputBar = ({
       { status: "Scraped", length: rawScrapeCount }
     );
 
+  const getTextInputElement = () => {
+    if (mode == "HTML") {
+      return (
+        <Textarea defaultValue={html || ""} onChange={({ target: { value } }) => setHtml(value)} />
+      );
+    }
+    return (
+      <input
+        required
+        type="text"
+        disabled={disabled}
+        placeholder="Use <p1-p2> to scrape multiple pages"
+        onChange={(e) => setUrl(e.target.value)}
+        value={url as string}
+        onFocus={protectHotkey}
+        onBlur={exposeHotkey}
+      />
+    );
+  };
+
   return (
     <div className="control-bar">
       <form onSubmit={scrape}>
         <VStack>
+          <RadioGroup onChange={(value: ScrapeMode) => setMode(value)} value={mode}>
+            <Stack direction="row">
+              <Radio value="URL">URL</Radio>
+              <Radio value="HTML">HTML</Radio>
+            </Stack>
+          </RadioGroup>
           <Flex direction="row" className="form-row">
-            <input
-              required
-              type="text"
-              disabled={disabled}
-              placeholder="Use <p1-p2> to scrape multiple pages"
-              onChange={(e) => setUrl(e.target.value)}
-              value={url as string}
-              onFocus={protectHotkey}
-              onBlur={exposeHotkey}
-            />
-            <Button className="scrape-button" type="submit" disabled={disabled || !url}>
+            {getTextInputElement()}
+            <Button className="scrape-button" type="submit" disabled={disabled || (!url && !html)}>
               Scrape
             </Button>
             <AddButtonGroup
