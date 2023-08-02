@@ -12,6 +12,7 @@ import ToastPortal from "providers/toast/portal";
 import { useNavv } from "hooks/navv";
 
 import { madFocus } from "utils/elementUtils";
+import { getKeyDownLookupKey } from "utils/keyUtils";
 
 import FileTagEditor from "components/reusable/FileTagEditor";
 import GalleryView from "components/standalone/fileview/gallery/GalleryView";
@@ -44,7 +45,7 @@ const FileView = ({ fileid }: { fileid: string }) => {
   const handle = useFullScreenHandle();
   const { enqueueSuccess, enqueueError } = useToast();
   const contentRef = useRef<any>(null);
-  const { navScrape, navJson } = useNavv();
+  const { navScrape, navJson, navBlankScrape } = useNavv();
   const {
     isOpen: isTagPopoverOpen,
     onToggle: onTagPopoverToggle,
@@ -103,33 +104,35 @@ const FileView = ({ fileid }: { fileid: string }) => {
     });
   }, []);
 
-  const onKeyDown = (e: any) => {
-    if (e.shiftKey || e.ctrlKey || e.metaKey) {
-      return;
+  const toggleFullScreen = () => {
+    if (handle.active) {
+      handle.exit();
+    } else {
+      handle.enter();
     }
+  };
 
-    const key = e.key.toLowerCase();
-    if (key === "w") {
-      toggleActivationWithToast();
-    } else if (key === "s") {
-      navScrape(file);
-    } else if (key === "j") {
-      navJson(file);
-    } else if (key === "l") {
-      onTagPopoverToggle();
-    } else if (key === "u") {
-      window.open(file.sourceurl, "_blank");
-    } else if (key === "f") {
-      if (handle.active) {
-        handle.exit();
-      } else {
-        handle.enter();
-      }
-    } else if (key === "`") {
-      toggleSessionBookmark(fileid).then((bookmarked) => {
-        const message = `Bookmark ${bookmarked ? "set" : "removed"}`;
-        enqueueSuccess({ message });
-      });
+  const toggleSessionBookmarkOnThisFile = () =>
+    toggleSessionBookmark(fileid).then((bookmarked) => {
+      const message = `Bookmark ${bookmarked ? "set" : "removed"}`;
+      enqueueSuccess({ message });
+    });
+
+  const keyMapping: { [key: string]: () => void } = {
+    "^..s": navBlankScrape,
+    "...f": toggleFullScreen,
+    "...l": onTagPopoverToggle,
+    "...w": toggleActivationWithToast,
+    "...`": toggleSessionBookmarkOnThisFile,
+    "...j": () => navJson(file),
+    "...s": () => navScrape(file),
+    "...u": () => window.open(file.sourceurl, "_blank"),
+  };
+
+  const onKeyDown = (e: any) => {
+    const func = keyMapping[getKeyDownLookupKey(e)];
+    if (func) {
+      func();
     }
   };
 
