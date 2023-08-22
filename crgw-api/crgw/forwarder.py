@@ -18,7 +18,7 @@ class catchtime:
     def __exit__(self, type, value, traceback):
         self.time = perf_counter() - self.time
         self.readout = f'api forward elapsed_time={self.time:.3f}'
-        print(self.readout)
+        LOGGER.info(self.readout)
 
 
 def forward_request(data, headers: dict, method: str, subpath: str, params: dict, cookies: dict):
