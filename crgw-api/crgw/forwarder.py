@@ -1,12 +1,24 @@
 import base64
 import logging
 import os
+from time import perf_counter
 
 import requests
 from pydash import url as pydash_url
 
 ALLOWED_FWD_HEADERS = ("content-type", "order", "nexttoken", "crg-method", "crg-body", "authorization")
 LOGGER = logging.getLogger("crgw-api")
+
+
+class catchtime:
+    def __enter__(self):
+        self.time = perf_counter()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.time = perf_counter() - self.time
+        self.readout = f'api forward elapsed_time={self.time:.3f}'
+        print(self.readout)
 
 
 def forward_request(data, headers: dict, method: str, subpath: str, params: dict, cookies: dict):
@@ -23,8 +35,9 @@ def forward_request(data, headers: dict, method: str, subpath: str, params: dict
 
     LOGGER.info(f"{url=} {method=} {headers=} {params=}")
 
-    with requests.session() as s:
-        if cookies:
-            s.cookies.update(cookies)
-        r = s.request(url=url, method=method, data=data, headers=headers, params=params)
-        return r.content, r.status_code, dict(r.headers)
+    with catchtime():
+        with requests.session() as s:
+            if cookies:
+                s.cookies.update(cookies)
+            r = s.request(url=url, method=method, data=data, headers=headers, params=params)
+            return r.content, r.status_code, dict(r.headers)
