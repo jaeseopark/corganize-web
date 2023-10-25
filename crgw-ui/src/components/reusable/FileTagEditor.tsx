@@ -61,8 +61,13 @@ const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
 
 const buildAutocompleteIndex = () =>
   Array.from(globalTags).reduce((acc, next) => {
+    if (next.length === 1) {
+      return acc;
+    }
+
     acc[next] = [next];
     const normalized = normalizeForAutocomplete(next);
+
     if (!(normalized in acc)) {
       acc[normalized] = [];
     }
