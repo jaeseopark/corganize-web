@@ -42,9 +42,6 @@ def run_cleaner(config: dict):
 
     cc = CorganizeClientWrapper(host=host, apikey=apikey)
     cleanup_local_files(config["data"]["path"], cc)
-    
-    r = requests.post(f"{host}/files/cleanup", headers=dict(apikey=apikey))
-    logger.info(f"file cleanup {r.status_code=} {r.text=}")
 
     r = requests.post(f"{host}/tags/cleanup", headers=dict(apikey=apikey))
     logger.info(f"tag cleanup {r.status_code=} {r.text=}")
