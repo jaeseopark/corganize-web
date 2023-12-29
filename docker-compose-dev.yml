@@ -53,6 +53,6 @@ services:
       CRG_REMOTE_HOST: ${CRG_REMOTE_HOST}
       CRG_REMOTE_APIKEY: ${CRG_REMOTE_APIKEY}
     volumes:
-      - ${CONFIG_PATH}:/config/config.yml
+      - ${CONFIG_PATH}:/config/config.yml:ro
       - ${DATA_MNT_DIR}:/mnt
       - ${LOG_DIR}:/var/log/crgw-daemon
