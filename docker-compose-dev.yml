@@ -5,6 +5,7 @@ services:
     volumes:
       - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ${DATA_MNT_DIR}/data:/data:ro
+    user: 0:0
     ports:
       - "5823:80"
     depends_on:
