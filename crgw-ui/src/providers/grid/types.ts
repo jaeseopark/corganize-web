@@ -9,6 +9,7 @@ export type SortType = "number" | "boolean" | "string";
 export type FilterType = "number" | "boolean" | "dropdown";
 export type Field = {
   key: keyof CorganizeFile;
+  nestedKey?: string;
   displayName: string;
   filterType: FilterType;
   sortType: SortType;

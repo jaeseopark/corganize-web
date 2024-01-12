@@ -49,6 +49,14 @@ const fieldBookmark: Field = {
   filterType: "boolean"
 }
 
+const fieldDuration: Field = {
+  displayName: "Duration",
+  key: "multimedia",
+  nestedKey: "duration",
+  sortType: "number",
+  filterType: "number",
+};
+
 export default {
   fieldDateActivated,
   fieldNew,
@@ -57,4 +65,5 @@ export default {
   fieldSize,
   fieldTags,
   fieldBookmark,
+  fieldDuration
 };

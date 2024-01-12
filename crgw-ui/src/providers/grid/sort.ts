@@ -7,7 +7,11 @@ const DEFAULT_COMPARER = (a: CorganizeFile, b: CorganizeFile): number =>
 
 const getFieldValue = (file: CorganizeFile, fld: Field) => {
   if (fld.sortType === "number") {
-    return Number(file[fld.key]) || 0;
+    if (!fld.nestedKey) {
+      return Number(file[fld.key]) || 0;
+    }
+    const obj = file[fld.key] || {};
+    return Number((obj as Record<string, number>)[fld.nestedKey]) || 0
   } else if (fld.sortType === "boolean") {
     return Boolean(file[fld.key]) || false;
   } else if (fld.sortType === "string") {
