@@ -230,8 +230,10 @@ def reencode(fileid: str, dimensions: List[int] = None, maxres:int = MAX_RESOLUT
         subprocess_call(args + additional_args + [tmp_path])
         new_size = os.stat(tmp_path).st_size
         if old_size > new_size:
+            LOGGER.info("The new file size is smaller.")
             os.rename(tmp_path, target_path)
         else:
+            LOGGER.info("The old file size is smaller.")
             os.rename(source_path, target_path)
             os.remove(tmp_path)
 
