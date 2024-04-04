@@ -211,6 +211,7 @@ def reencode(fileid: str, dimensions: List[int] = None, maxres:int = MAX_RESOLUT
         return 1
 
     def ffmpeg_reencode(source_path: str, target_path: str):
+        old_size = os.stat(source_path).st_size
         additional_args = []
 
         if dimensions:
@@ -227,6 +228,11 @@ def reencode(fileid: str, dimensions: List[int] = None, maxres:int = MAX_RESOLUT
             "-crf", str(crf),
         ]
         subprocess_call(args + additional_args + [tmp_path])
-        os.rename(tmp_path, target_path)
+        new_size = os.stat(tmp_path).st_size
+        if old_size > new_size:
+            os.rename(tmp_path, target_path)
+        else:
+            os.rename(source_path, target_path)
+            os.remove(tmp_path)
 
     return _process(source_file, suffix="-reencode", process=ffmpeg_reencode)
