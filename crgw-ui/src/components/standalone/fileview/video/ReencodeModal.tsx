@@ -77,7 +77,7 @@ const ReencodeModal = ({
   const [[width, height], setDimensions] = useState([initialWidth, initialHeight]);
   const [crf, setCrf] = useState(DEFAULT_CRF);
   const [maxres, setMaxres] = useState(DEFAULT_MAX_RES);
-  const [speed, setSpeed] = useState(DEFAULT_SPEED;
+  const [speed, setSpeed] = useState(DEFAULT_SPEED);
   const initialAspectRatio = getAspectRatio([initialWidth, initialHeight]);
 
   const resetThenClose = () => {
