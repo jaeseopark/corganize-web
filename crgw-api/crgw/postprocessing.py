@@ -98,6 +98,15 @@ def _process(source_file: dict,
     return new_file
 
 
+def _get_additional_args(vfilters, afilters):
+    additional_args = []
+    if len(vfilters) > 0:
+        additional_args += ["-vf", ",".join(vfilters)]
+    if len(afilters) > 0:
+        additional_args += ["-af", ",".join(afilters)]
+    return additional_args
+
+
 def intersects(s1: Tuple[int, int], s2: Tuple[int, int]) -> bool:
     s1_end = s1[1]
     s2_start, s2_end = s2
@@ -192,7 +201,7 @@ def cut_merge(fileid: str, segments: List[Tuple[int, int]]) -> dict:
     return _process(source_file, suffix=suffix, new_duration=duration, process=ffmpeg_filter_trim)
 
 
-def reencode(fileid: str, dimensions: List[int] = None, maxres:int = MAX_RESOLUTION, crf: int = DEFAULT_CRF, **kwargs) -> dict:
+def reencode(fileid: str, dimensions: List[int] = None, maxres: int = MAX_RESOLUTION, crf: int = DEFAULT_CRF, speed: float = 1.0, **kwargs) -> dict:
     """
     The original file gets deactivated when the processing is successfully finished.
     """
@@ -212,14 +221,21 @@ def reencode(fileid: str, dimensions: List[int] = None, maxres:int = MAX_RESOLUT
 
     def ffmpeg_reencode(source_path: str, target_path: str):
         old_size = os.stat(source_path).st_size
-        additional_args = []
+        vfilters = []
+        afilters = []
 
         if dimensions:
-            additional_args += ["-vf", f"crop={width}:{height}"]
+            vfilters += [f"crop={width}:{height}"]
 
         resize_scale = get_resize_scale()
         if resize_scale < 1:
-            additional_args += ["-vf", f"scale=iw*{resize_scale}:-1"]
+            vfilters += [f"scale=iw*{resize_scale}:-1"]
+
+        if speed > 0 and abs(speed - 1) > 0.01:
+            vfilters += [f"setpts={1/speed}*PTS"]
+            afilters += [f"atempo={speed}"]
+
+        additional_args = _get_additional_args(vfilters, afilters)
 
         tmp_path = target_path + ".mp4"
         args = [

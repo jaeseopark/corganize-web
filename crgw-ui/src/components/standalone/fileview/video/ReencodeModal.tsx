@@ -27,6 +27,9 @@ const DEFAULT_MIN_CRF = 18;
 const DEFAULT_MAX_CRF = 28;
 const DEFAULT_MIN_RES = 100; // short side
 const DEFAULT_MAX_RES = 1080; // short side
+const DEFAULT_SPEED = 1;
+const MIN_SPEED = 1;
+const MAX_SPEED = 10;
 
 const nearestEvenNumber = (n: number) => Math.round(n / 2) * 2;
 
@@ -74,6 +77,7 @@ const ReencodeModal = ({
   const [[width, height], setDimensions] = useState([initialWidth, initialHeight]);
   const [crf, setCrf] = useState(DEFAULT_CRF);
   const [maxres, setMaxres] = useState(DEFAULT_MAX_RES);
+  const [speed, setSpeed] = useState(DEFAULT_SPEED;
   const initialAspectRatio = getAspectRatio([initialWidth, initialHeight]);
 
   const resetThenClose = () => {
@@ -83,7 +87,7 @@ const ReencodeModal = ({
 
   const reencode = () => {
     const dimensions = dimensionsChecked ? [width, height] : undefined;
-    postprocesses.reencode({ fileid, crf, maxres, dimensions });
+    postprocesses.reencode({ fileid, crf, maxres, dimensions, speed });
     enqueue({
       message: "Reencode request submitted",
     });
@@ -147,6 +151,23 @@ const ReencodeModal = ({
                     max={DEFAULT_MAX_CRF}
                     step={1}
                     onChange={({ target: { value } }) => setCrf(Number.parseInt(value))}
+                    onKeyDown={onKeyDown}
+                  />
+                </Td>
+              </Tr>
+              <Tr>
+                <Td>
+                  <input type="checkbox" checked disabled />
+                </Td>
+                <Td>Speed</Td>
+                <Td>
+                  <input
+                    type="number"
+                    value={speed}
+                    min={MIN_SPEED}
+                    max={MAX_SPEED}
+                    step={0.25}
+                    onChange={({ target: { value } }) => setSpeed(Number.parseFloat(value))}
                     onKeyDown={onKeyDown}
                   />
                 </Td>

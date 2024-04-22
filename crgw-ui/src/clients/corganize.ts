@@ -323,11 +323,13 @@ export const cut: SegmentProcessor = (fileid, segments) => {
 export const reencode = ({
   fileid,
   crf,
+  speed,
   maxres,
   dimensions,
 }: {
   fileid: string;
   crf: number;
+  speed: number;
   maxres: number;
   dimensions?: number[];
 }): Promise<void> => {
@@ -337,7 +339,7 @@ export const reencode = ({
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ crf, maxres, dimensions }),
+    body: JSON.stringify({ crf, maxres, dimensions, speed }),
   }).then(async (res) => {
     if (res.status === 201) {
       return;
