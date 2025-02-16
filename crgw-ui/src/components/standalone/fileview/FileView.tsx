@@ -33,6 +33,7 @@ const getRendererByMimetype = (mimetype?: string) => {
     case "video/x-matroska":
     case "video/x-m4v":
     case "video/quicktime":
+    case "video/webm":
     default:
       return VideoView;
   }
