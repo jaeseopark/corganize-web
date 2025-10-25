@@ -91,7 +91,7 @@ const AdminView = () => {
             <PopoverContent width="100%">
               <PopoverArrow />
               <PopoverCloseButton />
-              <PopoverBody>{isRetaggerOpen && <Retagger />}</PopoverBody>
+              <PopoverBody>{isRetaggerOpen && <Retagger minQueryLength={1} />}</PopoverBody>
             </PopoverContent>
           </Popover>
         </HStack>

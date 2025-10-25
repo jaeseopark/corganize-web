@@ -11,6 +11,8 @@ import { useToast } from "providers/toast/hook";
 
 import { getFilesByTagsWithoutPagination, getGlobalTags, updateFile } from "clients/corganize";
 
+const DEFAULT_MIN_QUERY_LENGTH = 2;
+
 type TagOperatorWithoutId =
   | { type: "rename"; originalTag: string; value: string }
   | { type: "add" | "remove"; value: string };
@@ -93,12 +95,17 @@ const consolidate = (operators: TagOperator[]) => (file: CorganizeFile) =>
     return updatedFile;
   }, file);
 
-const Retagger = () => {
+type RetaggerProps = {
+  minQueryLength?: number;
+}
+
+const Retagger = (props: RetaggerProps) => {
   const [operators, setOperators] = useState<TagOperator[]>([]);
   const [tag, setTag] = useState("");
   const { enqueueWarning, enqueueSuccess, enqueueAsync } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
   const [suggestions, setSuggestions] = useState<Tag[]>([]);
+  const { minQueryLength = DEFAULT_MIN_QUERY_LENGTH } = props;
 
   useEffect(() => {
     getGlobalTags().then((tags) => setSuggestions(tags.map((tag) => ({ id: tag, name: tag }))));
@@ -180,6 +187,7 @@ const Retagger = () => {
               onDelete={() => setTag("")}
               onFocus={protectHotkey}
               onBlur={exposeHotkey}
+              minQueryLength={minQueryLength}
             />
           </Td>
           <Td>
