@@ -46,7 +46,7 @@ DAEMON_JOBS = [
     DaemonJob(func=init_cleaner),
 #    DaemonJob(func=init_scraper),
     DaemonJob(func=run_watcher, interval=1800),
-    DaemonJob(func=run_cleaner, interval=86400),
+    DaemonJob(func=run_cleaner, interval=1800),
 #    DaemonJob(func=run_scraper, interval=86400),
 ]
 
