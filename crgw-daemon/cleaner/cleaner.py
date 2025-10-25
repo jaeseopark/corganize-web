@@ -1,3 +1,4 @@
+from time import time
 import logging
 import os
 
@@ -71,7 +72,7 @@ def cleanup_unused_tags(host: str, apikey: str):
         
         if r.status_code != 200:
             logger.error(f"Failed to get tag counts: {r.status_code=} {r.text=}")
-            continue
+            break
         
         # Filter out zero counts and find tags with 0 usage
         tag_counts = r.json()
@@ -83,21 +84,21 @@ def cleanup_unused_tags(host: str, apikey: str):
 
         logger.info(f"Chunk {chunk_index}: checked {len(chunk)} tags, found {len(unused_tags)} unused")
 
-        if not unused_tags:
-            continue
+        if unused_tags:
+            # Delete unused tags for this chunk
+            r = requests.delete(
+                f"{host}/tags",
+                headers=headers,
+                json=dict(tags=unused_tags)
+            )
         
-        # Delete unused tags for this chunk
-        r = requests.delete(
-            f"{host}/tags",
-            headers=headers,
-            json=dict(tags=unused_tags)
-        )
-        
-        if r.status_code == 200:
-            logger.info(f"Successfully deleted {len(unused_tags)} unused tags from chunk {chunk_index}")
-            total_deleted += len(unused_tags)
-        else:
-            logger.error(f"Failed to delete tags from chunk {chunk_index}: {r.status_code=} {r.text=}")
+            if r.status_code == 200:
+                logger.info(f"Successfully deleted {len(unused_tags)} unused tags from chunk {chunk_index}")
+                total_deleted += len(unused_tags)
+            else:
+                logger.error(f"Failed to delete tags from chunk {chunk_index}: {r.status_code=} {r.text=}")
+
+        time.sleep(3)  # Sleep to avoid overwhelming the server
 
     logger.info(f"Tag cleanup complete, deleted {total_deleted} total unused tags")
 
