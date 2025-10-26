@@ -1,7 +1,7 @@
 import logging
 import os
 import signal
-from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from time import sleep
 
 import requests
@@ -64,7 +64,7 @@ def run_daemon():
     # Configure the scheduler for parallel job execution
     scheduler.configure(
         executors={
-            "default": ThreadPoolExecutor(max_workers=10)
+            "default": {"type": "threadpool", "max_workers": 10}
         },
         job_defaults={
             "coalesce": True,
@@ -72,30 +72,18 @@ def run_daemon():
         }
     )
     
-    # Then start scheduler with jobs...
     # Add jobs to the scheduler
     for func, interval in DAEMON_JOBS:
-        if interval:
-            # Recurring job
-            scheduler.add_job(
-                func,
-                trigger=IntervalTrigger(seconds=interval),
-                args=(config,),
-                id=func.__name__,
-                name=f"Recurring: {func.__name__}",
-                replace_existing=True,
-            )
-            LOGGER.info(f"Scheduled recurring job: {func.__name__} every {interval} seconds")
-        else:
-            # One-time job
-            scheduler.add_job(
-                func,
-                args=(config,),
-                id=func.__name__,
-                name=f"One-time: {func.__name__}",
-                replace_existing=True,
-            )
-            LOGGER.info(f"Scheduled one-time job: {func.__name__}")
+        scheduler.add_job(
+            func,
+            trigger=IntervalTrigger(seconds=interval),
+            args=(config,),
+            id=func.__name__,
+            name=f"Recurring: {func.__name__}",
+            replace_existing=True,
+            next_run_time=datetime.now(),  # Run immediately on startup
+        )
+        LOGGER.info(f"Scheduled recurring job: {func.__name__} every {interval} seconds")
 
     # Start the scheduler
     scheduler.start()
