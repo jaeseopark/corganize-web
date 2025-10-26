@@ -2,3 +2,4 @@ PyYAML==5.3
 commmons==0.0.20
 corganizeclient==0.0.16
 watchdog==2.1.7
+APScheduler==3.10.4
