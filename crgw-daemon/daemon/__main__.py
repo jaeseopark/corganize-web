@@ -85,6 +85,7 @@ def run_daemon():
 
     for job in DAEMON_JOBS:
         t = Thread(target=job.repeated_func, args=(config,))
+        LOGGER.info(f"Starting thread for job: {job.func.__name__}")
         threads.append(t)
         t.start()
 
