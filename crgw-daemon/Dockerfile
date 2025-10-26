@@ -3,7 +3,7 @@ FROM python:3.14-slim-trixie
 # Install dependencies
 WORKDIR /tmp/install
 COPY requirements.txt setup.py ./
-RUN pip install -r requirements.txt
+RUN pip install setuptools && pip install -r requirements.txt
 
 # Install app module
 COPY config/ config/
