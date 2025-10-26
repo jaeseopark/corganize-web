@@ -2,7 +2,6 @@ import logging
 from typing import Iterable
 
 import requests
-from commmons import init_logger_with_handlers
 from corganizeclient.client import CorganizeClient
 from pydash import chunk
 
@@ -41,7 +40,3 @@ def run_scraper(config: dict):
     for i, page in enumerate(chunk(list(filtered), CHUNK_SIZE)):
         result = cc.create_files(list(page))
         logger.info(f"{i=} {len(result['created'])=} {len(result['skipped'])=}")
-
-
-def init_scraper(config: dict):
-    init_logger_with_handlers("scraper", logging.DEBUG, config["log"]["scraper"])

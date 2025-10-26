@@ -1,12 +1,13 @@
 import logging
 import os
-from dataclasses import dataclass, field
-from threading import Thread
+import signal
+from datetime import datetime
 from time import sleep
-from typing import Callable
 
 import requests
 from requests import ConnectionError
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from commmons import init_logger_with_handlers
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
@@ -14,47 +15,19 @@ from cleaner import init_cleaner
 from cleaner.local_file_cleaner import run_local_file_cleaner
 from cleaner.tag_cleaner import run_tag_cleaner
 from config.config import get_config
-from scraper.scraper import init_scraper, run_scraper
+from scraper.scraper import run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
+scheduler = BackgroundScheduler()
 
 
-@dataclass
-class DaemonJob:
-    func: Callable[[dict], None]  # argument is 'config'
-    interval: int = field(default=None)  # Seconds
-    takes_config: bool = field(default=True)  # Whether func takes config as argument
-
-    @property
-    def repeated_func(self):
-        if not self.interval:
-            return self.func
-
-        def repeated_func(config: dict):
-            # TODO: use a timer instead of a loop
-            while True:
-                try:
-                    if self.takes_config:
-                        self.func(config)
-                    else:
-                        self.func()
-                except:
-                    LOGGER.exception("")
-                sleep(self.interval)
-                LOGGER.info(f"{self.func.__name__} Sleeping for {self.interval=} seconds")
-
-        return repeated_func
-
-
+# Job configuration: (func, interval_seconds or None for one-time)
 DAEMON_JOBS = [
-    DaemonJob(func=init_watcher),
-    DaemonJob(func=init_cleaner),
-#    DaemonJob(func=init_scraper),
-    DaemonJob(func=run_watcher, interval=1800),
-    DaemonJob(func=run_tag_cleaner, interval=1800),
-    DaemonJob(func=run_local_file_cleaner, interval=1800),
-#    DaemonJob(func=run_scraper, interval=86400),
+    (run_watcher, 1800),
+    (run_tag_cleaner, 1800),
+    (run_local_file_cleaner, 1800),
+    # (run_scraper, 86400),
 ]
 
 
@@ -76,21 +49,62 @@ def wait_until_api_ready():
 
 def run_daemon():
     wait_until_api_ready()
-
     config = get_config()
     os.makedirs(config["data"]["path"], exist_ok=True)
+
+    init_watcher(config)
+    init_cleaner(config)
+
+    # Initialize ALL loggers FIRST in the main thread
     init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["daemon"])
+    init_logger_with_handlers("watcher", logging.DEBUG, config["log"]["watcher"])
+    init_logger_with_handlers("cleaner", logging.DEBUG, config["log"]["cleaner"])
+    init_logger_with_handlers("scraper", logging.DEBUG, config["log"]["scraper"])
+    
+    # Configure the scheduler for parallel job execution
+    scheduler.configure(
+        executors={
+            "default": {"type": "threadpool", "max_workers": 10}
+        },
+        job_defaults={
+            "coalesce": True,
+            "max_instances": 1
+        }
+    )
+    
+    # Add jobs to the scheduler
+    for func, interval in DAEMON_JOBS:
+        scheduler.add_job(
+            func,
+            trigger=IntervalTrigger(seconds=interval),
+            args=(config,),
+            id=func.__name__,
+            name=f"Recurring: {func.__name__}",
+            replace_existing=True,
+            next_run_time=datetime.now(),  # Run immediately on startup
+        )
+        LOGGER.info(f"Scheduled recurring job: {func.__name__} every {interval} seconds")
 
-    threads = []
+    # Start the scheduler
+    scheduler.start()
+    LOGGER.info("APScheduler started. Running daemon jobs.")
 
-    for job in DAEMON_JOBS:
-        t = Thread(target=job.repeated_func, args=(config,))
-        LOGGER.info(f"Starting thread for job: {job.func.__name__}")
-        threads.append(t)
-        t.start()
+    # Handle graceful shutdown
+    def signal_handler(sig, frame):
+        LOGGER.info("Received shutdown signal. Shutting down scheduler...")
+        scheduler.shutdown(wait=True)
+        LOGGER.info("Scheduler shut down. Exiting.")
 
-    for t in threads:
-        t.join()
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    try:
+        # Keep the main thread alive
+        while scheduler.running:
+            sleep(1)
+    except KeyboardInterrupt:
+        LOGGER.info("Keyboard interrupt received.")
+        scheduler.shutdown(wait=True)
 
 
 if __name__ == "__main__":
