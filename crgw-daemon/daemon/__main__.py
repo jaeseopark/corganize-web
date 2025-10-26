@@ -19,18 +19,7 @@ from scraper.scraper import run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
-scheduler = BackgroundScheduler(
-    executors={
-        "default": {
-            "type": "threadpool",
-            "max_workers": 10
-        }
-    },
-    job_defaults={
-        "coalesce": True,
-        "max_instances": 1
-    }
-)
+scheduler = BackgroundScheduler()
 
 
 # Job configuration: (func, interval_seconds or None for one-time)
