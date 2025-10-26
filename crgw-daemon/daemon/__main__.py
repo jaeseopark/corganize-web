@@ -1,6 +1,7 @@
 import logging
 import os
 import signal
+from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 
 import requests
@@ -18,12 +19,7 @@ from scraper.scraper import run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
-scheduler = BackgroundScheduler(
-    job_defaults={"coalesce": True, "max_instances": 1},
-    executors={
-        "default": {"type": "threadpool", "max_workers": 10}
-    }
-)
+scheduler = BackgroundScheduler()
 
 
 # Job configuration: (func, interval_seconds or None for one-time)
@@ -64,6 +60,17 @@ def run_daemon():
     init_logger_with_handlers("watcher", logging.DEBUG, config["log"]["watcher"])
     init_logger_with_handlers("cleaner", logging.DEBUG, config["log"]["cleaner"])
     init_logger_with_handlers("scraper", logging.DEBUG, config["log"]["scraper"])
+    
+    # Configure the scheduler for parallel job execution
+    scheduler.configure(
+        executors={
+            "default": ThreadPoolExecutor(max_workers=10)
+        },
+        job_defaults={
+            "coalesce": True,
+            "max_instances": 1
+        }
+    )
     
     # Then start scheduler with jobs...
     # Add jobs to the scheduler
