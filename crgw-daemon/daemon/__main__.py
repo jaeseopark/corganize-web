@@ -18,13 +18,16 @@ from scraper.scraper import run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(
+    job_defaults={"coalesce": True, "max_instances": 1},
+    executors={
+        "default": {"type": "threadpool", "max_workers": 10}
+    }
+)
 
 
 # Job configuration: (func, interval_seconds or None for one-time)
 DAEMON_JOBS = [
-    (init_watcher, None),
-    (init_cleaner, None),
     (run_watcher, 1800),
     (run_tag_cleaner, 1800),
     (run_local_file_cleaner, 1800),
@@ -52,7 +55,10 @@ def run_daemon():
     wait_until_api_ready()
     config = get_config()
     os.makedirs(config["data"]["path"], exist_ok=True)
-    
+
+    init_watcher(config)
+    init_cleaner(config)
+
     # Initialize ALL loggers FIRST in the main thread
     init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["daemon"])
     init_logger_with_handlers("watcher", logging.DEBUG, config["log"]["watcher"])
