@@ -1,7 +1,6 @@
 import logging
 import os
 import signal
-from datetime import datetime
 from time import sleep
 
 import requests
@@ -15,7 +14,7 @@ from cleaner import init_cleaner
 from cleaner.local_file_cleaner import run_local_file_cleaner
 from cleaner.tag_cleaner import run_tag_cleaner
 from config.config import get_config
-from scraper.scraper import run_scraper
+from scraper.scraper import init_scraper, run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
@@ -24,6 +23,9 @@ scheduler = BackgroundScheduler()
 
 # Job configuration: (func, interval_seconds or None for one-time)
 DAEMON_JOBS = [
+    (init_watcher, None),
+    (init_cleaner, None),
+    # (init_scraper, None),
     (run_watcher, 1800),
     (run_tag_cleaner, 1800),
     (run_local_file_cleaner, 1800),
@@ -49,41 +51,34 @@ def wait_until_api_ready():
 
 def run_daemon():
     wait_until_api_ready()
+
     config = get_config()
     os.makedirs(config["data"]["path"], exist_ok=True)
-
-    init_watcher(config)
-    init_cleaner(config)
-
-    # Initialize ALL loggers FIRST in the main thread
     init_logger_with_handlers("daemon", logging.DEBUG, config["log"]["daemon"])
-    init_logger_with_handlers("watcher", logging.DEBUG, config["log"]["watcher"])
-    init_logger_with_handlers("cleaner", logging.DEBUG, config["log"]["cleaner"])
-    init_logger_with_handlers("scraper", logging.DEBUG, config["log"]["scraper"])
-    
-    # Configure the scheduler for parallel job execution
-    scheduler.configure(
-        executors={
-            "default": {"type": "threadpool", "max_workers": 10}
-        },
-        job_defaults={
-            "coalesce": True,
-            "max_instances": 1
-        }
-    )
-    
+
     # Add jobs to the scheduler
     for func, interval in DAEMON_JOBS:
-        scheduler.add_job(
-            func,
-            trigger=IntervalTrigger(seconds=interval),
-            args=(config,),
-            id=func.__name__,
-            name=f"Recurring: {func.__name__}",
-            replace_existing=True,
-            next_run_time=datetime.now(),  # Run immediately on startup
-        )
-        LOGGER.info(f"Scheduled recurring job: {func.__name__} every {interval} seconds")
+        if interval:
+            # Recurring job
+            scheduler.add_job(
+                func,
+                trigger=IntervalTrigger(seconds=interval),
+                args=(config,),
+                id=func.__name__,
+                name=f"Recurring: {func.__name__}",
+                replace_existing=True,
+            )
+            LOGGER.info(f"Scheduled recurring job: {func.__name__} every {interval} seconds")
+        else:
+            # One-time job
+            scheduler.add_job(
+                func,
+                args=(config,),
+                id=func.__name__,
+                name=f"One-time: {func.__name__}",
+                replace_existing=True,
+            )
+            LOGGER.info(f"Scheduled one-time job: {func.__name__}")
 
     # Start the scheduler
     scheduler.start()
