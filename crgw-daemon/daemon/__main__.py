@@ -3,13 +3,11 @@ import os
 import signal
 from datetime import datetime
 from time import sleep
-from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from requests import ConnectionError
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from apscheduler.executors.pool import ThreadPoolExecutor as APSchedulerThreadPoolExecutor
 from commmons import init_logger_with_handlers
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
@@ -21,7 +19,18 @@ from scraper.scraper import run_scraper
 from watcher.watcher import init_watcher, run_watcher
 
 LOGGER = logging.getLogger("daemon")
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(
+    executors={
+        "default": {
+            "type": "threadpool",
+            "max_workers": 10
+        }
+    },
+    job_defaults={
+        "coalesce": True,
+        "max_instances": 1
+    }
+)
 
 
 # Job configuration: (func, interval_seconds or None for one-time)
@@ -62,17 +71,6 @@ def run_daemon():
     init_logger_with_handlers("watcher", logging.DEBUG, config["log"]["watcher"])
     init_logger_with_handlers("cleaner", logging.DEBUG, config["log"]["cleaner"])
     init_logger_with_handlers("scraper", logging.DEBUG, config["log"]["scraper"])
-    
-    # Configure the scheduler for parallel job execution
-    scheduler.configure(
-        executors={
-            "default": APSchedulerThreadPoolExecutor(max_workers=10)
-        },
-        job_defaults={
-            "coalesce": True,
-            "max_instances": 1
-        }
-    )
     
     # Add jobs to the scheduler
     for func, interval in DAEMON_JOBS:
