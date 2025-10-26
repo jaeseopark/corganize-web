@@ -3,11 +3,13 @@ import os
 import signal
 from datetime import datetime
 from time import sleep
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from requests import ConnectionError
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.executors.pool import ThreadPoolExecutor as APSchedulerThreadPoolExecutor
 from commmons import init_logger_with_handlers
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
@@ -64,7 +66,7 @@ def run_daemon():
     # Configure the scheduler for parallel job execution
     scheduler.configure(
         executors={
-            "default": {"type": "threadpool", "max_workers": 10}
+            "default": APSchedulerThreadPoolExecutor(max_workers=10)
         },
         job_defaults={
             "coalesce": True,
