@@ -10,7 +10,9 @@ from requests import ConnectionError
 from commmons import init_logger_with_handlers
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
-from cleaner.cleaner import run_cleaner, init_cleaner
+from cleaner import init_cleaner
+from cleaner.local_file_cleaner import run_local_file_cleaner
+from cleaner.tag_cleaner import run_tag_cleaner
 from config.config import get_config
 from scraper.scraper import init_scraper, run_scraper
 from watcher.watcher import init_watcher, run_watcher
@@ -22,6 +24,7 @@ LOGGER = logging.getLogger("daemon")
 class DaemonJob:
     func: Callable[[dict], None]  # argument is 'config'
     interval: int = field(default=None)  # Seconds
+    takes_config: bool = field(default=True)  # Whether func takes config as argument
 
     @property
     def repeated_func(self):
@@ -32,7 +35,10 @@ class DaemonJob:
             # TODO: use a timer instead of a loop
             while True:
                 try:
-                    self.func(config)
+                    if self.takes_config:
+                        self.func(config)
+                    else:
+                        self.func()
                 except:
                     LOGGER.exception("")
                 sleep(self.interval)
@@ -46,7 +52,8 @@ DAEMON_JOBS = [
     DaemonJob(func=init_cleaner),
 #    DaemonJob(func=init_scraper),
     DaemonJob(func=run_watcher, interval=1800),
-    DaemonJob(func=run_cleaner, interval=1800),
+    DaemonJob(func=run_tag_cleaner, interval=1800),
+    DaemonJob(func=run_local_file_cleaner, interval=1800),
 #    DaemonJob(func=run_scraper, interval=86400),
 ]
 
