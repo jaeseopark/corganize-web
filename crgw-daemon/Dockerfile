@@ -1,4 +1,4 @@
-FROM python:3.14-slim-bullseye
+FROM python:3.14-slim
 
 # Install dependencies
 WORKDIR /tmp/install
