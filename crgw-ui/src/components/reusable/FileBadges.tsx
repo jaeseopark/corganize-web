@@ -38,15 +38,15 @@ const TagBadge = ({ tag }: { tag: string }) => {
   };
 
   return (
-    <ChakraBadge className="file-tag clickable" onClick={onClick}>
-      {tag}
-    </ChakraBadge>
+    <button className="file-tag clickable" onClick={onClick}>
+      <ChakraBadge>{tag}</ChakraBadge>
+    </button>
   );
 };
 
 const FileBadges = ({ f }: { f: CorganizeFile }) => {
   return (
-    <Wrap className="file-badges" spacing="3px" justify="center">
+    <Wrap as="div" className="file-badges" spacing="3px" justify="center">
       {Array.from(BADGE_GENERATION_MAP.entries()).map(([fieldName, func]) =>
         func(f).map(({ value, styleClasses }) => (
           <WrapItem key={value}>
