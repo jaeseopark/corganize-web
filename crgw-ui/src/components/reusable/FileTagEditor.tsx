@@ -2,7 +2,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
 import { decode } from "leet-decode";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReactTags } from "react-tag-autocomplete";
 import type { TagSelected, TagSuggestion } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
@@ -12,8 +12,6 @@ import { useFileRepository } from "providers/fileRepository/hook";
 import { useToast } from "providers/toast/hook";
 
 import { globalTags } from "clients/adapter";
-
-import { madFocusByClassName } from "utils/elementUtils";
 
 import "./FileTagEditor.scss";
 
@@ -91,12 +89,13 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   const file = findById(fileid);
   const tags: TagSelected[] = (file.tags || []).map((t) => ({ value: uuidv4().toString(), label: t }));
   const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
+  const apiRef = useRef<any>(null);
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
    */
   useEffect(() => {
-    madFocusByClassName("react-tags__search-input");
+    setTimeout(() => apiRef.current?.input.focus(), 100);
     return exposeHotkey; // expose the hot key when the component gets unmounted.
   }, []);
 
@@ -223,15 +222,20 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   return (
     <div className={cls("file-tag-editor", { mini })} onKeyDown={onKeyDown}>
       <ReactTags
+        ref={apiRef}
         delimiterKeys={["Enter", "Tab", ","]}
         selected={tags}
         suggestions={suggestions}
-        suggestionsTransform={(query, suggestions) => suggestions.filter(s => s.label.startsWith(query.toLowerCase()))}
+        suggestionsTransform={(query, suggestions) => {
+          if (!query.trim()) return [];
+          return suggestions.filter(s => s.label.toLowerCase().includes(query.toLowerCase()));
+        }}
         onInput={onInput}
         onAdd={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
+        placeholderText=""
         allowNew
       />
       <AutocompleteView />
