@@ -3,7 +3,8 @@ import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
 import { decode } from "leet-decode";
 import { useEffect, useState } from "react";
-import ReactTags, { Tag } from "react-tag-autocomplete";
+import { ReactTags } from "react-tag-autocomplete";
+import type { TagSelected, TagSuggestion } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
 import { useBlanket } from "providers/blanket/hook";
@@ -54,7 +55,7 @@ const getTokens = (filename: string): Set<string> => {
 
 const generateSuggestions = (tokens: Set<string>) => {
   globalTags.forEach(tokens.add, tokens);
-  return Array.from(tokens).map((t) => ({ id: uuidv4().toString(), name: t }));
+  return Array.from(tokens).map((t) => ({ value: uuidv4().toString(), label: t }));
 };
 
 const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
@@ -88,8 +89,8 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   const [candidates, setCandidates] = useState<string[]>([]);
 
   const file = findById(fileid);
-  const tags: Tag[] = (file.tags || []).map((t) => ({ id: uuidv4().toString(), name: t }));
-  const [suggestions, setSuggestions] = useState<Tag[]>([]);
+  const tags: TagSelected[] = (file.tags || []).map((t) => ({ value: uuidv4().toString(), label: t }));
+  const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
@@ -127,12 +128,12 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
       .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }));
   };
 
-  const onAddition = (newTag: Tag) => {
+  const onAddition = (newTag: TagSelected) => {
     const tagss = file.tags || [];
-    newTag.name = newTag.name.trim();
-    if (newTag.name) {
-      if (!tagss.includes(newTag.name)) {
-        assignTags([...tagss, newTag.name.toLowerCase()]);
+    newTag.label = newTag.label.trim();
+    if (newTag.label) {
+      if (!tagss.includes(newTag.label)) {
+        assignTags([...tagss, newTag.label.toLowerCase()]);
       }
     }
     setAutocompEnabled(true);
@@ -152,7 +153,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   };
 
   const rejectCandidate = () => {
-    const [_, ...rest] = candidates;
+    const [, ...rest] = candidates;
     setCandidates(rest);
   };
 
@@ -222,12 +223,12 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   return (
     <div className={cls("file-tag-editor", { mini })} onKeyDown={onKeyDown}>
       <ReactTags
-        delimiters={["Enter", "Tab", ","]}
-        tags={tags}
+        delimiterKeys={["Enter", "Tab", ","]}
+        selected={tags}
         suggestions={suggestions}
-        suggestionsFilter={(a, b) => a.name.startsWith(b.toLowerCase())}
+        suggestionsTransform={(query, suggestions) => suggestions.filter(s => s.label.startsWith(query.toLowerCase()))}
         onInput={onInput}
-        onAddition={onAddition}
+        onAdd={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
