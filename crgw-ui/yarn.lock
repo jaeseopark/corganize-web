@@ -2558,13 +2558,6 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-tag-autocomplete@^6.1.1":
-  version "6.3.3"
-  resolved "https://registry.yarnpkg.com/@types/react-tag-autocomplete/-/react-tag-autocomplete-6.3.3.tgz#1c42a7d7742607403764c16b20ae0ce9998353fe"
-  integrity sha512-lMjrtsbZYlNXyFiCvi2gwi7gt/ulJhVT4wjGaj/sFve0RbINUVhV6m5WCK65sD4uKoPKsKztf+VGT4SpL2JTJw==
-  dependencies:
-    "@types/react" "*"
-
 "@types/react@*":
   version "18.0.5"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.5.tgz#1a4d4b705ae6af5aed369dec22800b20f89f5301"
@@ -8680,10 +8673,10 @@ react-table@^7.7.0:
   resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.8.0.tgz#07858c01c1718c09f7f1aed7034fcfd7bda907d2"
   integrity sha512-hNaz4ygkZO4bESeFfnfOft73iBUj8K5oKi1EcSHPAibEydfsX2MyU6Z8KCr3mv3C9Kqqh71U+DhZkFvibbnPbA==
 
-react-tag-autocomplete@^6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-6.3.0.tgz#ce064bbab77b4daf7706be1c08413e7d0335ff4d"
-  integrity sha512-MUBVUFh5eOqshUm5NM20qp7zXk8TzSiKO4GoktlFzBLIOLs356npaMKtL02bm0nFV2f1zInUrXn1fq6+i5YX0w==
+react-tag-autocomplete@^7.5.1:
+  version "7.5.1"
+  resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-7.5.1.tgz#cfcc2870843c0b224735d832f6ffdfe982d64a8e"
+  integrity sha512-mu9EVZ9+ZtIFqh38ahxz1XcGPzXftMeBp8iT+rQigN9u6dou7VvXQHJ94qaaJs1SEbYgi5/ltRa7AiFptWT28A==
 
 react@^18.0.0:
   version "18.3.1"

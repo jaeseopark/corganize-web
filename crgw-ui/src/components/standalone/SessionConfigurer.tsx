@@ -1,7 +1,8 @@
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Button, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import ReactTags, { Tag } from "react-tag-autocomplete";
+import { ReactTags } from "react-tag-autocomplete";
+import type { TagSuggestion } from "react-tag-autocomplete";
 
 import { FileEndpoint, SessionInfo } from "typedefs/Session";
 
@@ -21,11 +22,11 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   const [minFileSize, setMinFileSize] = useState(0);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");
   const [tag, setTag] = useState("");
-  const [suggestions, setSuggestions] = useState([] as Tag[]);
+  const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
   const { protectHotkey, exposeHotkey } = useBlanket();
 
   useEffect(() => {
-    getGlobalTags().then((tags) => setSuggestions(tags.map((tag) => ({ id: tag, name: tag }))));
+    getGlobalTags().then((tags) => setSuggestions(tags.map((tag) => ({ value: tag, label: tag }))));
   }, []);
 
   const onOK = () =>
@@ -74,11 +75,11 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
 
   const renderTagInput = () => (
     <ReactTags
-      delimiters={["Enter", "Tab", ","]}
-      tags={tag ? [{ id: tag, name: tag }] : []}
+      delimiterKeys={["Enter", "Tab", ","]}
+      selected={tag ? [{ value: tag, label: tag }] : []}
       suggestions={suggestions}
-      suggestionsFilter={(a, b) => tag.length === 0 && a.name.startsWith(b.toLowerCase())}
-      onAddition={({ name: value }) => setTag(value)}
+      suggestionsTransform={(query, suggestions) => tag.length === 0 ? suggestions.filter(s => s.label.startsWith(query.toLowerCase())) : []}
+      onAdd={(newTag) => setTag(newTag.label)}
       onDelete={() => setTag("")}
       onFocus={protectHotkey}
       onBlur={exposeHotkey}
