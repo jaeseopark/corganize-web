@@ -1,16 +1,13 @@
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Button, VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { ReactTags } from "react-tag-autocomplete";
-import type { TagSuggestion } from "react-tag-autocomplete";
+import { useCallback, useEffect, useState } from "react";
 
 import { FileEndpoint, SessionInfo } from "typedefs/Session";
 
-import { useBlanket } from "providers/blanket/hook";
-
-import { getGlobalTags } from "clients/corganize";
+import TagSelector from "components/reusable/TagSelector";
 
 import "./SessionConfigurer.scss";
+import { populateGlobalTags } from "clients/adapter";
 
 const FILE_COUNT_INCREMENT = 500;
 const DEFAULT_FILE_COUNT_LIMIT = 1000;
@@ -22,11 +19,10 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   const [minFileSize, setMinFileSize] = useState(0);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");
   const [tag, setTag] = useState("");
-  const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
-  const { protectHotkey, exposeHotkey } = useBlanket();
+  const [globalTagsLoaded, setGlobalTagsLoaded] = useState(false);
 
   useEffect(() => {
-    getGlobalTags().then((tags) => setSuggestions(tags.map((tag) => ({ value: tag, label: tag }))));
+    populateGlobalTags().then(() => setGlobalTagsLoaded(true));
   }, []);
 
   const onOK = () =>
@@ -73,18 +69,18 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
     </select>
   );
 
-  const renderTagInput = () => (
-    <ReactTags
-      delimiterKeys={["Enter", "Tab", ","]}
-      selected={tag ? [{ value: tag, label: tag }] : []}
-      suggestions={suggestions}
-      suggestionsTransform={(query, suggestions) => tag.length === 0 ? suggestions.filter(s => s.label.startsWith(query.toLowerCase())) : []}
-      onAdd={(newTag) => setTag(newTag.label)}
-      onDelete={() => setTag("")}
-      onFocus={protectHotkey}
-      onBlur={exposeHotkey}
-    />
-  );
+  const renderTagInput = useCallback(() => {
+    if (!globalTagsLoaded) {
+      return null;
+    }
+    return (
+      <TagSelector
+        selectedTags={tag ? [tag] : []}
+        onTagsChange={(tags) => setTag(tags[0] || "")}
+        maxSelection={1}
+      />
+    );
+  }, [globalTagsLoaded, tag]);
 
   const renderConfigTable = () => (
     <div className="config-table">
