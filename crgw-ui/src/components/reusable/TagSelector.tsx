@@ -16,7 +16,7 @@ import fuzzysort from "fuzzysort";
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
 
-const getAutocompTokens = (autocompSeed: string): Set<string> => {
+const getAutocompTokens = (autocompSeed: string): string[] => {
   const tokenizedautocompSeed = autocompSeed
     .split(/[^A-Za-z0-9]/)
     .map((t) => t.trim().toLowerCase())
@@ -30,7 +30,7 @@ const getAutocompTokens = (autocompSeed: string): Set<string> => {
       }
     });
   }
-  return tokens;
+  return Array.from(tokens);
 };
 
 const generateSuggestions = (autocompCandidates: string[]): TagSuggestion[] => {
@@ -78,21 +78,22 @@ const TagSelector = ({
   // Autocomp states:
   const [autocompEnabled, setAutocompEnabled] = useState(true);
   const [rejectedAutocompCandidates, setRejectedAutocompCandidates] = useState<string[]>([]);
+  const autocompTokens = useMemo(() => getAutocompTokens(autocompSeed), [autocompSeed]);
   const autocompCandidates = useMemo(() => {
-    const tokens = getAutocompTokens(autocompSeed);
     const autocompleteIndex = buildAutocompleteIndex();
-    const matches = Array.from(tokens)
+    const matches = Array.from(autocompTokens)
       .map((t) => autocompleteIndex[getNormalizeAutocompKey(t)])
       .filter((t) => t);
     if (matches.length > 0) {
       const isNotRejected = (t: string) => !rejectedAutocompCandidates.includes(t);
-      return Array.from(new Set(matches.flat(2))).filter(isNotRejected);
+      const alreadySelected = (t: string) => !selectedTags.includes(t.toLowerCase());
+      return Array.from(new Set(matches.flat(2))).filter(isNotRejected).filter(alreadySelected);
     }
     return [];
-  }, [autocompSeed, rejectedAutocompCandidates]);
+  }, [autocompSeed, rejectedAutocompCandidates, autocompTokens, selectedTags]);
 
   // Suggestions:
-  const suggestions: TagSuggestion[] = useMemo(() => generateSuggestions(autocompCandidates), [autocompCandidates]);
+  const suggestions: TagSuggestion[] = useMemo(() => generateSuggestions(autocompTokens), [autocompTokens]);
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
