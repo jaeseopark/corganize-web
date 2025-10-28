@@ -74,7 +74,7 @@ const TagSelector = ({
   const { protectHotkey, exposeHotkey } = useBlanket();
   const apiRef = useRef<any>(null);
   const tags: TagSelected[] = selectedTags.map((t) => ({ value: uuidv4().toString(), label: t }));
-  
+
   // Autocomp states:
   const [autocompEnabled, setAutocompEnabled] = useState(true);
   const [rejectedAutocompCandidates, setRejectedAutocompCandidates] = useState<string[]>([]);
@@ -160,20 +160,34 @@ const TagSelector = ({
   const onKeyDown = useCallback(
     (e: any) => {
       const { key } = e;
+      if (key === "Enter") {
+        const inputValue = apiRef.current?.input?.value?.trim();
+        if (
+          inputValue &&
+          allowNew &&
+          (!maxSelection || selectedTags.length < maxSelection) &&
+          !selectedTags.includes(inputValue.toLowerCase())
+        ) {
+          onTagsChange([...selectedTags, inputValue.toLowerCase()]);
+          if (apiRef.current?.input) {
+            apiRef.current.input.value = "";
+          }
+          e.preventDefault();
+          return;
+        }
+      }
+
       if (!autocompEnabled || autocompCandidates.length === 0) {
         return;
       }
 
-      if (key === "Enter") {
-        e.preventDefault();
-        acceptCandidate();
-      } else if (key === "ArrowUp") {
+      if (key === "ArrowUp") {
         acceptCandidate();
       } else if (key === "ArrowDown") {
         rejectCandidate();
-      } 
+      }
     },
-    [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate],
+    [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate, allowNew, maxSelection, selectedTags, onTagsChange],
   );
 
   const suggestionsTransform: SuggestionsTransform = useCallback(
@@ -248,7 +262,6 @@ const TagSelector = ({
         placeholderText={placeholderText}
         labelText="" // Add this to remove the default "Select tags" label
         tagListLabelText=""
-        allowNew={allowNew && (!maxSelection || selectedTags.length < maxSelection)}
       />
       <AutocompleteView />
     </div>
