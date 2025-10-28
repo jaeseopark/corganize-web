@@ -22,6 +22,13 @@ LOGGER = logging.getLogger("daemon")
 scheduler = BackgroundScheduler()
 
 
+def report_progress(name: str, signal: str):
+    try:
+        requests.post("http://api/daemon/jobs/progress", json={"name": name, "signal": signal})
+    except Exception as e:
+        LOGGER.warning(f"Failed to report progress for {name} {signal}: {e}")
+
+
 # Job configuration: (func, interval_seconds or None for one-time)
 DAEMON_JOBS = [
     (run_watcher, 1800),
@@ -63,8 +70,18 @@ def run_daemon():
     
     # Add jobs to the scheduler
     for func, interval in DAEMON_JOBS:
+        def make_wrapped(f):
+            def wrapped(config):
+                report_progress(f.__name__, "start")
+                try:
+                    f(config)
+                finally:
+                    report_progress(f.__name__, "end")
+            return wrapped
+        
+        wrapped_func = make_wrapped(func)
         scheduler.add_job(
-            func,
+            wrapped_func,
             trigger=IntervalTrigger(seconds=interval),
             args=(config,),
             id=func.__name__,

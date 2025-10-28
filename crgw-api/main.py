@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import List
 
 from commmons import init_logger_with_handlers
@@ -15,6 +16,8 @@ from crgw.local_filesystem import get_local_files, get_remaining_space, teardown
 LOGGER = init_logger_with_handlers("crgw-api", logging.INFO, "/var/log/crgw-api/api.log")
 
 app = Flask(__name__)
+
+daemon_job_progress = {}
 
 
 @app.get("/files")
@@ -75,6 +78,26 @@ def health_info():
         fileCount=len(get_local_files())
     )
     return res, 200
+
+@app.post("/daemon/jobs/progress")
+def post_daemon_progress():
+    data = freq.get_json()
+    name = data['name']
+    signal = data['signal']
+    now = int(time.time())
+    if signal == 'start':
+        daemon_job_progress[name] = {'started': now, 'finished': None}
+    elif signal == 'end':
+        if name in daemon_job_progress:
+            daemon_job_progress[name]['finished'] = now
+        else:
+            # If end without start, create entry with both
+            daemon_job_progress[name] = {'started': now, 'finished': now}
+    return '', 200
+
+@app.get("/daemon/jobs/progress")
+def get_daemon_progress():
+    return daemon_job_progress, 200
 
 @app.post("/scrape")
 def scrapeee():
