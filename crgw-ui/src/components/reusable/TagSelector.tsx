@@ -255,9 +255,12 @@ const TagSelector = ({
         delimiterKeys={["Enter", "Tab", ","]}
         selected={tags}
         suggestions={suggestions}
-        suggestionsTransform={(query, suggestions) =>
-          matchSorter(suggestions, query, { keys: ["label"] }).slice(0, 10)
-        }
+        suggestionsTransform={(query, suggestions) => {
+          if (query.trim().length === 0) {
+            return [];
+          }
+          return matchSorter(suggestions, query, { keys: ["label"] }).slice(0, 10);
+        }}
         onInput={onInput}
         onAdd={onAddition}
         onDelete={onDelete}
