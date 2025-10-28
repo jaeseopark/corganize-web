@@ -6,7 +6,7 @@ import { SessionInfo } from "typedefs/Session";
 
 import { FileRepository } from "providers/fileRepository/fileRepository";
 
-import { addGlobalTags, populateGlobalTags, retrieveFiles } from "clients/adapter";
+import { addGlobalTags, retrieveFiles } from "clients/adapter";
 import * as client from "clients/corganize";
 
 import { getPosixSeconds } from "utils/dateUtils";
@@ -115,7 +115,6 @@ export const useFileRepository = () => {
       });
 
   const startSession = (sessionInfo: SessionInfo) => {
-    populateGlobalTags();
     retrieveFiles(sessionInfo, addFiles);
   };
 

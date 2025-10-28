@@ -1,14 +1,10 @@
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Button, VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { ReactTags } from "react-tag-autocomplete";
-import type { TagSuggestion } from "react-tag-autocomplete";
+import { useState } from "react";
 
 import { FileEndpoint, SessionInfo } from "typedefs/Session";
 
-import { useBlanket } from "providers/blanket/hook";
-
-import { getGlobalTags } from "clients/corganize";
+import TagSelector from "components/reusable/TagSelector";
 
 import "./SessionConfigurer.scss";
 
@@ -17,17 +13,11 @@ const DEFAULT_FILE_COUNT_LIMIT = 1000;
 const MIN_FILE_SIZE_INCREMENT = 50;
 const MB_TO_BYTES = 1000000;
 
-const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
+const SessionConfigurer = ({ setInfo, disabled }: { setInfo: (s: SessionInfo) => void; disabled?: boolean }) => {
   const [fileCountLimit, setFileCountLimit] = useState(DEFAULT_FILE_COUNT_LIMIT);
   const [minFileSize, setMinFileSize] = useState(0);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");
   const [tag, setTag] = useState("");
-  const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
-  const { protectHotkey, exposeHotkey } = useBlanket();
-
-  useEffect(() => {
-    getGlobalTags().then((tags) => setSuggestions(tags.map((tag) => ({ value: tag, label: tag }))));
-  }, []);
 
   const onOK = () =>
     setInfo({
@@ -74,15 +64,10 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
   );
 
   const renderTagInput = () => (
-    <ReactTags
-      delimiterKeys={["Enter", "Tab", ","]}
-      selected={tag ? [{ value: tag, label: tag }] : []}
-      suggestions={suggestions}
-      suggestionsTransform={(query, suggestions) => tag.length === 0 ? suggestions.filter(s => s.label.startsWith(query.toLowerCase())) : []}
-      onAdd={(newTag) => setTag(newTag.label)}
-      onDelete={() => setTag("")}
-      onFocus={protectHotkey}
-      onBlur={exposeHotkey}
+    <TagSelector
+      selectedTags={tag ? [tag] : []}
+      onTagsChange={(tags) => setTag(tags[0] || "")}
+      maxSelection={1}
     />
   );
 
@@ -125,6 +110,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
         colorScheme="teal"
         variant="solid"
         aria-label="Start Session"
+        disabled={disabled}
       >
         {buttonLabel}
       </Button>
