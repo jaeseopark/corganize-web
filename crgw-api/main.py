@@ -5,6 +5,7 @@ from typing import List
 
 from commmons import init_logger_with_handlers
 from flask import Flask, request as freq, Response
+from flask_socketio import SocketIO, emit
 from hypersquirrel.core import Watchlist
 from hypersquirrel.entry import create_watchlist, scrape, scrape_literal_urls
 from ytdlwrapper.ytdlpscrape import scrape_ytdl
@@ -16,6 +17,7 @@ from crgw.local_filesystem import get_local_files, get_remaining_space, teardown
 LOGGER = init_logger_with_handlers("crgw-api", logging.INFO, "/var/log/crgw-api/api.log")
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 daemon_job_progress = {}
 
@@ -86,18 +88,15 @@ def post_daemon_progress():
     signal = data['signal']
     now = int(time.time())
     if signal == 'start':
-        daemon_job_progress[name] = {'started': now, 'finished': None}
+        daemon_job_progress[name] = {'started': now}
     elif signal == 'end':
         if name in daemon_job_progress:
             daemon_job_progress[name]['finished'] = now
         else:
             # If end without start, create entry with both
             daemon_job_progress[name] = {'started': now, 'finished': now}
+    socketio.emit('progress_update', daemon_job_progress)
     return '', 200
-
-@app.get("/daemon/jobs/progress")
-def get_daemon_progress():
-    return daemon_job_progress, 200
 
 @app.post("/scrape")
 def scrapeee():
@@ -152,9 +151,14 @@ def fwd_remote(subpath: str):
     return res
 
 
+@socketio.on('connect')
+def handle_connect():
+    emit('progress_update', daemon_job_progress)
+
+
 if __name__ == '__main__':
     # This block is only for the dev env.
     try:
-        app.run(host="0.0.0.0", port=80)
+        socketio.run(app, host="0.0.0.0", port=80)
     except (KeyboardInterrupt, SystemExit):
         teardown()
