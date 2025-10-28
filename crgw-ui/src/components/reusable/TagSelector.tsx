@@ -163,9 +163,11 @@ const TagSelector = ({
       const { key } = e;
       if (key === "Enter") {
         const inputValue = apiRef.current?.input?.value?.trim();
+        const highlightedOption = apiRef.current?.listBox.activeOption;
         if (
-          inputValue &&
           allowNew &&
+          inputValue &&
+          !highlightedOption &&
           (!maxSelection || selectedTags.length < maxSelection) &&
           !selectedTags.includes(inputValue.toLowerCase())
         ) {
@@ -193,12 +195,11 @@ const TagSelector = ({
 
   const suggestionsTransform: SuggestionsTransform = useCallback(
     (query: string, suggestions: TagSuggestion[]) => {
-      if (query.trim().length === 0) {
-        return [];
-      }
-
-      const results = fuzzysort.go(query, suggestions, { key: 'label' });
-      return results.slice(0, 10).map(r => r.obj);
+      // probably replaced by onShouldExpand.. delete later.
+      // if (query.trim().length === 0) {
+      //   return [];
+      // }
+      return fuzzysort.go(query, suggestions, { key: 'label' }).slice(0, 10).map(r => r.obj);
     },
     [],
   );
@@ -260,6 +261,7 @@ const TagSelector = ({
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
+        onShouldExpand={(query: string) => query.trim().length > 0}
         placeholderText={placeholderText}
         labelText="" // Add this to remove the default "Select tags" label
         tagListLabelText=""
