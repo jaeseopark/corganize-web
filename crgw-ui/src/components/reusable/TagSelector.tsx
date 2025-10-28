@@ -174,7 +174,7 @@ const TagSelector = ({
     if (autocompEnabled !== shouldEnableAutocomp) {
       setAutocompEnabled(shouldEnableAutocomp);
     }
-  }, [autocompEnabled, setAutocompEnabled]);
+  }, [autocompEnabled]);
 
   const onKeyDown = useCallback((e: any) => {
     const { key } = e;
@@ -247,7 +247,6 @@ const TagSelector = ({
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
-        onShouldExpand={(value) => value.trim().length > 0}
         placeholderText={placeholderText}
         labelText="" // Add this to remove the default "Select tags" label
         tagListLabelText=""
