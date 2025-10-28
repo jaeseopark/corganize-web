@@ -2,7 +2,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
 import { decode } from "leet-decode";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ReactTags } from "react-tag-autocomplete";
 import type { TagSelected, TagSuggestion } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
@@ -79,7 +79,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
   const [autocompEnabled, setAutocompEnabled] = useState(true);
-  const [candidates, setCandidates] = useState<string[]>([]);
+  const [autocompCandidates, setAutocompCandidates] = useState<string[]>([]);
 
   const file = findById(fileid);
   const tags: TagSelected[] = (file.tags || []).map((t) => ({ value: uuidv4().toString(), label: t }));
@@ -106,12 +106,12 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
     if (matches.length > 0) {
       const tags = file.tags || [];
       const isBrandNew = (t: string) => !tags.includes(t);
-      setCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
+      setAutocompCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
     }
     setSuggestions(generateSuggestions(tokens));
   }, []);
 
-  const assignTags = (tags: string[]) => {
+  const assignTags = useCallback((tags: string[]) => {
     const payload = {
       fileid,
       tags,
@@ -120,9 +120,9 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
     updateFile(payload)
       .then(() => enqueueSuccess({ message: "Tags updated" }))
       .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }));
-  };
+  }, [fileid, updateFile, enqueueSuccess, enqueueError]);
 
-  const onAddition = (newTag: TagSelected) => {
+  const onAddition = useCallback((newTag: TagSelected) => {
     const tagss = file.tags || [];
     newTag.label = newTag.label.trim();
     if (newTag.label) {
@@ -131,40 +131,40 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
       }
     }
     setAutocompEnabled(true);
-  };
+  }, [file.tags, assignTags, setAutocompEnabled]);
 
-  const onDelete = (i: number) => {
+  const onDelete = useCallback((i: number) => {
     if (i < 0) return;
     const clone = (file.tags || []).slice(0);
     clone.splice(i, 1);
     assignTags(clone);
-  };
+  }, [file.tags, assignTags]);
 
-  const acceptCandidate = () => {
-    const [candidate, ...rest] = candidates;
+  const acceptCandidate = useCallback(() => {
+    const [candidate, ...rest] = autocompCandidates;
     assignTags([...(file.tags || []), candidate]);
-    setCandidates(rest);
-  };
+    setAutocompCandidates(rest);
+  }, [autocompCandidates, file.tags, assignTags, setAutocompCandidates]);
 
-  const rejectCandidate = () => {
-    const [, ...rest] = candidates;
-    setCandidates(rest);
-  };
+  const rejectCandidate = useCallback(() => {
+    const [, ...rest] = autocompCandidates;
+    setAutocompCandidates(rest);
+  }, [autocompCandidates, setAutocompCandidates]);
 
   /**
    * Enables the autocomplete mode only when user isn't typing.
    * @param query search string from the input component
    */
-  const onInput = (query: string) => {
+  const onInput = useCallback((query: string) => {
     const shouldEnableAutocomp = !query.trim();
     if (autocompEnabled !== shouldEnableAutocomp) {
       setAutocompEnabled(shouldEnableAutocomp);
     }
-  };
+  }, [autocompEnabled, setAutocompEnabled]);
 
-  const onKeyDown = (e: any) => {
+  const onKeyDown = useCallback((e: any) => {
     const { key } = e;
-    if (!autocompEnabled || candidates.length === 0) {
+    if (!autocompEnabled || autocompCandidates.length === 0) {
       return;
     }
 
@@ -173,14 +173,14 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
     } else if (key === "ArrowDown") {
       rejectCandidate();
     }
-  };
+  }, [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate]);
 
   const AutocompleteView = () => {
-    if (candidates.length === 0) {
+    if (autocompCandidates.length === 0) {
       return null;
     }
 
-    const [first, ...rest] = candidates;
+    const [first, ...rest] = autocompCandidates;
 
     return (
       <Flex className="autocomplete-candidates" direction="row">
@@ -223,7 +223,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
         suggestions={suggestions}
         suggestionsTransform={(query, suggestions) => {
           if (!query.trim()) return suggestions;
-          return suggestions.filter(s => s.label.toLowerCase().startsWith(query.toLowerCase()));
+          return suggestions.filter(s => s.label.toLowerCase().includes(query.toLowerCase()));
         }}
         onInput={onInput}
         onAdd={onAddition}
@@ -232,6 +232,15 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
         onBlur={exposeHotkey}
         placeholderText=""
         allowNew
+        renderInput={({ classNames, inputWidth, ...inputProps }) => (
+          <input
+            className={classNames.input}
+            style={{ width: inputWidth }}
+            // prevent browser autocomplete (password managers, etc)
+            autoComplete="off"
+            {...inputProps}
+          />
+        )}
       />
       <AutocompleteView />
     </div>
