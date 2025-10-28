@@ -60,13 +60,8 @@ const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
 
 const buildAutocompleteIndex = () =>
   Array.from(globalTags).reduce((acc, next) => {
-    if (next.length === 1) {
-      return acc;
-    }
-
     acc[next] = [next];
     const normalized = normalizeForAutocomplete(next);
-
     if (!(normalized in acc)) {
       acc[normalized] = [];
     }
@@ -227,8 +222,8 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
         selected={tags}
         suggestions={suggestions}
         suggestionsTransform={(query, suggestions) => {
-          if (!query.trim()) return [];
-          return suggestions.filter(s => s.label.toLowerCase().includes(query.toLowerCase()));
+          if (!query.trim()) return suggestions;
+          return suggestions.filter(s => s.label.toLowerCase().startsWith(query.toLowerCase()));
         }}
         onInput={onInput}
         onAdd={onAddition}
