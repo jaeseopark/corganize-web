@@ -14,6 +14,7 @@ import { useToast } from "providers/toast/hook";
 import { globalTags } from "clients/adapter";
 
 import "./FileTagEditor.scss";
+import { matchSorter } from "match-sorter";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
@@ -92,7 +93,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   useEffect(() => {
     setTimeout(() => apiRef.current?.input.focus(), 100);
     return exposeHotkey; // expose the hot key when the component gets unmounted.
-  }, []);
+  }, [exposeHotkey]);
 
   /**
    * Generates the autocomplete candidates and suggestions when the component mounts.
@@ -109,7 +110,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
       setAutocompCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
     }
     setSuggestions(generateSuggestions(tokens));
-  }, []);
+  }, [file]);
 
   const assignTags = useCallback((tags: string[]) => {
     const payload = {
@@ -221,16 +222,18 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
         delimiterKeys={["Enter", "Tab", ","]}
         selected={tags}
         suggestions={suggestions}
-        suggestionsTransform={(query, suggestions) => {
-          if (!query.trim()) return suggestions;
-          return suggestions.filter(s => s.label.toLowerCase().includes(query.toLowerCase()));
-        }}
+        suggestionsTransform={(query, suggestions) =>
+          matchSorter(suggestions, query, { keys: ['label'] }).slice(0, 10)
+        }
         onInput={onInput}
         onAdd={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
+        onShouldExpand={(value) => value.trim().length > 0}
         placeholderText=""
+        labelText="" // Add this to remove the default "Select tags" label
+        tagListLabelText=""
         allowNew
         renderInput={({ classNames, inputWidth, ...inputProps }) => (
           <input
