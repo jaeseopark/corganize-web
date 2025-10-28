@@ -2,7 +2,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
 import { decode } from "leet-decode";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ReactTags } from "react-tag-autocomplete";
 import type { TagSelected, TagSuggestion } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
@@ -13,9 +13,8 @@ import { useToast } from "providers/toast/hook";
 
 import { globalTags } from "clients/adapter";
 
-import { madFocusByClassName } from "utils/elementUtils";
-
 import "./FileTagEditor.scss";
+import { matchSorter } from "match-sorter";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
@@ -62,13 +61,8 @@ const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
 
 const buildAutocompleteIndex = () =>
   Array.from(globalTags).reduce((acc, next) => {
-    if (next.length === 1) {
-      return acc;
-    }
-
     acc[next] = [next];
     const normalized = normalizeForAutocomplete(next);
-
     if (!(normalized in acc)) {
       acc[normalized] = [];
     }
@@ -86,19 +80,20 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   const { enqueueSuccess, enqueueError } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
   const [autocompEnabled, setAutocompEnabled] = useState(true);
-  const [candidates, setCandidates] = useState<string[]>([]);
+  const [autocompCandidates, setAutocompCandidates] = useState<string[]>([]);
 
   const file = findById(fileid);
   const tags: TagSelected[] = (file.tags || []).map((t) => ({ value: uuidv4().toString(), label: t }));
   const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
+  const apiRef = useRef<any>(null);
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
    */
   useEffect(() => {
-    madFocusByClassName("react-tags__search-input");
+    setTimeout(() => apiRef.current?.input.focus(), 100);
     return exposeHotkey; // expose the hot key when the component gets unmounted.
-  }, []);
+  }, [exposeHotkey]);
 
   /**
    * Generates the autocomplete candidates and suggestions when the component mounts.
@@ -112,12 +107,12 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
     if (matches.length > 0) {
       const tags = file.tags || [];
       const isBrandNew = (t: string) => !tags.includes(t);
-      setCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
+      setAutocompCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
     }
     setSuggestions(generateSuggestions(tokens));
-  }, []);
+  }, [file]);
 
-  const assignTags = (tags: string[]) => {
+  const assignTags = useCallback((tags: string[]) => {
     const payload = {
       fileid,
       tags,
@@ -126,9 +121,9 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
     updateFile(payload)
       .then(() => enqueueSuccess({ message: "Tags updated" }))
       .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }));
-  };
+  }, [fileid, updateFile, enqueueSuccess, enqueueError]);
 
-  const onAddition = (newTag: TagSelected) => {
+  const onAddition = useCallback((newTag: TagSelected) => {
     const tagss = file.tags || [];
     newTag.label = newTag.label.trim();
     if (newTag.label) {
@@ -137,40 +132,40 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
       }
     }
     setAutocompEnabled(true);
-  };
+  }, [file.tags, assignTags, setAutocompEnabled]);
 
-  const onDelete = (i: number) => {
+  const onDelete = useCallback((i: number) => {
     if (i < 0) return;
     const clone = (file.tags || []).slice(0);
     clone.splice(i, 1);
     assignTags(clone);
-  };
+  }, [file.tags, assignTags]);
 
-  const acceptCandidate = () => {
-    const [candidate, ...rest] = candidates;
+  const acceptCandidate = useCallback(() => {
+    const [candidate, ...rest] = autocompCandidates;
     assignTags([...(file.tags || []), candidate]);
-    setCandidates(rest);
-  };
+    setAutocompCandidates(rest);
+  }, [autocompCandidates, file.tags, assignTags, setAutocompCandidates]);
 
-  const rejectCandidate = () => {
-    const [, ...rest] = candidates;
-    setCandidates(rest);
-  };
+  const rejectCandidate = useCallback(() => {
+    const [, ...rest] = autocompCandidates;
+    setAutocompCandidates(rest);
+  }, [autocompCandidates, setAutocompCandidates]);
 
   /**
    * Enables the autocomplete mode only when user isn't typing.
    * @param query search string from the input component
    */
-  const onInput = (query: string) => {
+  const onInput = useCallback((query: string) => {
     const shouldEnableAutocomp = !query.trim();
     if (autocompEnabled !== shouldEnableAutocomp) {
       setAutocompEnabled(shouldEnableAutocomp);
     }
-  };
+  }, [autocompEnabled, setAutocompEnabled]);
 
-  const onKeyDown = (e: any) => {
+  const onKeyDown = useCallback((e: any) => {
     const { key } = e;
-    if (!autocompEnabled || candidates.length === 0) {
+    if (!autocompEnabled || autocompCandidates.length === 0) {
       return;
     }
 
@@ -179,14 +174,14 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
     } else if (key === "ArrowDown") {
       rejectCandidate();
     }
-  };
+  }, [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate]);
 
   const AutocompleteView = () => {
-    if (candidates.length === 0) {
+    if (autocompCandidates.length === 0) {
       return null;
     }
 
-    const [first, ...rest] = candidates;
+    const [first, ...rest] = autocompCandidates;
 
     return (
       <Flex className="autocomplete-candidates" direction="row">
@@ -223,15 +218,22 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
   return (
     <div className={cls("file-tag-editor", { mini })} onKeyDown={onKeyDown}>
       <ReactTags
+        ref={apiRef}
         delimiterKeys={["Enter", "Tab", ","]}
         selected={tags}
         suggestions={suggestions}
-        suggestionsTransform={(query, suggestions) => suggestions.filter(s => s.label.startsWith(query.toLowerCase()))}
+        suggestionsTransform={(query, suggestions) =>
+          matchSorter(suggestions, query, { keys: ['label'] }).slice(0, 10)
+        }
         onInput={onInput}
         onAdd={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
+        onShouldExpand={(value) => value.trim().length > 0}
+        placeholderText=""
+        labelText="" // Add this to remove the default "Select tags" label
+        tagListLabelText=""
         allowNew
       />
       <AutocompleteView />
