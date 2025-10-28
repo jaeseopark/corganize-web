@@ -235,15 +235,6 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
         labelText="" // Add this to remove the default "Select tags" label
         tagListLabelText=""
         allowNew
-        renderInput={({ classNames, inputWidth, ...inputProps }) => (
-          <input
-            className={classNames.input}
-            style={{ width: inputWidth }}
-            // prevent browser autocomplete (password managers, etc)
-            autoComplete="off"
-            {...inputProps}
-          />
-        )}
       />
       <AutocompleteView />
     </div>
