@@ -33,6 +33,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
       onTagsChange={assignTags}
       autocompSeed={file.filename}
       mini={mini}
+      allowNew
     />
   );
 };

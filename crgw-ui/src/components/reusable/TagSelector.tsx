@@ -77,6 +77,7 @@ type TagSelectorProps = {
   maxSelection?: number;
   minSuggestedTagLength?: number;
   mini?: boolean;
+  allowNew?: boolean;
 };
 
 const TagSelector = ({
@@ -85,7 +86,8 @@ const TagSelector = ({
   autocompSeed = "",
   maxSelection,
   minSuggestedTagLength = 2,
-  mini = false,
+  mini = true,
+  allowNew = false,
 }: TagSelectorProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
   const [autocompEnabled, setAutocompEnabled] = useState(true);
@@ -222,6 +224,10 @@ const TagSelector = ({
     );
   }
 
+  const placeholderText = maxSelection && selectedTags.length >= maxSelection 
+    ? `Maximum ${maxSelection} tags reached` 
+    : "";
+
   return (
     <div className={cls("tag-selector", { mini })} onKeyDown={onKeyDown}>
       <ReactTags
@@ -238,10 +244,10 @@ const TagSelector = ({
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
         onShouldExpand={(value) => value.trim().length > 0}
-        placeholderText=""
+        placeholderText={placeholderText}
         labelText="" // Add this to remove the default "Select tags" label
         tagListLabelText=""
-        allowNew
+        allowNew={allowNew && (!maxSelection || selectedTags.length < maxSelection)}
       />
       <AutocompleteView />
     </div>
