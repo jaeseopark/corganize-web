@@ -37,8 +37,10 @@ const MainView = () => {
   } = useGrid();
 
   useEffect(() => {
-    populateGlobalTags().then(() => setGlobalTagsLoaded(true));
-  }, []);
+    if (isAuthenticated) {
+      populateGlobalTags().then(() => setGlobalTagsLoaded(true));
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (sessionInfo) {
