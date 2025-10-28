@@ -14,6 +14,7 @@ import useAthentication from "hooks/authentication";
 import { useNavv } from "hooks/navv";
 
 import { login } from "clients/corganize";
+import { populateGlobalTags } from "clients/adapter";
 
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
@@ -26,6 +27,7 @@ import PageControl from "components/standalone/grid/PageControl";
 const MainView = () => {
   const { startSession } = useFileRepository();
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>();
+  const [globalTagsLoaded, setGlobalTagsLoaded] = useState(false);
   const { files } = useFileRepository();
   const { isBlanketEnabled } = useBlanket();
   const { navToAdmin } = useNavv();
@@ -33,6 +35,10 @@ const MainView = () => {
   const {
     fileProps: { setFiles: setGridFiles },
   } = useGrid();
+
+  useEffect(() => {
+    populateGlobalTags().then(() => setGlobalTagsLoaded(true));
+  }, []);
 
   useEffect(() => {
     if (sessionInfo) {
@@ -57,8 +63,8 @@ const MainView = () => {
   } else if (!sessionInfo) {
     mainContent = (
       <Center height="100vh" flexDir="column">
-        <SessionConfigurer setInfo={setSessionInfo} />
-        <Button leftIcon={<SettingsIcon />} onClick={navToAdmin} marginTop="1em">
+        <SessionConfigurer setInfo={setSessionInfo} disabled={!globalTagsLoaded} />
+        <Button leftIcon={<SettingsIcon />} onClick={navToAdmin} marginTop="1em" disabled={!globalTagsLoaded}>
           Admin
         </Button>
       </Center>

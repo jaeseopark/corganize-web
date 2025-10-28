@@ -1,29 +1,23 @@
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Button, VStack } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { FileEndpoint, SessionInfo } from "typedefs/Session";
 
 import TagSelector from "components/reusable/TagSelector";
 
 import "./SessionConfigurer.scss";
-import { populateGlobalTags } from "clients/adapter";
 
 const FILE_COUNT_INCREMENT = 500;
 const DEFAULT_FILE_COUNT_LIMIT = 1000;
 const MIN_FILE_SIZE_INCREMENT = 50;
 const MB_TO_BYTES = 1000000;
 
-const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
+const SessionConfigurer = ({ setInfo, disabled }: { setInfo: (s: SessionInfo) => void; disabled?: boolean }) => {
   const [fileCountLimit, setFileCountLimit] = useState(DEFAULT_FILE_COUNT_LIMIT);
   const [minFileSize, setMinFileSize] = useState(0);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");
   const [tag, setTag] = useState("");
-  const [globalTagsLoaded, setGlobalTagsLoaded] = useState(false);
-
-  useEffect(() => {
-    populateGlobalTags().then(() => setGlobalTagsLoaded(true));
-  }, []);
 
   const onOK = () =>
     setInfo({
@@ -69,18 +63,13 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
     </select>
   );
 
-  const renderTagInput = useCallback(() => {
-    if (!globalTagsLoaded) {
-      return null;
-    }
-    return (
-      <TagSelector
-        selectedTags={tag ? [tag] : []}
-        onTagsChange={(tags) => setTag(tags[0] || "")}
-        maxSelection={1}
-      />
-    );
-  }, [globalTagsLoaded, tag]);
+  const renderTagInput = () => (
+    <TagSelector
+      selectedTags={tag ? [tag] : []}
+      onTagsChange={(tags) => setTag(tags[0] || "")}
+      maxSelection={1}
+    />
+  );
 
   const renderConfigTable = () => (
     <div className="config-table">
@@ -121,6 +110,7 @@ const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) =
         colorScheme="teal"
         variant="solid"
         aria-label="Start Session"
+        disabled={disabled}
       >
         {buttonLabel}
       </Button>

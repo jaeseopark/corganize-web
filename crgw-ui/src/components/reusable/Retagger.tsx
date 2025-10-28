@@ -1,6 +1,6 @@
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Button, HStack, IconButton, Input, Select, Table, Tbody, Td, Tr } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
@@ -11,7 +11,6 @@ import { useToast } from "providers/toast/hook";
 import TagSelector from "./TagSelector";
 
 import { getFilesByTagsWithoutPagination, updateFile } from "clients/corganize";
-import { populateGlobalTags } from "clients/adapter";
 
 type TagOperatorWithoutId =
   | { type: "rename"; originalTag: string; value: string }
@@ -98,13 +97,8 @@ const consolidate = (operators: TagOperator[]) => (file: CorganizeFile) =>
 const Retagger = () => {
   const [operators, setOperators] = useState<TagOperator[]>([]);
   const [tag, setTag] = useState("");
-  const [globalTagsLoaded, setGlobalTagsLoaded] = useState(false);
   const { enqueueWarning, enqueueSuccess, enqueueAsync } = useToast();
   const { protectHotkey, exposeHotkey } = useBlanket();
-
-  useEffect(() => {
-    populateGlobalTags().then(() => setGlobalTagsLoaded(true));
-  }, []);
 
   const getFirstInputViolation = () => {
     if (tag.length === 0) {
@@ -168,25 +162,16 @@ const Retagger = () => {
     setTag("");
   };
 
-  const renderTagSelector = useCallback(() => {
-    if (!globalTagsLoaded) {
-      return null;
-    }
-    return (
-      <TagSelector
-        selectedTags={tag ? [tag] : []}
-        onTagsChange={(tags) => setTag(tags[0] || "")}
-        maxSelection={1}
-      />
-    );
-  }, [globalTagsLoaded, tag]);
-
   return (
     <Table>
       <Tbody>
         <Tr>
           <Td colSpan={2}>
-            {renderTagSelector()}
+            <TagSelector
+              selectedTags={tag ? [tag] : []}
+              onTagsChange={(tags) => setTag(tags[0] || "")}
+              maxSelection={1}
+            />
           </Td>
           <Td>
             <IconButton
