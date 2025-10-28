@@ -1,5 +1,5 @@
 import { CloseIcon, MinusIcon } from "@chakra-ui/icons";
-import { useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { BlanketContext, UserAction } from "providers/blanket/blanket";
@@ -25,16 +25,16 @@ export const useBlanket = () => {
     state: { title, body, userActions },
     dispatch,
   } = useContext(BlanketContext);
-  const nagivate = useNavigate();
+  const navigate = useNavigate();
 
-  const isBlanketEnabled = !!title && !!body;
-  const exitBlanket = () => dispatch!({ type: "UNSET" });
+  const isBlanketEnabled = useMemo(() => !!title && !!body, [title, body]);
+  const exitBlanket = useCallback(() => dispatch!({ type: "UNSET" }), [dispatch]);
 
-  const setBlanket = ({ title, fileid, body, userActions }: SetBlanketProps) => {
+  const setBlanket = useCallback(({ title, fileid, body, userActions }: SetBlanketProps) => {
     const defaultUserAction: UserAction = {
       name: "Close",
       icon: <CloseIcon />,
-      onClick: () => nagivate("/"),
+      onClick: () => navigate("/"),
     };
 
     const payload = {
@@ -44,9 +44,9 @@ export const useBlanket = () => {
     };
 
     dispatch!({ type: "SET", payload });
-  };
+  }, [dispatch, navigate]);
 
-  const upsertUserAction = ({ name, icon, onClick }: UserAction) =>
+  const upsertUserAction = useCallback(({ name, icon, onClick }: UserAction) =>
     dispatch!({
       type: "UPSERT_USER_ACTION",
       payload: {
@@ -54,15 +54,15 @@ export const useBlanket = () => {
         onClick,
         icon: icon || <MinusIcon />,
       },
-    });
+    }), [dispatch]);
 
-  const protectHotkey = () => {
+  const protectHotkey = useCallback(() => {
     isHotkeyProtected = true;
-  };
+  }, []);
 
-  const exposeHotkey = () => {
+  const exposeHotkey = useCallback(() => {
     isHotkeyProtected = false;
-  };
+  }, []);
 
   return {
     title,
