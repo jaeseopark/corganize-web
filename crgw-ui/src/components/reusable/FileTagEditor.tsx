@@ -34,6 +34,7 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
       autocompSeed={file.filename}
       mini={mini}
       allowNew
+      shouldAutofocus
     />
   );
 };

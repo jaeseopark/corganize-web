@@ -78,6 +78,7 @@ type TagSelectorProps = {
   minSuggestedTagLength?: number;
   mini?: boolean;
   allowNew?: boolean;
+  shouldAutofocus?: boolean;
 };
 
 const TagSelector = ({
@@ -88,6 +89,7 @@ const TagSelector = ({
   minSuggestedTagLength = 2,
   mini = true,
   allowNew = false,
+  shouldAutofocus = false,
 }: TagSelectorProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
   const [autocompEnabled, setAutocompEnabled] = useState(true);
@@ -101,7 +103,9 @@ const TagSelector = ({
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
    */
   useEffect(() => {
-    setTimeout(() => apiRef.current?.input.focus(), 100);
+    if (shouldAutofocus) {
+      setTimeout(() => apiRef.current?.input.focus(), 100);
+    }
     return exposeHotkey; // expose the hot key when the component gets unmounted.
   }, [exposeHotkey]);
 
