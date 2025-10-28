@@ -45,9 +45,9 @@ const fieldTags: Field = {
 const fieldBookmark: Field = {
   displayName: "Bookmark",
   key: "bookmarkexpiry",
-  "sortType": "boolean",
-  filterType: "boolean"
-}
+  sortType: "boolean",
+  filterType: "boolean",
+};
 
 const fieldDuration: Field = {
   displayName: "Duration",
@@ -65,5 +65,5 @@ export default {
   fieldSize,
   fieldTags,
   fieldBookmark,
-  fieldDuration
+  fieldDuration,
 };

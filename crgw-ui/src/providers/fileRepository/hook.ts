@@ -63,7 +63,7 @@ export const useFileRepository = () => {
     };
 
     return updateFile(partialProps).then(() =>
-      dispatch!({ type: "SET_MOST_RECENT", payload: fileid })
+      dispatch!({ type: "SET_MOST_RECENT", payload: fileid }),
     );
   };
 
@@ -151,6 +151,6 @@ export const useFileRepository = () => {
       cut: processSegments(client.cut),
       reencode: client.reencode,
     },
-    toggleSessionBookmark: toggleBookmark
+    toggleSessionBookmark: toggleBookmark,
   };
 };

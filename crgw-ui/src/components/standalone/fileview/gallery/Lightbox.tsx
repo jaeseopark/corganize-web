@@ -12,7 +12,7 @@ const Lightbox = forwardRef(
       highlightProps: { setNextHighlightIndex },
       modeProps: { mode },
     }: GalleryProps,
-    ref
+    ref,
   ) => {
     const localRef = useRef<HTMLDivElement | null>(null);
     const multiRef = useMergeRefs(localRef, ref);
@@ -43,7 +43,7 @@ const Lightbox = forwardRef(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default Lightbox;

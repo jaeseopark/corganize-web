@@ -36,7 +36,7 @@ const toIndex = (localFilenames: string[]) =>
 
 export async function retrieveFiles(
   arg: string[] | SessionInfo,
-  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[]
+  onLoad: (moreFiles: CorganizeFile[]) => CorganizeFile[],
 ) {
   let count = 0;
 

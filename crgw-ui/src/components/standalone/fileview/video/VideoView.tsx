@@ -58,7 +58,7 @@ const VideoView = forwardRef(({ fileid }: { fileid: string }, ref) => {
         multimedia: m,
       });
     },
-    [multimedia, updateFile, fileid]
+    [multimedia, updateFile, fileid],
   );
 
   const onMetadata = ({ target }: any) => {
@@ -82,7 +82,7 @@ const VideoView = forwardRef(({ fileid }: { fileid: string }, ref) => {
 
   const postprocessSegments = async (
     name: string,
-    func: (fileid: string, segments: Segment[]) => Promise<void>
+    func: (fileid: string, segments: Segment[]) => Promise<void>,
   ) => {
     if (closedSegments.length === 0) {
       enqueueWarning({ message: "Need segments" });

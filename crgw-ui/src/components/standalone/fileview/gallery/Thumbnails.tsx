@@ -14,7 +14,7 @@ const Thumbnails = forwardRef(
       modeProps: { mode, enterLightboxMode },
       highlightProps: { isHighlighted },
     }: GalleryProps,
-    ref: Ref<HTMLDivElement>
+    ref: Ref<HTMLDivElement>,
   ) => {
     const localRef = useRef<HTMLDivElement | null>(null);
     const selectedImgRef = useRef<HTMLDivElement | null>(null);
@@ -55,7 +55,7 @@ const Thumbnails = forwardRef(
         })}
       </SimpleGrid>
     );
-  }
+  },
 );
 
 export default Thumbnails;

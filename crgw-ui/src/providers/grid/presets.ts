@@ -106,9 +106,9 @@ const PRESET_BOOKMARKED: Preset = {
     {
       field: Fields.fieldBookmark,
       boolean: {
-        value: "checked"
-      }
-    }
+        value: "checked",
+      },
+    },
   ],
   sorts: [
     {

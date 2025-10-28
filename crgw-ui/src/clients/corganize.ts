@@ -30,7 +30,7 @@ function b64EncodeUnicode(str: string) {
   return window.btoa(
     encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
       return String.fromCharCode(parseInt(p1, 16));
-    })
+    }),
   );
 }
 
@@ -45,7 +45,7 @@ const proxyFetch = (
   url: RequestInfo,
   method: "GET" | "POST" | "PATCH" | "DELETE" = "GET",
   data: object = {},
-  init?: RequestInit
+  init?: RequestInit,
 ) => {
   let headers = {
     "crg-method": method,
@@ -77,7 +77,7 @@ const getFilesById = (fileIds: string[]) => {
         acc.push(...result.value);
       }
       return acc;
-    }, new Array<CorganizeFile>())
+    }, new Array<CorganizeFile>()),
   );
 };
 
@@ -94,7 +94,7 @@ export const getFilesBySessionInfo = (sessionInfo: SessionInfo, callback: Retrie
 
 export const getFilesByTags = (
   tags: string[],
-  callback: (files: CorganizeFile[]) => CorganizeFile[]
+  callback: (files: CorganizeFile[]) => CorganizeFile[],
 ) => {
   const npg = nextPageGetter("/api/remote/files", { tags: tags.join("|") }, callback);
   return getFilesWithPagination(npg, 99999);
@@ -127,7 +127,7 @@ const nextPageGetter = (path: string, params: Dictionary<string>, callback: Retr
 export const getFilesWithPagination = async (
   getNextPage: (token?: string) => Promise<FileResponse>,
   remaining: number,
-  paginationToken?: string
+  paginationToken?: string,
 ): Promise<void> => {
   if (remaining <= 0) return;
 
@@ -143,11 +143,11 @@ export const getFilesWithPagination = async (
 
 export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => {
   const findFileById = (fileid: string) =>
-  ({
-    ...files.find((f) => f.fileid === fileid),
-    lastupdated: getPosixSeconds(),
-    dateactivated: getPosixSeconds(),
-  } as CorganizeFile);
+    ({
+      ...files.find((f) => f.fileid === fileid),
+      lastupdated: getPosixSeconds(),
+      dateactivated: getPosixSeconds(),
+    }) as CorganizeFile;
 
   const promises = chunk(files, CREATE_FILE_CHUNK_SIZE).map((thisChunk) =>
     proxyFetch("/api/remote/files", "POST", thisChunk)
@@ -163,7 +163,7 @@ export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => 
           created: created.map(findFileById),
           skipped: skipped.map(findFileById),
         };
-      })
+      }),
   );
 
   return Promise.all(promises).then((responses) =>
@@ -174,13 +174,13 @@ export const createFiles = (files: CorganizeFile[]): Promise<CreateResponse> => 
           skipped: [...acc.skipped, ...next.skipped],
         };
       },
-      { created: [], skipped: [] } as CreateResponse
-    )
+      { created: [], skipped: [] } as CreateResponse,
+    ),
   );
 };
 
 export const updateFile = (
-  partialProps: Partial<CorganizeFile>
+  partialProps: Partial<CorganizeFile>,
 ): Promise<Partial<CorganizeFile>> => {
   return proxyFetch("/api/remote/files", "PATCH", partialProps).then((response) => {
     if (response.status !== 200) {
@@ -205,10 +205,14 @@ export const getGlobalTags = (): Promise<string[]> =>
     .then((res) => res.json())
     .then(({ tags }) => tags);
 
-const postprocessScarpePromise = (promise: Promise<CorganizeFile[]>): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> => {
-  const ignoreFilesWithoutNames = (files: CorganizeFile[]): CorganizeFile[] => files.filter(f => f.filename);
+const postprocessScarpePromise = (
+  promise: Promise<CorganizeFile[]>,
+): Promise<{ available: CorganizeFile[]; discarded: CorganizeFile[] }> => {
+  const ignoreFilesWithoutNames = (files: CorganizeFile[]): CorganizeFile[] =>
+    files.filter((f) => f.filename);
 
-  const populateMissingFields = (files: CorganizeFile[]): CorganizeFile[] => files.map(f => ({ ...f, storageservice: "None" }));
+  const populateMissingFields = (files: CorganizeFile[]): CorganizeFile[] =>
+    files.map((f) => ({ ...f, storageservice: "None" }));
 
   const dedupFilesById = (files: CorganizeFile[]) =>
     files.filter((v, i, a) => a.findIndex((f) => f.fileid === v.fileid) === i);
@@ -228,9 +232,7 @@ const postprocessScarpePromise = (promise: Promise<CorganizeFile[]>): Promise<{ 
     .then(dedupAgainstDatabase);
 };
 
-export const scrapeAsync = (
-  ...urls: string[]
-) => {
+export const scrapeAsync = (...urls: string[]) => {
   const scrapeSingleUrl = (url: string) =>
     fetchWithCreds("/api/scrape", {
       method: "POST",
@@ -242,18 +244,17 @@ export const scrapeAsync = (
       .then((res) => res.json())
       .then(({ files }) => files);
 
-  const selttled = Promise.allSettled(urls.map((url) => scrapeSingleUrl(url)))
-    .then((results) =>
-      results.reduce((acc, result) => {
-        if (result.status === "fulfilled") {
-          acc.push(...result.value);
-        }
-        return acc;
-      }, new Array<CorganizeFile>())
-    )
+  const selttled = Promise.allSettled(urls.map((url) => scrapeSingleUrl(url))).then((results) =>
+    results.reduce((acc, result) => {
+      if (result.status === "fulfilled") {
+        acc.push(...result.value);
+      }
+      return acc;
+    }, new Array<CorganizeFile>()),
+  );
 
   return postprocessScarpePromise(selttled);
-}
+};
 
 export const scrapeHtmlAsync = (html: string) => {
   const promise = fetchWithCreds("/api/scrape", {
@@ -267,7 +268,7 @@ export const scrapeHtmlAsync = (html: string) => {
     .then(({ files }) => files);
 
   return postprocessScarpePromise(promise);
-}
+};
 
 export const scrapeLiteralUrlsAsync = (urls: string[]): Promise<CorganizeFile[]> =>
   fetchWithCreds("/api/scrape/literal", {

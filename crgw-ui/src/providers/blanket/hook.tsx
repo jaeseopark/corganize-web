@@ -30,31 +30,37 @@ export const useBlanket = () => {
   const isBlanketEnabled = useMemo(() => !!title && !!body, [title, body]);
   const exitBlanket = useCallback(() => dispatch!({ type: "UNSET" }), [dispatch]);
 
-  const setBlanket = useCallback(({ title, fileid, body, userActions }: SetBlanketProps) => {
-    const defaultUserAction: UserAction = {
-      name: "Close",
-      icon: <CloseIcon />,
-      onClick: () => navigate("/"),
-    };
+  const setBlanket = useCallback(
+    ({ title, fileid, body, userActions }: SetBlanketProps) => {
+      const defaultUserAction: UserAction = {
+        name: "Close",
+        icon: <CloseIcon />,
+        onClick: () => navigate("/"),
+      };
 
-    const payload = {
-      title: title || <FileHeader fileid={fileid!} />,
-      body,
-      userActions: userActions || [defaultUserAction],
-    };
+      const payload = {
+        title: title || <FileHeader fileid={fileid!} />,
+        body,
+        userActions: userActions || [defaultUserAction],
+      };
 
-    dispatch!({ type: "SET", payload });
-  }, [dispatch, navigate]);
+      dispatch!({ type: "SET", payload });
+    },
+    [dispatch, navigate],
+  );
 
-  const upsertUserAction = useCallback(({ name, icon, onClick }: UserAction) =>
-    dispatch!({
-      type: "UPSERT_USER_ACTION",
-      payload: {
-        name,
-        onClick,
-        icon: icon || <MinusIcon />,
-      },
-    }), [dispatch]);
+  const upsertUserAction = useCallback(
+    ({ name, icon, onClick }: UserAction) =>
+      dispatch!({
+        type: "UPSERT_USER_ACTION",
+        payload: {
+          name,
+          onClick,
+          icon: icon || <MinusIcon />,
+        },
+      }),
+    [dispatch],
+  );
 
   const protectHotkey = useCallback(() => {
     isHotkeyProtected = true;

@@ -62,10 +62,10 @@ const FileView = ({ fileid }: { fileid: string }) => {
         .then(({ message, emoji }) =>
           enqueueSuccess({
             message: `${message} ${emoji}`,
-          })
+          }),
         )
         .catch((error: Error) => enqueueError({ message: error.message })),
-    [toggleActivation]
+    [toggleActivation],
   );
 
   const madFocusContent = useCallback(() => {

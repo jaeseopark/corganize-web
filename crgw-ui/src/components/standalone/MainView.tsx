@@ -66,7 +66,12 @@ const MainView = () => {
     mainContent = (
       <Center height="100vh" flexDir="column">
         <SessionConfigurer setInfo={setSessionInfo} disabled={!globalTagsLoaded} />
-        <Button leftIcon={<SettingsIcon />} onClick={navToAdmin} marginTop="1em" disabled={!globalTagsLoaded}>
+        <Button
+          leftIcon={<SettingsIcon />}
+          onClick={navToAdmin}
+          marginTop="1em"
+          disabled={!globalTagsLoaded}
+        >
           Admin
         </Button>
       </Center>

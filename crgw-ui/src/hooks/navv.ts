@@ -8,7 +8,7 @@ export const useNavv = () => {
   return {
     navRoot: () => navigate("/"),
     navToAdmin: () => navigate("/admin"),
-    navBlankScrape: () => navigate('/scrape'),
+    navBlankScrape: () => navigate("/scrape"),
     navJson: (file: CorganizeFile) => navigate(`/file/${file.fileid}/json`),
     navContent: (file: CorganizeFile) => navigate(`/file/${file.fileid}/content`),
     navTags: (file: CorganizeFile) => navigate(`/file/${file.fileid}/tags`),

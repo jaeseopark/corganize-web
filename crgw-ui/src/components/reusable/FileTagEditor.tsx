@@ -16,16 +16,19 @@ const FileTagEditor = ({ fileid, mini }: FileTagEditorProps) => {
 
   const file = findById(fileid);
 
-  const assignTags = useCallback((tags: string[]) => {
-    const payload = {
-      fileid,
-      tags,
-    };
+  const assignTags = useCallback(
+    (tags: string[]) => {
+      const payload = {
+        fileid,
+        tags,
+      };
 
-    updateFile(payload)
-      .then(() => enqueueSuccess({ message: "Tags updated" }))
-      .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }));
-  }, [fileid, updateFile, enqueueSuccess, enqueueError]);
+      updateFile(payload)
+        .then(() => enqueueSuccess({ message: "Tags updated" }))
+        .catch((e: Error) => enqueueError({ header: "Failed", message: e.message }));
+    },
+    [fileid, updateFile, enqueueSuccess, enqueueError],
+  );
 
   return (
     <TagSelector

@@ -142,7 +142,9 @@ const Retagger = () => {
         return files.map(consolidatedOperator);
       })
       .then((mappedFiles) =>
-        Promise.all(mappedFiles.map((file) => updateFile({ fileid: file.fileid, tags: file.tags })))
+        Promise.all(
+          mappedFiles.map((file) => updateFile({ fileid: file.fileid, tags: file.tags })),
+        ),
       )
       .then(() => enqueueSuccess({ message: "Done" }));
   };

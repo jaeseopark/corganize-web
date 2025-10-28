@@ -74,5 +74,5 @@ export const createMegaFilter = (filters: Filter[]) =>
 
       return acc;
     },
-    (f: CorganizeFile) => true
+    (f: CorganizeFile) => true,
   );

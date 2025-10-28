@@ -60,15 +60,18 @@ const generateSuggestions = (tokens: Set<string>, minLength: number) => {
 const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
 
 const buildAutocompleteIndex = () =>
-  Array.from(globalTags).reduce((acc, next) => {
-    acc[next] = [next];
-    const normalized = normalizeForAutocomplete(next);
-    if (!(normalized in acc)) {
-      acc[normalized] = [];
-    }
-    acc[normalized].push(next);
-    return acc;
-  }, {} as { [key: string]: string[] });
+  Array.from(globalTags).reduce(
+    (acc, next) => {
+      acc[next] = [next];
+      const normalized = normalizeForAutocomplete(next);
+      if (!(normalized in acc)) {
+        acc[normalized] = [];
+      }
+      acc[normalized].push(next);
+      return acc;
+    },
+    {} as { [key: string]: string[] },
+  );
 
 type TagSelectorProps = {
   selectedTags: string[];
@@ -131,25 +134,31 @@ const TagSelector = ({
     }
   }, [autocompSeed, selectedTags, minSuggestedTagLength]);
 
-  const onAddition = useCallback((newTag: TagSelected) => {
-    newTag.label = newTag.label.trim();
-    if (newTag.label) {
-      if (!selectedTags.includes(newTag.label)) {
-        const newTags = [...selectedTags, newTag.label.toLowerCase()];
-        if (!maxSelection || newTags.length <= maxSelection) {
-          onTagsChange(newTags);
+  const onAddition = useCallback(
+    (newTag: TagSelected) => {
+      newTag.label = newTag.label.trim();
+      if (newTag.label) {
+        if (!selectedTags.includes(newTag.label)) {
+          const newTags = [...selectedTags, newTag.label.toLowerCase()];
+          if (!maxSelection || newTags.length <= maxSelection) {
+            onTagsChange(newTags);
+          }
         }
       }
-    }
-    setAutocompEnabled(true);
-  }, [selectedTags, onTagsChange, maxSelection, setAutocompEnabled]);
+      setAutocompEnabled(true);
+    },
+    [selectedTags, onTagsChange, maxSelection, setAutocompEnabled],
+  );
 
-  const onDelete = useCallback((i: number) => {
-    if (i < 0) return;
-    const clone = selectedTags.slice(0);
-    clone.splice(i, 1);
-    onTagsChange(clone);
-  }, [selectedTags, onTagsChange]);
+  const onDelete = useCallback(
+    (i: number) => {
+      if (i < 0) return;
+      const clone = selectedTags.slice(0);
+      clone.splice(i, 1);
+      onTagsChange(clone);
+    },
+    [selectedTags, onTagsChange],
+  );
 
   const acceptCandidate = useCallback(() => {
     const [candidate, ...rest] = autocompCandidates;
@@ -169,25 +178,31 @@ const TagSelector = ({
    * Enables the autocomplete mode only when user isn't typing.
    * @param query search string from the input component
    */
-  const onInput = useCallback((query: string) => {
-    const shouldEnableAutocomp = !query.trim();
-    if (autocompEnabled !== shouldEnableAutocomp) {
-      setAutocompEnabled(shouldEnableAutocomp);
-    }
-  }, [autocompEnabled]);
+  const onInput = useCallback(
+    (query: string) => {
+      const shouldEnableAutocomp = !query.trim();
+      if (autocompEnabled !== shouldEnableAutocomp) {
+        setAutocompEnabled(shouldEnableAutocomp);
+      }
+    },
+    [autocompEnabled],
+  );
 
-  const onKeyDown = useCallback((e: any) => {
-    const { key } = e;
-    if (!autocompEnabled || autocompCandidates.length === 0) {
-      return;
-    }
+  const onKeyDown = useCallback(
+    (e: any) => {
+      const { key } = e;
+      if (!autocompEnabled || autocompCandidates.length === 0) {
+        return;
+      }
 
-    if (key === "ArrowUp") {
-      acceptCandidate();
-    } else if (key === "ArrowDown") {
-      rejectCandidate();
-    }
-  }, [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate]);
+      if (key === "ArrowUp") {
+        acceptCandidate();
+      } else if (key === "ArrowDown") {
+        rejectCandidate();
+      }
+    },
+    [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate],
+  );
 
   const AutocompleteView = () => {
     if (autocompCandidates.length === 0) {
@@ -228,9 +243,10 @@ const TagSelector = ({
     );
   }
 
-  const placeholderText = maxSelection && selectedTags.length >= maxSelection 
-    ? `Maximum ${maxSelection} tags reached` 
-    : "";
+  const placeholderText =
+    maxSelection && selectedTags.length >= maxSelection
+      ? `Maximum ${maxSelection} tags reached`
+      : "";
 
   return (
     <div className={cls("tag-selector", { mini })} onKeyDown={onKeyDown}>
@@ -240,7 +256,7 @@ const TagSelector = ({
         selected={tags}
         suggestions={suggestions}
         suggestionsTransform={(query, suggestions) =>
-          matchSorter(suggestions, query, { keys: ['label'] }).slice(0, 10)
+          matchSorter(suggestions, query, { keys: ["label"] }).slice(0, 10)
         }
         onInput={onInput}
         onAdd={onAddition}

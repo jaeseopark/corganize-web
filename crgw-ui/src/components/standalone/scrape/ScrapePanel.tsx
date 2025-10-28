@@ -67,7 +67,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
         .catch(setError)
         .finally(() => setProcessing(false));
     },
-    [isProcessing, url, html]
+    [isProcessing, url, html],
   );
 
   useEffect(() => {

@@ -11,7 +11,7 @@ const getFieldValue = (file: CorganizeFile, fld: Field) => {
       return Number(file[fld.key]) || 0;
     }
     const obj = file[fld.key] || {};
-    return Number((obj as Record<string, number>)[fld.nestedKey]) || 0
+    return Number((obj as Record<string, number>)[fld.nestedKey]) || 0;
   } else if (fld.sortType === "boolean") {
     return Boolean(file[fld.key]) || false;
   } else if (fld.sortType === "string") {

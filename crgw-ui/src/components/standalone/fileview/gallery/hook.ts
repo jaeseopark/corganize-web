@@ -15,7 +15,7 @@ export type Mode = "lightbox" | "summary" | "thumbnail" | "edit";
 export const useGallery = (
   srcs: string[],
   updateMultimedia: (newProps: Partial<Multimedia>) => Promise<void>,
-  highlightsSeed?: string
+  highlightsSeed?: string,
 ) => {
   const { enqueue } = useToast();
   const [mode, setMode] = useState<Mode>("thumbnail");

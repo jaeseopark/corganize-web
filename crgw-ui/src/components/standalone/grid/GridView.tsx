@@ -58,7 +58,7 @@ const GridView = () => {
   const toggleActivationOfFile = (file?: CorganizeFile) => {
     if (!file) return;
     toggleActivation(file.fileid).then(({ message, emoji }) =>
-      enqueueSuccess({ message: `${message} ${emoji}` })
+      enqueueSuccess({ message: `${message} ${emoji}` }),
     );
   };
 

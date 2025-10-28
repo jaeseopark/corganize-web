@@ -124,7 +124,7 @@ const ScrapeInputBar = ({
     }))
     .concat(
       { status: "Discarded", length: rawScrapeCount - cards.length },
-      { status: "Scraped", length: rawScrapeCount }
+      { status: "Scraped", length: rawScrapeCount },
     );
 
   const getTextInputElement = () => {

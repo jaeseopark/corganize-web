@@ -63,7 +63,7 @@ const GalleryView = forwardRef(({ fileid }: { fileid: string }, ref: Ref<HTMLDiv
         multimedia: m,
       });
     },
-    [multimedia, updateFile]
+    [multimedia, updateFile],
   );
 
   const galleryProps = useGallery(unzippedUrls, updateMultimedia, multimedia?.highlights);
