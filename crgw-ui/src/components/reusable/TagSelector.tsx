@@ -195,13 +195,12 @@ const TagSelector = ({
 
   const suggestionsTransform: SuggestionsTransform = useCallback(
     (query: string, suggestions: TagSuggestion[]) => {
-      // probably replaced by onShouldExpand.. delete later.
-      // if (query.trim().length === 0) {
-      //   return [];
-      // }
-      return fuzzysort.go(query, suggestions, { key: 'label' }).slice(0, 10).map(r => r.obj);
+      return fuzzysort.go(query, suggestions, {
+        keys: ['label'],
+        scoreFn: (r) => r.score * (autocompTokens.includes(r.obj.label) ? 2 : 1)
+      }).slice(0, 10).map(r => r.obj);
     },
-    [],
+    [autocompTokens],
   );
 
   const AutocompleteView = () => {
