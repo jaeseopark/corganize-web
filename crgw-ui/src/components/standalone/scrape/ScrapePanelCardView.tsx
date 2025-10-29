@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import cls from "classnames";
+import { useCallback } from "react";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
 
@@ -33,21 +34,23 @@ const CardView = ({ card, onSend, onScrape, disableScrapeButton }: CardViewProps
   const title = `${fileid}: ${filename.substring(0, FILENAME_LENGTH)}`;
   const complete = status === CARD_STATUS.COMPLETE;
   const clickable = status === CARD_STATUS.AVAILABLE;
-  const onSendCard = () => {
+  const handleSendCard = useCallback(() => {
     if (clickable) onSend(card);
-  };
+  }, [clickable, onSend, card]);
+
+  const handleScrape = useCallback(() => onScrape(sourceurl), [onScrape, sourceurl]);
 
   return (
     <div className={cls("scrape-card", { error, complete })}>
       <img
         className={cls("thumbnail", { clickable, error, complete })}
         src={thumbnailurl || "not.found.jpg"}
-        onClick={onSendCard}
+        onClick={handleSendCard}
         alt={title}
       />
       <Button
         className="scrape-button"
-        onClick={() => onScrape(sourceurl)}
+        onClick={handleScrape}
         disabled={disableScrapeButton}
       >
         Scrape
