@@ -1,5 +1,5 @@
 import { AddIcon } from "@chakra-ui/icons";
-import { Button, HStack, IconButton, Progress, Table, Tbody, Td, Tr } from "@chakra-ui/react";
+import { Button, HStack, IconButton, Progress, Table, Tbody, Td, Tr, VStack, Text } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -11,17 +11,20 @@ import TagSelector from "../TagSelector";
 
 import { getFilesByTagsWithoutPagination, updateFile } from "clients/corganize";
 
-import LineGraph from "./LineGraph";
+import LineGraph, { GraphDataPoint } from "./LineGraph";
 import OperatorComponent from "./OperatorComponent";
 import { TagOperator, TagOperatorWithoutId } from "./types";
 import { consolidate } from "./utils";
+
+const MAX_FILES_TO_PROCESS = 500;
 
 const Retagger: React.FC = () => {
   const [operators, setOperators] = useState<TagOperator[]>([]);
   const [tag, setTag] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [fpsData, setFpsData] = useState<{ time: number; fps: number }[]>([]);
+  const [progressData, setProgressData] = useState<GraphDataPoint[]>([]);
+  const [totalFiles, setTotalFiles] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const { enqueueWarning } = useToast();
@@ -64,19 +67,26 @@ const Retagger: React.FC = () => {
     setShowProgress(true);
     setIsRunning(true);
     setProgress(0);
-    setFpsData([]);
+    setProgressData([]);
 
     getFilesByTagsWithoutPagination([tag.trim()])
       .then((files: CorganizeFile[]) => {
-        const total = files.length;
-        const mappedFiles = files.map(consolidatedOperator);
+        const limitedFiles = files.slice(0, MAX_FILES_TO_PROCESS);
+        const total = limitedFiles.length;
+        setTotalFiles(total);
+        
+        // Warn user if files were truncated
+        if (files.length > MAX_FILES_TO_PROCESS) {
+          enqueueWarning({ message: `Found ${files.length} files, but only processing the first ${MAX_FILES_TO_PROCESS} to avoid network throttling.` });
+        }
+        
+        const mappedFiles = limitedFiles.map(consolidatedOperator);
         let processed = 0;
         const startTime = Date.now();
 
         const id = setInterval(() => {
           const elapsed = (Date.now() - startTime) / 1000;
-          const fps = processed / elapsed;
-          setFpsData((prev) => [...prev, { time: elapsed, fps }]);
+          setProgressData((prev) => [...prev, { timestamp: elapsed, processed }]);
         }, 1000);
 
         setIntervalId(id);
@@ -118,12 +128,13 @@ const Retagger: React.FC = () => {
     ]);
   }, [operators]);
 
-  const reset = useCallback(() => {
+    const reset = useCallback(() => {
     setOperators([]);
     setTag("");
     setIsRunning(false);
     setProgress(0);
-    setFpsData([]);
+    setProgressData([]);
+    setTotalFiles(0);
     setShowProgress(false);
     if (intervalId) clearInterval(intervalId);
   }, [intervalId]);
@@ -160,8 +171,13 @@ const Retagger: React.FC = () => {
         {showProgress && (
           <Tr>
             <Td colSpan={3}>
-              <LineGraph data={fpsData} />
-              <Progress value={progress} />
+              <LineGraph data={progressData} />
+              <VStack spacing={1} align="stretch">
+                <Text fontSize="sm" textAlign="center">
+                  {Math.round(progress * totalFiles / 100)}/{totalFiles} ({Math.round(progress)}%)
+                </Text>
+                <Progress value={progress} />
+              </VStack>
             </Td>
           </Tr>
         )}
