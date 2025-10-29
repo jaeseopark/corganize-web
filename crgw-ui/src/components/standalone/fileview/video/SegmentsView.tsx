@@ -1,5 +1,6 @@
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
+import { useCallback } from "react";
 
 import {
   ClosedSegmentBlock,
@@ -23,6 +24,11 @@ const SegmentsView = ({
   jumpToTime: (percent: number) => void;
   duration?: number;
 } & Partial<CorganizeFile>) => {
+  const getOnClick = useCallback(
+    (m: number) => () => jumpToTime((duration! * m) / 10),
+    [jumpToTime, duration],
+  );
+
   if (!duration) {
     return null;
   }
@@ -58,7 +64,7 @@ const SegmentsView = ({
     return (
       <>
         {MARKERS.map((m) => (
-          <TimeMarker key={m} value={m} onClick={() => jumpToTime((duration * m) / 10)} />
+          <TimeMarker key={m} value={m} onClick={getOnClick(m)} />
         ))}
       </>
     );

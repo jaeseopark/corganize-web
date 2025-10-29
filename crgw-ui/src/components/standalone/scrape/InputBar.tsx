@@ -13,7 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import cls from "classnames";
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useBlanket } from "providers/blanket/hook";
 
@@ -47,16 +47,19 @@ const AddButtonGroup = ({
 }) => {
   const selectRef = useRef<HTMLSelectElement | null>(null);
 
-  const addCards = (cards: Card[], sampleSize?: number) => {
-    if (sampleSize) {
-      cards = sample(cards, sampleSize);
-    }
-    createFilesFromCards(cards);
-  };
+  const addCards = useCallback(
+    (cards: Card[], sampleSize?: number) => {
+      if (sampleSize) {
+        cards = sample(cards, sampleSize);
+      }
+      createFilesFromCards(cards);
+    },
+    [createFilesFromCards],
+  );
 
-  const getAvailableCards = () => filterCards(CARD_STATUS.AVAILABLE);
+  const getAvailableCards = useCallback(() => filterCards(CARD_STATUS.AVAILABLE), [filterCards]);
 
-  const getOptions = () => {
+  const options = useMemo(() => {
     const fromStartOptions = BULK_ADD_OPTIONS.map((cnt) => ({
       label: `First ${cnt}`,
       onClick: () => addCards(getAvailableCards().slice(0, cnt)),
@@ -73,10 +76,16 @@ const AddButtonGroup = ({
     }));
 
     return [...fromStartOptions, ...randomOptions, ...fromEndOptions];
-  };
+  }, [addCards, getAvailableCards]);
 
   const isZeroCards = filterCards(CARD_STATUS.AVAILABLE).length === 0;
-  const options = getOptions();
+
+  const handleAdd = useCallback(() => {
+    if (selectRef?.current) {
+      const { onClick } = options[selectRef.current.selectedIndex];
+      onClick();
+    }
+  }, [options]);
 
   return (
     <ButtonGroup className="add-group">
@@ -87,12 +96,7 @@ const AddButtonGroup = ({
       </Select>
       <Button
         className="add-button"
-        onClick={() => {
-          if (selectRef?.current) {
-            const { onClick } = options[selectRef?.current.selectedIndex];
-            onClick();
-          }
-        }}
+        onClick={handleAdd}
         disabled={disabled || isZeroCards}
       >
         Add
@@ -113,19 +117,23 @@ const ScrapeInputBar = ({
   rawScrapeCount,
 }: ScrapeInputBarProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
-  const filterCards = (status: string) => cards.filter((c) => c.status === status);
   const [mode, setMode] = useState<ScrapeMode>("URL");
+  const filterCards = useCallback((status: string) => cards.filter((c) => c.status === status), [cards]);
 
-  const countByStatus = Array.from(new Set(cards.map((c) => c.status)))
-    .sort()
-    .map((status) => ({
-      status,
-      length: filterCards(status).length,
-    }))
-    .concat(
-      { status: "Discarded", length: rawScrapeCount - cards.length },
-      { status: "Scraped", length: rawScrapeCount },
-    );
+  const countByStatus = useMemo(
+    () =>
+      Array.from(new Set(cards.map((c) => c.status)))
+        .sort()
+        .map((status) => ({
+          status,
+          length: filterCards(status).length,
+        }))
+        .concat(
+          { status: "Discarded", length: rawScrapeCount - cards.length },
+          { status: "Scraped", length: rawScrapeCount },
+        ),
+    [cards, filterCards, rawScrapeCount],
+  );
 
   const getTextInputElement = () => {
     if (mode == "HTML") {

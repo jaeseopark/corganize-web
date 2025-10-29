@@ -1,6 +1,6 @@
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Button, HStack, IconButton, Input, Select, Table, Tbody, Td, Tr } from "@chakra-ui/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { CorganizeFile } from "typedefs/CorganizeFile";
@@ -98,9 +98,8 @@ const Retagger = () => {
   const [operators, setOperators] = useState<TagOperator[]>([]);
   const [tag, setTag] = useState("");
   const { enqueueWarning, enqueueSuccess, enqueueAsync } = useToast();
-  const { protectHotkey, exposeHotkey } = useBlanket();
 
-  const getFirstInputViolation = () => {
+  const getFirstInputViolation = useCallback(() => {
     if (tag.length === 0) {
       return { message: "Tag must be non-empty" };
     }
@@ -118,9 +117,9 @@ const Retagger = () => {
     if (blankValueInput) {
       return { message: "Operator values must be non-empty" };
     }
-  };
+  }, [tag, operators]);
 
-  const run = () => {
+  const run = useCallback(() => {
     const violation = getFirstInputViolation();
     if (violation) {
       enqueueWarning(violation);
@@ -147,22 +146,34 @@ const Retagger = () => {
         ),
       )
       .then(() => enqueueSuccess({ message: "Done" }));
-  };
+  }, [getFirstInputViolation, tag, operators, enqueueWarning, enqueueAsync, enqueueSuccess]);
 
-  const substitute = (id: string, operator: TagOperatorWithoutId): TagOperator[] =>
-    operators.reduce((acc, next) => {
-      if (next.id === id) {
-        acc.push({ id, ...operator });
-      } else {
-        acc.push(next);
-      }
-      return acc;
-    }, [] as TagOperator[]);
+  const substitute = useCallback(
+    (id: string, operator: TagOperatorWithoutId): TagOperator[] =>
+      operators.reduce((acc, next) => {
+        if (next.id === id) {
+          acc.push({ id, ...operator });
+        } else {
+          acc.push(next);
+        }
+        return acc;
+      }, [] as TagOperator[]),
+    [operators],
+  );
 
-  const reset = () => {
+  const handleTagChange = useCallback((tags: string[]) => setTag(tags[0] || ""), []);
+
+  const addOperator = useCallback(() => {
+    setOperators([
+      ...operators,
+      { id: uuidv4(), type: "rename", originalTag: "", value: "" },
+    ]);
+  }, [operators]);
+
+  const reset = useCallback(() => {
     setOperators([]);
     setTag("");
-  };
+  }, []);
 
   return (
     <Table>
@@ -171,7 +182,7 @@ const Retagger = () => {
           <Td colSpan={2}>
             <TagSelector
               selectedTags={tag ? [tag] : []}
-              onTagsChange={(tags) => setTag(tags[0] || "")}
+              onTagsChange={handleTagChange}
               maxSelection={1}
             />
           </Td>
@@ -180,12 +191,7 @@ const Retagger = () => {
               variant="outline"
               icon={<AddIcon />}
               aria-label="Add a row"
-              onClick={() =>
-                setOperators([
-                  ...operators,
-                  { id: uuidv4(), type: "rename", originalTag: "", value: "" },
-                ])
-              }
+              onClick={addOperator}
             />
           </Td>
         </Tr>

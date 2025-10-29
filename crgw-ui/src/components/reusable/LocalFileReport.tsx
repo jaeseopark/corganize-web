@@ -1,5 +1,5 @@
 import { Button, List, ListItem } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getLocalFilenames, getRemainingSpace } from "clients/corganize";
 
@@ -16,7 +16,7 @@ const LocalFileReport = () => {
     getRemainingSpace().then(setRemainingSpace);
   }, []);
 
-  const onClick = () => {
+  const onClick = useCallback(() => {
     if (isProcessing) {
       // TODO: kill process
       setProcessing(false);
@@ -25,7 +25,7 @@ const LocalFileReport = () => {
       setUnregistered([]);
       // TODO start the comparison process
     }
-  };
+  }, [isProcessing]);
 
   const buttonLabel = isProcessing ? "Cancel" : "Run";
 
