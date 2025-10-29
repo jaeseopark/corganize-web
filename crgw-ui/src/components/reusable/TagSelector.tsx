@@ -1,10 +1,9 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
-import { decode } from "leet-decode";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ReactTags } from "react-tag-autocomplete";
-import type { TagSelected, TagSuggestion } from "react-tag-autocomplete";
+import type { SuggestionsTransform, TagSelected, TagSuggestion } from "react-tag-autocomplete";
 import { v4 as uuidv4 } from "uuid";
 
 import { useBlanket } from "providers/blanket/hook";
@@ -12,62 +11,42 @@ import { useBlanket } from "providers/blanket/hook";
 import { globalTags } from "clients/adapter";
 
 import "./TagSelector.scss";
-import { matchSorter } from "match-sorter";
+import fuzzysort from "fuzzysort";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
-const SHOULD_DECODE_LEET_TEXT = false;
 
-const decodeLeetText = (text: string): string => {
-  // this lib is so slow?
-  return decode(text)[0];
-};
-
-const getTokens = (filename: string): Set<string> => {
-  const getTokensss = (filename: string) => {
-    const tokenizedFilename = filename
-      .split(/[^A-Za-z0-9]/)
-      .map((t) => t.trim().toLowerCase())
-      .filter((t) => t);
-    const tokens = new Set(tokenizedFilename); // this line takes care of the case where tokenLength == 1
-    for (let tokenLength = 2; tokenLength <= AUTOCOMP_TOKEN_LENGTH_LIMIT; tokenLength++) {
-      tokenizedFilename.forEach((_, i, ary) => {
-        const j = i + tokenLength;
-        if (j <= ary.length) {
-          tokens.add(ary.slice(i, j).join(" "));
-        }
-      });
-    }
-    return tokens;
-  };
-
-  const tokens = getTokensss(filename);
-  if (SHOULD_DECODE_LEET_TEXT) {
-    const leetTokens = getTokensss(decodeLeetText(filename));
-    leetTokens.forEach(tokens.add, tokens);
+const getAutocompTokens = (autocompSeed: string): string[] => {
+  const tokenizedautocompSeed = autocompSeed
+    .split(/[^A-Za-z0-9]/)
+    .map((t) => t.trim().toLowerCase())
+    .filter((t) => t.length > 1);
+  const tokens = new Set(tokenizedautocompSeed);
+  for (let tokenLength = 2; tokenLength <= AUTOCOMP_TOKEN_LENGTH_LIMIT; tokenLength++) {
+    tokenizedautocompSeed.forEach((_, i, ary) => {
+      const j = i + tokenLength;
+      if (j <= ary.length) {
+        tokens.add(ary.slice(i, j).join(" "));
+      }
+    });
   }
-
-  return tokens;
+  return Array.from(tokens);
 };
 
-const generateSuggestions = (tokens: Set<string>, minLength: number) => {
-  globalTags.forEach(tokens.add, tokens);
-  return Array.from(tokens)
-    .filter((t) => t.length >= minLength)
-    .map((t) => ({ value: uuidv4().toString(), label: t }));
+const generateSuggestions = (autocompCandidates: string[]): TagSuggestion[] => {
+  const allTags = new Set([...autocompCandidates, ...Array.from(globalTags)]);
+  return Array.from(allTags).map((t) => ({ value: uuidv4().toString(), label: t }));
 };
 
-const normalizeForAutocomplete = (s: string) => s.replaceAll(" ", "");
+const getNormalizeAutocompKey = (s: string) => s.replaceAll(" ", "");
 
 const buildAutocompleteIndex = () =>
   Array.from(globalTags).reduce(
     (acc, next) => {
       acc[next] = [next];
-      const normalized = normalizeForAutocomplete(next);
-      if (!(normalized in acc)) {
-        acc[normalized] = [];
-      }
-      acc[normalized].push(next);
+      const normKey = getNormalizeAutocompKey(next);
+      acc[normKey] = acc[normKey] || [];
+      acc[normKey].push(next);
       return acc;
     },
     {} as { [key: string]: string[] },
@@ -78,7 +57,6 @@ type TagSelectorProps = {
   onTagsChange: (tags: string[]) => void;
   autocompSeed?: string;
   maxSelection?: number;
-  minSuggestedTagLength?: number;
   mini?: boolean;
   allowNew?: boolean;
   shouldAutofocus?: boolean;
@@ -89,18 +67,33 @@ const TagSelector = ({
   onTagsChange,
   autocompSeed = "",
   maxSelection,
-  minSuggestedTagLength = 2,
   mini = true,
   allowNew = false,
   shouldAutofocus = false,
 }: TagSelectorProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
-  const [autocompEnabled, setAutocompEnabled] = useState(true);
-  const [autocompCandidates, setAutocompCandidates] = useState<string[]>([]);
-
-  const tags: TagSelected[] = selectedTags.map((t) => ({ value: uuidv4().toString(), label: t }));
-  const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
   const apiRef = useRef<any>(null);
+  const tags: TagSelected[] = selectedTags.map((t) => ({ value: uuidv4().toString(), label: t }));
+
+  // Autocomp states:
+  const [autocompEnabled, setAutocompEnabled] = useState(true);
+  const [rejectedAutocompCandidates, setRejectedAutocompCandidates] = useState<string[]>([]);
+  const autocompTokens = useMemo(() => getAutocompTokens(autocompSeed), [autocompSeed]);
+  const autocompCandidates = useMemo(() => {
+    const autocompleteIndex = buildAutocompleteIndex();
+    const matches = Array.from(autocompTokens)
+      .map((t) => autocompleteIndex[getNormalizeAutocompKey(t)])
+      .filter((t) => t);
+    if (matches.length > 0) {
+      const isNotRejected = (t: string) => !rejectedAutocompCandidates.includes(t);
+      const alreadySelected = (t: string) => !selectedTags.includes(t.toLowerCase());
+      return Array.from(new Set(matches.flat(2))).filter(isNotRejected).filter(alreadySelected);
+    }
+    return [];
+  }, [autocompSeed, rejectedAutocompCandidates, autocompTokens, selectedTags]);
+
+  // Suggestions:
+  const suggestions: TagSuggestion[] = useMemo(() => generateSuggestions(autocompTokens), [autocompTokens]);
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
@@ -112,27 +105,6 @@ const TagSelector = ({
     return exposeHotkey; // expose the hot key when the component gets unmounted.
   }, [exposeHotkey]);
 
-  /**
-   * Generates the autocomplete candidates and suggestions when the component mounts or autocompSeed changes.
-   */
-  useEffect(() => {
-    if (autocompSeed) {
-      const tokens = getTokens(autocompSeed);
-      const autocompleteIndex = buildAutocompleteIndex();
-      const matches = Array.from(tokens)
-        .map((t) => autocompleteIndex[normalizeForAutocomplete(t)])
-        .filter((t) => t);
-      if (matches.length > 0) {
-        const isBrandNew = (t: string) => !selectedTags.includes(t);
-        setAutocompCandidates(Array.from(new Set(matches.flat(2).filter(isBrandNew))));
-      }
-      setSuggestions(generateSuggestions(tokens, minSuggestedTagLength));
-    } else {
-      // If no autocompSeed, just use global tags filtered by min length
-      const tokens = new Set<string>();
-      setSuggestions(generateSuggestions(tokens, minSuggestedTagLength));
-    }
-  }, [autocompSeed, selectedTags, minSuggestedTagLength]);
 
   const onAddition = useCallback(
     (newTag: TagSelected) => {
@@ -161,18 +133,16 @@ const TagSelector = ({
   );
 
   const acceptCandidate = useCallback(() => {
-    const [candidate, ...rest] = autocompCandidates;
+    const [candidate] = autocompCandidates;
     const newTags = [...selectedTags, candidate];
     if (!maxSelection || newTags.length <= maxSelection) {
       onTagsChange(newTags);
-      setAutocompCandidates(rest);
     }
-  }, [autocompCandidates, selectedTags, onTagsChange, maxSelection, setAutocompCandidates]);
+  }, [autocompCandidates, selectedTags, onTagsChange, maxSelection]);
 
   const rejectCandidate = useCallback(() => {
-    const [, ...rest] = autocompCandidates;
-    setAutocompCandidates(rest);
-  }, [autocompCandidates, setAutocompCandidates]);
+    setRejectedAutocompCandidates((prev) => [...prev, autocompCandidates[0]]);
+  }, [autocompCandidates]);
 
   /**
    * Enables the autocomplete mode only when user isn't typing.
@@ -191,6 +161,25 @@ const TagSelector = ({
   const onKeyDown = useCallback(
     (e: any) => {
       const { key } = e;
+      if (key === "Enter") {
+        const inputValue = apiRef.current?.input?.value?.trim();
+        const highlightedOption = apiRef.current?.listBox.activeOption;
+        if (
+          allowNew &&
+          inputValue &&
+          !highlightedOption &&
+          (!maxSelection || selectedTags.length < maxSelection) &&
+          !selectedTags.includes(inputValue.toLowerCase())
+        ) {
+          onTagsChange([...selectedTags, inputValue.toLowerCase()]);
+          if (apiRef.current?.input) {
+            apiRef.current.input.value = "";
+          }
+          e.preventDefault();
+          return;
+        }
+      }
+
       if (!autocompEnabled || autocompCandidates.length === 0) {
         return;
       }
@@ -201,7 +190,18 @@ const TagSelector = ({
         rejectCandidate();
       }
     },
-    [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate],
+    [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate, allowNew, maxSelection, selectedTags, onTagsChange],
+  );
+
+  const suggestionsTransform: SuggestionsTransform = useCallback(
+    (query: string, suggestions: TagSuggestion[]) => {
+      // probably replaced by onShouldExpand.. delete later.
+      // if (query.trim().length === 0) {
+      //   return [];
+      // }
+      return fuzzysort.go(query, suggestions, { key: 'label' }).slice(0, 10).map(r => r.obj);
+    },
+    [],
   );
 
   const AutocompleteView = () => {
@@ -252,24 +252,19 @@ const TagSelector = ({
     <div className={cls("tag-selector", { mini })} onKeyDown={onKeyDown}>
       <ReactTags
         ref={apiRef}
-        delimiterKeys={["Enter", "Tab", ","]}
+        delimiterKeys={["Enter"]}
         selected={tags}
         suggestions={suggestions}
-        suggestionsTransform={(query, suggestions) => {
-          if (query.trim().length === 0) {
-            return [];
-          }
-          return matchSorter(suggestions, query, { keys: ["label"] }).slice(0, 10);
-        }}
+        suggestionsTransform={suggestionsTransform}
         onInput={onInput}
         onAdd={onAddition}
         onDelete={onDelete}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
+        onShouldExpand={(query: string) => query.trim().length > 0}
         placeholderText={placeholderText}
         labelText="" // Add this to remove the default "Select tags" label
         tagListLabelText=""
-        allowNew={allowNew && (!maxSelection || selectedTags.length < maxSelection)}
       />
       <AutocompleteView />
     </div>

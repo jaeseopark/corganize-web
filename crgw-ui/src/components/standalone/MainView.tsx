@@ -2,7 +2,7 @@ import { SettingsIcon } from "@chakra-ui/icons";
 import { Box, Button, Center, Divider } from "@chakra-ui/react";
 import { GoogleLogin } from "@react-oauth/google";
 import cls from "classnames";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { SessionInfo } from "typedefs/Session";
 
@@ -54,46 +54,57 @@ const MainView = () => {
     }
   }, [files]);
 
-  let mainContent;
+  const getMainContent = () => {
+    if (!isAuthenticated) {
+      return (
+        <Center height="100vh" flexDir="column">
+          <GoogleLogin onSuccess={({ credential }) => login(credential!)} />
+        </Center>
+      );
+    }
 
-  if (!isAuthenticated) {
-    mainContent = (
+    if (sessionInfo) {
+      // When authenticated and sessionInfo exists, show the main grid view
+      return (
+        <Box margin="1rem">
+          <PresetBar />
+          <Divider marginY=".5em" />
+          <FieldBar />
+          <GlobalSearch />
+          <PageControl />
+          <GridView />
+          <PageControl />
+        </Box>
+      );
+    }
+
+    if (!globalTagsLoaded) {
+      return (
+        <Center height="100vh" flexDir="column">
+          Loading...
+        </Center>
+      );
+    }
+
+    // let the user configure the session info
+    return (
       <Center height="100vh" flexDir="column">
-        <GoogleLogin onSuccess={({ credential }) => login(credential!)} />
-      </Center>
-    );
-  } else if (!sessionInfo) {
-    mainContent = (
-      <Center height="100vh" flexDir="column">
-        <SessionConfigurer setInfo={setSessionInfo} disabled={!globalTagsLoaded} />
+        <SessionConfigurer setInfo={setSessionInfo} />
         <Button
           leftIcon={<SettingsIcon />}
           onClick={navToAdmin}
           marginTop="1em"
-          disabled={!globalTagsLoaded}
         >
           Admin
         </Button>
       </Center>
-    );
-  } else {
-    mainContent = (
-      <Box margin="1rem">
-        <PresetBar />
-        <Divider marginY=".5em" />
-        <FieldBar />
-        <GlobalSearch />
-        <PageControl />
-        <GridView />
-        <PageControl />
-      </Box>
     );
   }
 
   return (
     <>
       <AppRoutes />
-      <div className={cls({ hidden: isBlanketEnabled })}>{mainContent}</div>
+      <div className={cls({ hidden: isBlanketEnabled })}>{getMainContent()}</div>
     </>
   );
 };

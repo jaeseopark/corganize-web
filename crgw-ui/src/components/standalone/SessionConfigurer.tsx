@@ -15,10 +15,8 @@ const MB_TO_BYTES = 1000000;
 
 const SessionConfigurer = ({
   setInfo,
-  disabled,
 }: {
   setInfo: (s: SessionInfo) => void;
-  disabled?: boolean;
 }) => {
   const [fileCountLimit, setFileCountLimit] = useState(DEFAULT_FILE_COUNT_LIMIT);
   const [minFileSize, setMinFileSize] = useState(0);
@@ -116,7 +114,6 @@ const SessionConfigurer = ({
         colorScheme="teal"
         variant="solid"
         aria-label="Start Session"
-        disabled={disabled}
       >
         {buttonLabel}
       </Button>
