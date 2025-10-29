@@ -123,6 +123,9 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
     if (key.toLowerCase() === "u" && mostRecentFile) {
       window.open(mostRecentFile.sourceurl, "_blank");
     }
+    if (key.toLowerCase() === "a") {
+      createFilesFromCards(cards);
+    }
   };
 
   if (error) {
