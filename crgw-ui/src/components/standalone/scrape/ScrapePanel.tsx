@@ -82,8 +82,8 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
     }
   }, [isProcessing]);
 
-  const createFilesFromCards = (cards: Card[]) => {
-    const files = cards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
+  const createFilesFromCards = (selectedCards: Card[]) => {
+    const files = selectedCards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
 
     const displayToasts = (res: client.CreateResponse) => {
       if (files.length === 1) return res;
@@ -101,14 +101,20 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
     };
 
     const updateCardStatus = ({ created, skipped }: client.CreateResponse) => {
-      const updateCardStatus = (f: CorganizeFile, status: string, errorString?: string) => {
-        const card = cards.find((c) => c.file.fileid === f.fileid) as Card;
-        card.status = status;
-        card.error = errorString;
-      };
-
-      created.forEach((f) => updateCardStatus(f, CARD_STATUS.COMPLETE));
-      skipped.forEach((f) => updateCardStatus(f, CARD_STATUS.ERROR, "already exists"));
+      setCards(prevCards => 
+        prevCards.map(card => {
+          const createdFile = created.find(f => f.fileid === card.file.fileid);
+          const skippedFile = skipped.find(f => f.fileid === card.file.fileid);
+          
+          if (createdFile) {
+            return { ...card, status: CARD_STATUS.COMPLETE };
+          }
+          if (skippedFile) {
+            return { ...card, status: CARD_STATUS.ERROR, error: "already exists" };
+          }
+          return card;
+        })
+      );
     };
 
     setProcessing(true);
