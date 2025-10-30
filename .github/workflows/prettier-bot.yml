@@ -21,14 +21,10 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install Prettier dependencies
+      - name: Install and run Prettier
         run: |
           cd crgw-ui
           npm install --no-package-lock --only=dev prettier @trivago/prettier-plugin-sort-imports
-
-      - name: Run Prettier
-        run: |
-          cd crgw-ui
           npx prettier --write .
 
       - name: Check for changes
