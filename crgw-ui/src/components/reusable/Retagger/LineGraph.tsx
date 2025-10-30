@@ -42,13 +42,7 @@ const LineGraph: React.FC<LineGraphProps> = ({ data }) => {
           strokeDasharray="2,2"
         />
         {/* Scale label */}
-        <text
-          x={35}
-          y={y + 4}
-          fontSize="10"
-          textAnchor="end"
-          fill="#666"
-        >
+        <text x={35} y={y + 4} fontSize="10" textAnchor="end" fill="#666">
           {fileValue}
         </text>
       </g>
@@ -59,7 +53,7 @@ const LineGraph: React.FC<LineGraphProps> = ({ data }) => {
     <svg width={width} height={height} style={{ border: "1px solid black" }}>
       {/* Y-axis scale */}
       {scaleElements}
-      
+
       <polyline fill="none" stroke="blue" strokeWidth="2" points={points} />
       <text x={10} y={20} fontSize="12">
         Files processed over time
@@ -75,12 +69,7 @@ const LineGraph: React.FC<LineGraphProps> = ({ data }) => {
         Files
       </text>
       {/* X-axis label */}
-      <text
-        x={width / 2}
-        y={height - 5}
-        fontSize="12"
-        textAnchor="middle"
-      >
+      <text x={width / 2} y={height - 5} fontSize="12" textAnchor="middle">
         Time (s)
       </text>
     </svg>

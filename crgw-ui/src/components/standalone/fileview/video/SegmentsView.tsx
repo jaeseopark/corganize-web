@@ -1,6 +1,7 @@
+import { useCallback } from "react";
+
 import { CorganizeFile } from "typedefs/CorganizeFile";
 import { Segment } from "typedefs/Segment";
-import { useCallback } from "react";
 
 import {
   ClosedSegmentBlock,

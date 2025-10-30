@@ -1,6 +1,7 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
+import fuzzysort from "fuzzysort";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ReactTags } from "react-tag-autocomplete";
 import type { SuggestionsTransform, TagSelected, TagSuggestion } from "react-tag-autocomplete";
@@ -11,7 +12,6 @@ import { useBlanket } from "providers/blanket/hook";
 import { globalTags } from "clients/adapter";
 
 import "./TagSelector.scss";
-import fuzzysort from "fuzzysort";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less

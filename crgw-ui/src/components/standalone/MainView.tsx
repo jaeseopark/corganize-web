@@ -13,8 +13,8 @@ import { useGrid } from "providers/grid/hook";
 import useAthentication from "hooks/authentication";
 import { useNavv } from "hooks/navv";
 
-import { login } from "clients/corganize";
 import { populateGlobalTags } from "clients/adapter";
+import { login } from "clients/corganize";
 
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
