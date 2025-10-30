@@ -79,7 +79,7 @@ const TagSelector = ({
   const [autocompEnabled, setAutocompEnabled] = useState(true);
   const [rejectedAutocompCandidates, setRejectedAutocompCandidates] = useState<string[]>([]);
   const autocompTokens = useMemo(() => getAutocompTokens(autocompSeed), [autocompSeed]);
-  const autocompCandidates = useMemo(() => {
+  const autocompCandidates = useMemo(() => { 
     const autocompleteIndex = buildAutocompleteIndex();
     const matches = Array.from(autocompTokens)
       .map((t) => autocompleteIndex[getNormalizeAutocompKey(t)])
