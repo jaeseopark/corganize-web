@@ -13,7 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import cls from "classnames";
-import { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { useBlanket } from "providers/blanket/hook";
 
@@ -78,7 +78,7 @@ const AddButtonGroup = ({
     return [...fromStartOptions, ...randomOptions, ...fromEndOptions];
   }, [addCards, getAvailableCards]);
 
-  const isZeroCards = filterCards(CARD_STATUS.AVAILABLE).length === 0;
+  const isZeroCards = useMemo(() => filterCards(CARD_STATUS.AVAILABLE).length === 0, [filterCards]);
 
   const handleAdd = useCallback(() => {
     if (selectRef?.current) {
@@ -134,7 +134,7 @@ const ScrapeInputBar = ({
     [cards, filterCards, rawScrapeCount],
   );
 
-  const handleKeydown = (e: React.KeyboardEvent) => {
+  const handleKeydown = useCallback((e: React.KeyboardEvent) => {
     switch (e.key.toLowerCase()) {
       case "a":
       case "u":
@@ -144,12 +144,20 @@ const ScrapeInputBar = ({
       default:
         break;
     }
-  }
+  }, []);
+
+  const handleUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  }, [setUrl]);
+
+  const handleHtmlChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHtml(e.target.value);
+  }, [setHtml]);
 
   const getTextInputElement = () => {
     if (mode == "HTML") {
       return (
-        <Textarea defaultValue={html || ""} onChange={({ target: { value } }) => setHtml(value)} onKeyDown={handleKeydown} onFocus={protectHotkey} onBlur={exposeHotkey} />
+        <Textarea defaultValue={html || ""} onChange={handleHtmlChange} onKeyDown={handleKeydown} onFocus={protectHotkey} onBlur={exposeHotkey} />
       );
     }
     return (
@@ -158,7 +166,7 @@ const ScrapeInputBar = ({
         type="text"
         disabled={disabled}
         placeholder="Use <p1-p2> to scrape multiple pages"
-        onChange={(e) => setUrl(e.target.value)}
+        onChange={handleUrlChange}
         onKeyDown={handleKeydown}
         value={url as string}
         onFocus={protectHotkey}
@@ -204,4 +212,4 @@ const ScrapeInputBar = ({
   );
 };
 
-export default ScrapeInputBar;
+export default React.memo(ScrapeInputBar);
