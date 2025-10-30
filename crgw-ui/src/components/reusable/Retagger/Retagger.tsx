@@ -1,5 +1,16 @@
 import { AddIcon } from "@chakra-ui/icons";
-import { Button, HStack, IconButton, Progress, Table, Tbody, Td, Tr, VStack, Text } from "@chakra-ui/react";
+import {
+  Button,
+  HStack,
+  IconButton,
+  Progress,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Tr,
+  VStack,
+} from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -7,10 +18,9 @@ import { CorganizeFile } from "typedefs/CorganizeFile";
 
 import { useToast } from "providers/toast/hook";
 
-import TagSelector from "../TagSelector";
-
 import { getFilesByTagsWithoutPagination, updateFile } from "clients/corganize";
 
+import TagSelector from "../TagSelector";
 import LineGraph, { GraphDataPoint } from "./LineGraph";
 import OperatorComponent from "./OperatorComponent";
 import { TagOperator, TagOperatorWithoutId } from "./types";
@@ -81,12 +91,14 @@ const Retagger: React.FC = () => {
         const limitedFiles = files.slice(0, MAX_FILES_TO_PROCESS);
         const total = limitedFiles.length;
         setTotalFiles(total);
-        
+
         // Warn user if files were truncated
         if (files.length > MAX_FILES_TO_PROCESS) {
-          enqueueWarning({ message: `Found ${files.length} files, but only processing the first ${MAX_FILES_TO_PROCESS} to avoid network throttling.` });
+          enqueueWarning({
+            message: `Found ${files.length} files, but only processing the first ${MAX_FILES_TO_PROCESS} to avoid network throttling.`,
+          });
         }
-        
+
         const mappedFiles = limitedFiles.map(consolidatedOperator);
         let processed = 0;
         const startTime = Date.now();
@@ -133,13 +145,10 @@ const Retagger: React.FC = () => {
   const handleTagChange = useCallback((tags: string[]) => setTag(tags[0] || ""), []);
 
   const addOperator = useCallback(() => {
-    setOperators([
-      ...operators,
-      { id: uuidv4(), type: "rename", originalTag: "", value: "" },
-    ]);
+    setOperators([...operators, { id: uuidv4(), type: "rename", originalTag: "", value: "" }]);
   }, [operators]);
 
-    const reset = useCallback(() => {
+  const reset = useCallback(() => {
     setOperators([]);
     setTag("");
     setIsRunning(false);
@@ -185,7 +194,7 @@ const Retagger: React.FC = () => {
               <LineGraph data={progressData} />
               <VStack spacing={1} align="stretch">
                 <Text fontSize="sm" textAlign="center">
-                  {Math.round(progress * totalFiles / 100)}/{totalFiles} ({Math.round(progress)}%)
+                  {Math.round((progress * totalFiles) / 100)}/{totalFiles} ({Math.round(progress)}%)
                 </Text>
                 <Progress value={progress} />
               </VStack>

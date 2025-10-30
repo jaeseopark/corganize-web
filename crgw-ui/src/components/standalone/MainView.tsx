@@ -13,8 +13,8 @@ import { useGrid } from "providers/grid/hook";
 import useAthentication from "hooks/authentication";
 import { useNavv } from "hooks/navv";
 
-import { login } from "clients/corganize";
 import { populateGlobalTags } from "clients/adapter";
+import { login } from "clients/corganize";
 
 import AppRoutes from "components/standalone/AppRoutes";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
@@ -90,16 +90,12 @@ const MainView = () => {
     return (
       <Center height="100vh" flexDir="column">
         <SessionConfigurer setInfo={setSessionInfo} />
-        <Button
-          leftIcon={<SettingsIcon />}
-          onClick={navToAdmin}
-          marginTop="1em"
-        >
+        <Button leftIcon={<SettingsIcon />} onClick={navToAdmin} marginTop="1em">
           Admin
         </Button>
       </Center>
     );
-  }
+  };
 
   return (
     <>

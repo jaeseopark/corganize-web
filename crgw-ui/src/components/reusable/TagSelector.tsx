@@ -1,6 +1,7 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Badge, Center, Flex, Spinner } from "@chakra-ui/react";
 import cls from "classnames";
+import fuzzysort from "fuzzysort";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ReactTags } from "react-tag-autocomplete";
 import type { SuggestionsTransform, TagSelected, TagSuggestion } from "react-tag-autocomplete";
@@ -11,7 +12,6 @@ import { useBlanket } from "providers/blanket/hook";
 import { globalTags } from "clients/adapter";
 
 import "./TagSelector.scss";
-import fuzzysort from "fuzzysort";
 
 const AUTOCOMP_DISPLAY_LENGTH = 5;
 const AUTOCOMP_TOKEN_LENGTH_LIMIT = 3; // most tags are 3 words or less
@@ -87,13 +87,18 @@ const TagSelector = ({
     if (matches.length > 0) {
       const isNotRejected = (t: string) => !rejectedAutocompCandidates.includes(t);
       const alreadySelected = (t: string) => !selectedTags.includes(t.toLowerCase());
-      return Array.from(new Set(matches.flat(2))).filter(isNotRejected).filter(alreadySelected);
+      return Array.from(new Set(matches.flat(2)))
+        .filter(isNotRejected)
+        .filter(alreadySelected);
     }
     return [];
   }, [autocompSeed, rejectedAutocompCandidates, autocompTokens, selectedTags]);
 
   // Suggestions:
-  const suggestions: TagSuggestion[] = useMemo(() => generateSuggestions(autocompTokens), [autocompTokens]);
+  const suggestions: TagSuggestion[] = useMemo(
+    () => generateSuggestions(autocompTokens),
+    [autocompTokens],
+  );
 
   /**
    * Focuses the input element when the component mounts; allowing the user to start typing right away.
@@ -104,7 +109,6 @@ const TagSelector = ({
     }
     return exposeHotkey; // expose the hot key when the component gets unmounted.
   }, [exposeHotkey]);
-
 
   const onAddition = useCallback(
     (newTag: TagSelected) => {
@@ -190,15 +194,27 @@ const TagSelector = ({
         rejectCandidate();
       }
     },
-    [autocompEnabled, autocompCandidates, acceptCandidate, rejectCandidate, allowNew, maxSelection, selectedTags, onTagsChange],
+    [
+      autocompEnabled,
+      autocompCandidates,
+      acceptCandidate,
+      rejectCandidate,
+      allowNew,
+      maxSelection,
+      selectedTags,
+      onTagsChange,
+    ],
   );
 
   const suggestionsTransform: SuggestionsTransform = useCallback(
     (query: string, suggestions: TagSuggestion[]) => {
-      return fuzzysort.go(query, suggestions, {
-        keys: ['label'],
-        scoreFn: (r) => r.score * (autocompTokens.includes(r.obj.label) ? 2 : 1)
-      }).slice(0, 10).map(r => r.obj);
+      return fuzzysort
+        .go(query, suggestions, {
+          keys: ["label"],
+          scoreFn: (r) => r.score * (autocompTokens.includes(r.obj.label) ? 2 : 1),
+        })
+        .slice(0, 10)
+        .map((r) => r.obj);
     },
     [autocompTokens],
   );

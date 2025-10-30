@@ -1,5 +1,5 @@
-import { IconButton, Input, Select, Td } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
+import { IconButton, Input, Select, Td } from "@chakra-ui/react";
 import React from "react";
 
 import { useBlanket } from "providers/blanket/hook";
@@ -13,11 +13,7 @@ interface OperatorComponentProps {
   onDelete: () => void;
 }
 
-const OperatorComponent: React.FC<OperatorComponentProps> = ({
-  operator,
-  onUpdate,
-  onDelete,
-}) => {
+const OperatorComponent: React.FC<OperatorComponentProps> = ({ operator, onUpdate, onDelete }) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
   return (
     <>
