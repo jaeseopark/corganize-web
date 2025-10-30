@@ -138,7 +138,6 @@ const ScrapeInputBar = ({
     switch (e.key.toLowerCase()) {
       case "a":
       case "u":
-        e.preventDefault();
         e.stopPropagation();
         break;
       default:
