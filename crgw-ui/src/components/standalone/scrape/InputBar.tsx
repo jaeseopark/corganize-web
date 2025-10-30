@@ -134,10 +134,22 @@ const ScrapeInputBar = ({
     [cards, filterCards, rawScrapeCount],
   );
 
+  const handleKeydown = (e: React.KeyboardEvent) => {
+    switch (e.key.toLowerCase()) {
+      case "a":
+      case "u":
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      default:
+        break;
+    }
+  }
+
   const getTextInputElement = () => {
     if (mode == "HTML") {
       return (
-        <Textarea defaultValue={html || ""} onChange={({ target: { value } }) => setHtml(value)} />
+        <Textarea defaultValue={html || ""} onChange={({ target: { value } }) => setHtml(value)} onKeyDown={handleKeydown} onFocus={protectHotkey} onBlur={exposeHotkey} />
       );
     }
     return (
@@ -147,6 +159,7 @@ const ScrapeInputBar = ({
         disabled={disabled}
         placeholder="Use <p1-p2> to scrape multiple pages"
         onChange={(e) => setUrl(e.target.value)}
+        onKeyDown={handleKeydown}
         value={url as string}
         onFocus={protectHotkey}
         onBlur={exposeHotkey}
