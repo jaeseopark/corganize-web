@@ -1,5 +1,5 @@
 import React, { Dispatch, useEffect, useReducer } from "react";
-import { io, Socket } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
 import { DaemonJobProgress } from "typedefs/DaemonJobProgress";
 

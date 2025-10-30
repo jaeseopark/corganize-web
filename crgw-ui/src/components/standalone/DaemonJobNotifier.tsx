@@ -14,12 +14,12 @@ const DaemonJobNotifier = () => {
 
     // Find jobs that started (in current but not in previous)
     const startedJobs = currentActiveJobNames.filter(
-      (name) => !previousActiveJobNames.includes(name)
+      (name) => !previousActiveJobNames.includes(name),
     );
 
     // Find jobs that finished (in previous but not in current)
     const finishedJobs = previousActiveJobNames.filter(
-      (name) => !currentActiveJobNames.includes(name)
+      (name) => !currentActiveJobNames.includes(name),
     );
 
     // Show toasts for started jobs
