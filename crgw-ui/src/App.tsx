@@ -3,6 +3,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import BlanketProvider from "providers/blanket/blanket";
 import BlanketPortal from "providers/blanket/portal";
+import DaemonJobsProvider from "providers/daemonJobs/daemonJobs";
 import FileRepositoryProvider from "providers/fileRepository/fileRepository";
 import GridProvider from "providers/grid/grid";
 import ToastPortal from "providers/toast/portal";
@@ -28,9 +29,11 @@ const AppWithProviders = () => (
       <ToastProvider>
         <BlanketProvider>
           <GridProvider>
-            <GoogleOAuthProvider clientId={OAUTH_CLIENT_ID}>
-              <App />
-            </GoogleOAuthProvider>
+            <DaemonJobsProvider>
+              <GoogleOAuthProvider clientId={OAUTH_CLIENT_ID}>
+                <App />
+              </GoogleOAuthProvider>
+            </DaemonJobsProvider>
           </GridProvider>
         </BlanketProvider>
       </ToastProvider>

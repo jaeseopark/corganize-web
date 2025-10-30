@@ -1,6 +1,7 @@
 moviepy==1.0.3
 Flask==2.1.1
 Werkzeug==2.1.2
+flask-socketio==5.3.6
 corganizeclient==0.0.16
 hypersquirrel==1.0.38
 yt-dlp==2023.7.6

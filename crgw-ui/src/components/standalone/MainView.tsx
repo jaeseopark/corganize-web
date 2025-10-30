@@ -17,6 +17,7 @@ import { populateGlobalTags } from "clients/adapter";
 import { login } from "clients/corganize";
 
 import AppRoutes from "components/standalone/AppRoutes";
+import DaemonJobNotifier from "components/standalone/DaemonJobNotifier";
 import SessionConfigurer from "components/standalone/SessionConfigurer";
 import FieldBar from "components/standalone/field/FieldBar";
 import PresetBar from "components/standalone/field/PresetBar";
