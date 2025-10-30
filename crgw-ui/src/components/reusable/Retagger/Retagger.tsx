@@ -27,7 +27,7 @@ const Retagger: React.FC = () => {
   const [totalFiles, setTotalFiles] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
-  const { enqueueWarning } = useToast();
+  const { enqueueWarning, enqueueSuccess } = useToast();
 
   const getFirstInputViolation = useCallback(() => {
     if (tag.length === 0) {
@@ -71,6 +71,13 @@ const Retagger: React.FC = () => {
 
     getFilesByTagsWithoutPagination([tag.trim()])
       .then((files: CorganizeFile[]) => {
+        if (files.length === 0) {
+          enqueueWarning({ message: "No files found with the specified tag" });
+          setIsRunning(false);
+          setShowProgress(false);
+          return;
+        }
+
         const limitedFiles = files.slice(0, MAX_FILES_TO_PROCESS);
         const total = limitedFiles.length;
         setTotalFiles(total);
@@ -97,10 +104,14 @@ const Retagger: React.FC = () => {
           setProgress((processed / total) * 100);
         });
 
-        return Promise.all(promises);
+        return Promise.all(promises).then(() => ({ id, total }));
       })
-      .then(() => {
-        if (intervalId) clearInterval(intervalId);
+      .then((result) => {
+        if (result) {
+          const { id, total } = result;
+          if (id) clearInterval(id);
+          enqueueSuccess({ message: `Successfully processed ${total} files` });
+        }
         setIsRunning(false);
         setShowProgress(false);
       });
