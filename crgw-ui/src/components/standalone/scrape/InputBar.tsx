@@ -135,6 +135,7 @@ const ScrapeInputBar = ({
   );
 
   const handleKeydown = useCallback((e: React.KeyboardEvent) => {
+    // prevent parent ScrapeView from catching 'a' and 'u' hotkeys.
     switch (e.key.toLowerCase()) {
       case "a":
       case "u":
