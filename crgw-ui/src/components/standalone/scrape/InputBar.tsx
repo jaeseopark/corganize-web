@@ -94,11 +94,7 @@ const AddButtonGroup = ({
           <option key={label}>{label}</option>
         ))}
       </Select>
-      <Button
-        className="add-button"
-        onClick={handleAdd}
-        disabled={disabled || isZeroCards}
-      >
+      <Button className="add-button" onClick={handleAdd} disabled={disabled || isZeroCards}>
         Add
       </Button>
     </ButtonGroup>
@@ -118,7 +114,10 @@ const ScrapeInputBar = ({
 }: ScrapeInputBarProps) => {
   const { protectHotkey, exposeHotkey } = useBlanket();
   const [mode, setMode] = useState<ScrapeMode>("URL");
-  const filterCards = useCallback((status: string) => cards.filter((c) => c.status === status), [cards]);
+  const filterCards = useCallback(
+    (status: string) => cards.filter((c) => c.status === status),
+    [cards],
+  );
 
   const countByStatus = useMemo(
     () =>

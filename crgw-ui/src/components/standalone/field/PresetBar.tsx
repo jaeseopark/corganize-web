@@ -10,7 +10,7 @@ const PresetBar = () => {
   } = useGrid();
 
   const getOnClick = useCallback(
-    (p: typeof EXPOSED_PRESETS[0]) => () => setPreset(p),
+    (p: (typeof EXPOSED_PRESETS)[0]) => () => setPreset(p),
     [setPreset],
   );
 

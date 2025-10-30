@@ -13,11 +13,7 @@ const DEFAULT_FILE_COUNT_LIMIT = 1000;
 const MIN_FILE_SIZE_INCREMENT = 50;
 const MB_TO_BYTES = 1000000;
 
-const SessionConfigurer = ({
-  setInfo,
-}: {
-  setInfo: (s: SessionInfo) => void;
-}) => {
+const SessionConfigurer = ({ setInfo }: { setInfo: (s: SessionInfo) => void }) => {
   const [fileCountLimit, setFileCountLimit] = useState(DEFAULT_FILE_COUNT_LIMIT);
   const [minFileSize, setMinFileSize] = useState(0);
   const [endpoint, setEndpoint] = useState<FileEndpoint>("stale");

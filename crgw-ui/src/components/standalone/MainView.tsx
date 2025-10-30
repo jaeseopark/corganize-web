@@ -90,16 +90,12 @@ const MainView = () => {
     return (
       <Center height="100vh" flexDir="column">
         <SessionConfigurer setInfo={setSessionInfo} />
-        <Button
-          leftIcon={<SettingsIcon />}
-          onClick={navToAdmin}
-          marginTop="1em"
-        >
+        <Button leftIcon={<SettingsIcon />} onClick={navToAdmin} marginTop="1em">
           Admin
         </Button>
       </Center>
     );
-  }
+  };
 
   return (
     <>

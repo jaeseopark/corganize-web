@@ -48,11 +48,7 @@ const CardView = ({ card, onSend, onScrape, disableScrapeButton }: CardViewProps
         onClick={handleSendCard}
         alt={title}
       />
-      <Button
-        className="scrape-button"
-        onClick={handleScrape}
-        disabled={disableScrapeButton}
-      >
+      <Button className="scrape-button" onClick={handleScrape} disabled={disableScrapeButton}>
         Scrape
       </Button>
     </div>
