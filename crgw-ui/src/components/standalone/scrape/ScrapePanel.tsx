@@ -83,7 +83,9 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
   }, [isProcessing]);
 
   const createFilesFromCards = (selectedCards: Card[]) => {
-    const files = selectedCards.filter((c) => c.status === CARD_STATUS.AVAILABLE).map((c) => c.file);
+    const files = selectedCards
+      .filter((c) => c.status === CARD_STATUS.AVAILABLE)
+      .map((c) => c.file);
 
     const displayToasts = (res: client.CreateResponse) => {
       if (files.length === 1) return res;
@@ -101,11 +103,11 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
     };
 
     const updateCardStatus = ({ created, skipped }: client.CreateResponse) => {
-      setCards(prevCards => 
-        prevCards.map(card => {
-          const createdFile = created.find(f => f.fileid === card.file.fileid);
-          const skippedFile = skipped.find(f => f.fileid === card.file.fileid);
-          
+      setCards((prevCards) =>
+        prevCards.map((card) => {
+          const createdFile = created.find((f) => f.fileid === card.file.fileid);
+          const skippedFile = skipped.find((f) => f.fileid === card.file.fileid);
+
           if (createdFile) {
             return { ...card, status: CARD_STATUS.COMPLETE };
           }
@@ -113,7 +115,7 @@ const ScrapePanel = ({ defaultUrls }: ScrapePanelProps) => {
             return { ...card, status: CARD_STATUS.ERROR, error: "already exists" };
           }
           return card;
-        })
+        }),
       );
     };
 
