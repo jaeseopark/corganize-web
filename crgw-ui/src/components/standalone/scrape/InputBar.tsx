@@ -146,18 +146,30 @@ const ScrapeInputBar = ({
     }
   }, []);
 
-  const handleUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
-  }, [setUrl]);
+  const handleUrlChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setUrl(e.target.value);
+    },
+    [setUrl],
+  );
 
-  const handleHtmlChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setHtml(e.target.value);
-  }, [setHtml]);
+  const handleHtmlChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setHtml(e.target.value);
+    },
+    [setHtml],
+  );
 
   const getTextInputElement = () => {
     if (mode == "HTML") {
       return (
-        <Textarea defaultValue={html || ""} onChange={handleHtmlChange} onKeyDown={handleKeydown} onFocus={protectHotkey} onBlur={exposeHotkey} />
+        <Textarea
+          defaultValue={html || ""}
+          onChange={handleHtmlChange}
+          onKeyDown={handleKeydown}
+          onFocus={protectHotkey}
+          onBlur={exposeHotkey}
+        />
       );
     }
     return (
